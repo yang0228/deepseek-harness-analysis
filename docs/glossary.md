@@ -43,19 +43,19 @@ Profile 决定一个 `dsh` 应用如何启动，Agent Preset 决定一个会话�
 | Application Profile | `sdk-minimal` | 启动由独立 Bundle 拥有的显式最小 SDK 树，不叠加 `dsh-base`。 |
 | Application Profile | `acp` | 启动仅用于自动化的 ACP server，默认关闭 HMR，在启动时应用 Patch。 |
 | Agent Preset | `standard` | 为会话提供文件编辑、Shell、文件与 Web 检索、Skill、Plan、Goal、子 Agent 和 Workflow。 |
-| Agent Preset | `minimal` | Preset 自身提供持久 Shell，有效工具还可包含 Host 全局工具；POSIX 使用 [bash 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/bundle/web-app/presets/minimal.patch.yml#L23-L42)，Windows 使用 [pwsh 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/bundle/web-app/presets/minimal.patch.yml#L43-L61)。 |
+| Agent Preset | `minimal` | Preset 自身提供持久 Shell，有效工具还可包含 Host 全局工具；POSIX 使用 [bash 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L40-L59)，Windows 使用 [pwsh 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L60-L78)。 |
 | Agent Preset | `ptc` | 通过 PTC SDK 呈现工具；默认禁用 Workflow engine 与通用 Workflow tool；Ralph 由独立的可选实验 Bundle 提供。 |
 | Agent Preset | `cordis` | 在 Standard 能力之上加入 runtime inspection、plugin experiment 和 preset-authoring guidance，用于创建自定义 Agent Preset。 |
 
-固定上游 UI 英文 locale 将 `ptc` 显示为 PTC mode，将 `cordis` 显示为 Creator mode。这两个显示名称来自 [UI locale 第 50–61 行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/client/ui-agent-preset/src/client/locales.ts#L50-L61)，不是从 Preset id 推断出的名称；读取器仅记录声明 id、排序和源路径。不要把旧称“Code”写成 `code` Preset id；当前权威 id 是 `ptc` 和 `cordis`。
+固定上游 UI 英文 locale 将 `ptc` 显示为 PTC mode，将 `cordis` 显示为 Creator mode。这两个显示名称来自 [UI locale 第 50–61 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/client/ui-agent-preset/src/client/locales.ts#L50-L61)，不是从 Preset id 推断出的名称；读取器仅记录声明 id、排序和源路径。不要把旧称“Code”写成 `code` Preset id；当前权威 id 是 `ptc` 和 `cordis`。
 
 Desktop 使用保留的 `profiles/desktop` 与独立 Web Host，默认由操作系统分配端口，不属于 `PROFILE_TEMPLATES` 中的第六行。有效工作目录由 Session 事件记录，可随会话改变；原项目身份、Sandbox 写入根和已启动进程的目录有独立生命周期，见[SDK 与工作目录](05-getting-started.md#claim-dsh-start-004)。会话 live stream、持久化 settlement 与格式 migration 的区别见[Session 专题](deep-dives/session-event-log.md)。
 
 ## 来源
 
-- [上游架构文档](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L13-L53)
-- [上游术语表](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/glossary.md#L7-L45)
-- [上游 Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/boot/app-boot/src/profile.ts#L178-L195)
+- [上游架构文档](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L13-L53)
+- [上游术语表](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/glossary.md#L7-L46)
+- [上游 Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/util/official-bundles/src/bundles.ts#L9-L26)
 
 ## 继续查阅
 

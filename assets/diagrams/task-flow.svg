@@ -63,5 +63,5 @@
   <text x="190" y="720" text-anchor="middle" class="body">任务完成</text>
 
   <text x="36" y="779" class="note">示例展示两个成功 Step；Turn 也可能没有 Step，或继续更多 Step。</text>
-  <text x="36" y="804" class="note">基线 d7432673 · 输入须经 prepareCall 接纳；结算前崩溃不保证响应流可恢复。</text>
+  <text x="36" y="804" class="note">基线 f3803c96 · 输入须经 prepareCall 接纳；结算前崩溃不保证响应流可恢复。</text>
 </svg>

@@ -2,7 +2,7 @@
 
 ## 基线
 
-DeepSeek Harness commit `d743267388641bc76f17c45ce8b4c231aed1d32c`。本页描述 Cordis 自身的 Context、Service 解析和 Effect 清理；应用是否因某条插件失败而停止，由上层启动策略决定。
+DeepSeek Harness commit `f3803c96974ad4a94195fb97e5c637e9c2a3afe3`。本页描述 Cordis 自身的 Context、Service 解析和 Effect 清理；应用是否因某条插件失败而停止，由上层启动策略决定。
 
 ## 一句话结论
 
@@ -63,14 +63,14 @@ Agent loop 在这些原语之上另行组织 teardown：停止并排空 Driver�
 
 | 主题 | 固定来源 | 核对重点 |
 |---|---|---|
-| Context 与 Service 解析 | [Context 继承与 isolate](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/context.ts#L99-L125)；[Service 父链解析](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/reflect.ts#L144-L166) | 子 Context 与 isolation symbol 决定可见实现。 |
-| Agent Scope 与 Realm | [Preset Service 边界](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/README.md#L56-L62) | 注册父链不自动传播 Service isolation。 |
-| Loader Realm | [Realm 定义与配置映射](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/loader/src/config/isolate.ts#L25-L101) | Entry 专属或按标签共享的 Service symbol。 |
-| Fiber 创建与 disposal | [子 Context、父 Effect 与 pending cleanup](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/fiber.ts#L222-L295) | 注册所有权、入口和激活前 Effect 的卸载。 |
-| 依赖重载 | [实现快照与 epoch](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/fiber.ts#L597-L639) | 只有声明依赖进入当前 Fiber 的门控和重载计算。 |
-| Effect 清理 | [Effect 与逆序链](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/fiber.ts#L405-L441)；[disposer 调用](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/fiber.ts#L114-L117)；[unload](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/fiber.ts#L675-L695)；[wrapper 逆序读取](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/utils.ts#L27-L31) | 单个 Effect 的串接和不同 wrapper 的并行结算。 |
-| Listener 与 waterfall | [waterfall 与 Effect 注册](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/events.ts#L234-L259)；[Listener 所有权](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/cordis/src/events.ts#L277-L301) | 显式委托与自动移除。 |
-| Agent loop 的上层 teardown | [创建与卸载顺序](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/agent-loop/README.md#L108-L112)；[共享 teardown 的逐阶段错误处理](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/agent-loop/src/index.ts#L541-L590) | 基础 Effect 语义与业务资源排空顺序分开判断。 |
+| Context 与 Service 解析 | [Context 继承与 isolate](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/context.ts#L99-L125)；[Service 父链解析](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/reflect.ts#L144-L166) | 子 Context 与 isolation symbol 决定可见实现。 |
+| Agent Scope 与 Realm | [Preset Service 边界](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/README.md#L56-L62) | 注册父链不自动传播 Service isolation。 |
+| Loader Realm | [Realm 定义与配置映射](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/loader/src/config/isolate.ts#L25-L101) | Entry 专属或按标签共享的 Service symbol。 |
+| Fiber 创建与 disposal | [子 Context、父 Effect 与 pending cleanup](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L222-L295) | 注册所有权、入口和激活前 Effect 的卸载。 |
+| 依赖重载 | [实现快照与 epoch](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L597-L639) | 只有声明依赖进入当前 Fiber 的门控和重载计算。 |
+| Effect 清理 | [Effect 与逆序链](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L405-L441)；[disposer 调用](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L114-L117)；[unload](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L702-L722)；[wrapper 逆序读取](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/utils.ts#L27-L31) | 单个 Effect 的串接和不同 wrapper 的并行结算。 |
+| Listener 与 waterfall | [waterfall 与 Effect 注册](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/events.ts#L234-L259)；[Listener 所有权](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/events.ts#L277-L301) | 显式委托与自动移除。 |
+| Agent loop 的上层 teardown | [创建与卸载顺序](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/README.md#L107-L112)；[共享 teardown 的逐阶段错误处理](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/index.ts#L495-L544) | 基础 Effect 语义与业务资源排空顺序分开判断。 |
 
 ## 限制与失败
 

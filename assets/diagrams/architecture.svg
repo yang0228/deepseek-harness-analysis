@@ -72,6 +72,6 @@
 
   <text x="36" y="574" class="body">Application Profile：应用级组合</text>
   <text x="964" y="574" text-anchor="end" class="body">Agent Preset：每个 Agent 的 prompt / tools / services</text>
-  <text x="36" y="603" class="small">基线 d7432673 · 模型适配器、循环、工具和会话能力均由插件提供</text>
+  <text x="36" y="603" class="small">基线 f3803c96 · 模型适配器、循环、工具和会话能力均由插件提供</text>
   </g>
 </svg>

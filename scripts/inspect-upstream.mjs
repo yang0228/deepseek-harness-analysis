@@ -496,7 +496,7 @@ async function inspectUpstreamChecked({ source, baseline }) {
     })
   }
   const packagePath = join(source, 'package.json')
-  const profilePath = join(source, 'packages/boot/app-boot/src/profile.ts')
+  const profilePath = join(source, 'packages/util/official-bundles/src/bundles.ts')
   const packageText = await readRequiredText(packagePath)
   let manifest
   try {

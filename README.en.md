@@ -8,9 +8,9 @@ Choose your next step in the Chinese handbook: [read online, no setup required](
 
 ## Baseline
 
-All upstream findings are pinned to DeepSeek Harness commit `d743267388641bc76f17c45ce8b4c231aed1d32c`. This snapshot is a reproducible analysis target, not a statement about the current upstream release or production readiness.
+All upstream findings are pinned to DeepSeek Harness commit `f3803c96974ad4a94195fb97e5c637e9c2a3afe3`. This snapshot is a reproducible analysis target, not a statement about the current upstream release or production readiness.
 
-Verified on 2026-10-10 against source version `0.2.1-alpha.2`. See the [baseline update record](docs/updates/2026-10-10.md). External comparisons retain their original 2026-09-08 access date; this update rechecks the DSH side only.
+Verified on 2026-10-28 against source version `0.2.2-alpha.2`. See the [baseline update record](docs/updates/2026-10-28.md). External comparisons retain their original 2026-09-08 access date; this update rechecks the DSH side only.
 
 ## What changed in this baseline
 
@@ -53,6 +53,6 @@ The verifier checks repository structure, Claim targets, immutable citations, co
 
 ## Safety and contribution
 
-The pinned upstream is a developer preview, permits breaking changes, and is not a production-readiness promise. Read the pinned upstream [`SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/SAFETY.md#L5-L23) before running model-generated code or commands. Repository security reports follow [SECURITY.md](SECURITY.md); upstream product questions use the [current upstream repository](https://github.com/deepseek-ai/deepseek-harness).
+The pinned upstream is a developer preview, permits breaking changes, and is not a production-readiness promise. Read the pinned upstream [`SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/SAFETY.md#L5-L23) before running model-generated code or commands. Repository security reports follow [SECURITY.md](SECURITY.md); upstream product questions use the [current upstream repository](https://github.com/deepseek-ai/deepseek-harness).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for evidence and baseline-update requirements, [SUPPORT.md](SUPPORT.md) for support boundaries, and [`CITATION.cff`](CITATION.cff) for citation metadata. Maintainer: [`@yang0228`](https://github.com/yang0228).

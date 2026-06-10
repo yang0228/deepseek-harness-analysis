@@ -12,7 +12,7 @@ DeepSeek Harness Analysis 是面向 Agent 系统开发者、技术决策者与�
 
 从这里开始：[在线阅读，无需安装](#read-online) · [本地核验证据，可选](#verify-locally) · [运行上游应用](#run-harness)。
 
-**固定分析基线：** DeepSeek Harness commit `d743267388641bc76f17c45ce8b4c231aed1d32c`。上游事实、作者推论和限定条件均围绕这一源码快照组织；它不代表上游当前版本。核验日期：2026-10-10；源码版本：`0.2.1-alpha.2`。完整元数据见 [`evidence/baseline.json`](evidence/baseline.json)，变更见[本次升级记录](docs/updates/2026-10-10.md)。
+**固定分析基线：** DeepSeek Harness commit `f3803c96974ad4a94195fb97e5c637e9c2a3afe3`。上游事实、作者推论和限定条件均围绕这一源码快照组织；它不代表上游当前版本。核验日期：2026-10-28；源码版本：`0.2.2-alpha.2`。完整元数据见 [`evidence/baseline.json`](evidence/baseline.json)，变更见[本次升级记录](docs/updates/2026-10-28.md)。
 
 ## 整体架构
 
@@ -68,7 +68,7 @@ git clone https://github.com/yang0228/deepseek-harness-analysis.git &&
 ```sh
 handbook_root="$PWD" &&
   git clone https://github.com/deepseek-ai/deepseek-harness.git "$handbook_root/../deepseek-harness-source" &&
-  git -C "$handbook_root/../deepseek-harness-source" checkout --detach d743267388641bc76f17c45ce8b4c231aed1d32c &&
+  git -C "$handbook_root/../deepseek-harness-source" checkout --detach f3803c96974ad4a94195fb97e5c637e9c2a3afe3 &&
   npm run verify -- --source "$handbook_root/../deepseek-harness-source"
 ```
 
@@ -92,7 +92,7 @@ handbook_root="$PWD" &&
 
 这是独立于阅读和证据核验的操作。[可复现的入门路径](docs/05-getting-started.md)提供前置条件、独立实验目录和 Harness Home 设置；以下链接直达对应步骤。
 
-**运行前请读安全说明：** 固定基线处于开发者预览阶段，允许破坏性变更，未经过安全审计，也不应视为生产就绪。请阅读固定提交的[上游 `SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/SAFETY.md#L5-L23)，使用最小权限，并按所选 Provider 配置凭据。上游运行示例按源码审查，不能视为本手册已经完成的实机体验记录。
+**运行前请读安全说明：** 固定基线处于开发者预览阶段，允许破坏性变更，未经过安全审计，也不应视为生产就绪。请阅读固定提交的[上游 `SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/SAFETY.md#L5-L23)，使用最小权限，并按所选 Provider 配置凭据。上游运行示例按源码审查，不能视为本手册已经完成的实机体验记录。
 
 | 想做什么 | 选择哪条路径 | 需要留意什么 |
 |---|---|---|
@@ -114,9 +114,9 @@ handbook_root="$PWD" &&
 
 | 核查点 | 直接打开证据 | 重点看什么 |
 |---|---|---|
-| 上游规定了什么？ | [架构规则，第 118–126 行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L118-L126) | 模型可见输入必须可由日志重建；新增模型输入需要对应 Session 事件。 |
-| 请求配置与工具定义从哪里恢复？ | [`EpochHeader` 字段，第 234–250 行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/session/src/types.ts#L234-L250) | 请求头记录调用配置和工具定义；系统提示属于消息历史。 |
-| 日志怎样变成模型消息？ | [`deriveEventMessage()` 实现，第 120–150 行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/session/src/surface.ts#L120-L150) | 用户消息、工具结果等可以投影为模型消息；任务边界和失败尝试等仅留在日志。 |
+| 上游规定了什么？ | [架构规则，第 118–126 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L122-L130) | 模型可见输入必须可由日志重建；新增模型输入需要对应 Session 事件。 |
+| 请求配置与工具定义从哪里恢复？ | [`EpochHeader` 字段，第 234–250 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/types.ts#L240-L256) | 请求头记录调用配置和工具定义；系统提示属于消息历史。 |
+| 日志怎样变成模型消息？ | [`deriveEventMessage()` 实现，第 120–150 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/surface.ts#L120-L150) | 用户消息、工具结果等可以投影为模型消息；任务边界和失败尝试等仅留在日志。 |
 
 **一个可直接复核的例子：** 在最后一个链接中，`user/message` 分支返回消息数据，未形成模型消息的日志事件返回 `null`。这说明“有日志记录”不等于“会发送给模型”；该函数展示消息投影的一条实现路径，不单独证明所有插件都遵守整个日志规则。
 
@@ -188,6 +188,6 @@ handbook_root="$PWD" &&
 - 修改前阅读[参与贡献](CONTRIBUTING.md)，保留 Claim 分类、不可变来源和限定语，并运行本仓库测试与证据校验。
 - 一般问题见[支持范围](SUPPORT.md)；DeepSeek Harness 安装、配置和产品使用问题转向[上游仓库](https://github.com/deepseek-ai/deepseek-harness)的当前支持渠道。
 - 本仓库的安全问题按 [SECURITY.md](SECURITY.md) 私密报告；上游安全问题按其当前公开渠道处理。
-- 引用使用 [`CITATION.cff`](CITATION.cff) 中的首选信息，并注明分析基线 `d7432673`；其中的版本字段为 `snapshot-d7432673`。
+- 引用使用 [`CITATION.cff`](CITATION.cff) 中的首选信息，并注明分析基线 `f3803c96`；其中的版本字段为 `snapshot-f3803c96`。
 
 维护者：[`@yang0228`](https://github.com/yang0228)。

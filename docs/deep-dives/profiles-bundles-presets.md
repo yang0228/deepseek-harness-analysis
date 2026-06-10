@@ -2,7 +2,7 @@
 
 ## 基线
 
-DeepSeek Harness commit `d743267388641bc76f17c45ce8b4c231aed1d32c`。
+DeepSeek Harness commit `f3803c96974ad4a94195fb97e5c637e9c2a3afe3`。
 
 ## 一句话结论
 
@@ -44,7 +44,7 @@ Profile、Bundle、Patch 组合应用；普通 Preset 声明与 Scope 组合 Age
 | Preset | `dsh-agent-preset` 普通插件行的 `config.plugins` | 声明完整子插件列表；Loader 行 id 用于编辑，`config.id` 用于 Session 身份。 |
 | Scope | 内存中的 key 与父子关系 | Agent 绑定到 Preset 修订，继承 prompt、tools 等注册；Service 另按 Realm 解析。 |
 
-Desktop 初始化并在运行中独占 `profiles/desktop` 及其包管理状态，以 Electron Node 模式运行私有 Host 和共享 Web 应用，默认用 `--port 0` 请求 OS 分配端口。CLI 不能启动该 Profile，因此它不计入五个 CLI 模板。Desktop 随附的 `dsh` 使用共享 CLI dispatcher：先启动 Desktop 完成初始化，再完全退出应用，就可执行 `dsh plugin --profile desktop add/list/remove`，下次打开 Desktop 时应用修改。该命令拒绝未初始化的 Desktop Profile，npm 安装的 `dsh` 不能修改它。[随附 CLI 与安装所有权](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/apps/desktop/README.md#L93-L105)说明共享数据与独立可执行依赖的区别。
+Desktop 初始化并在运行中独占 `profiles/desktop` 及其包管理状态，以 Electron Node 模式运行私有 Host 和共享 Web 应用，默认用 `--port 0` 请求 OS 分配端口。CLI 不能启动该 Profile，因此它不计入五个 CLI 模板。Desktop 随附的 `dsh` 使用共享 CLI dispatcher：先启动 Desktop 完成初始化，再完全退出应用，就可执行 `dsh plugin --profile desktop add/list/remove`，下次打开 Desktop 时应用修改。该命令拒绝未初始化的 Desktop Profile，npm 安装的 `dsh` 不能修改它。[随附 CLI 与安装所有权](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/apps/desktop/README.md#L132-L146)说明共享数据与独立可执行依赖的区别。
 
 ### 两条组合链
 
@@ -68,7 +68,7 @@ flowchart LR
 
 Registry 不扫描 Preset 目录，也不接受路径或写回 YAML。新 Preset 与内置覆盖均由 Bundle Patch 声明：插入 `agent-preset` 行，或按行 id 修改配置。Web 的四个定义位于 `web-app/presets/*.patch.yml`。
 
-最新[上游架构文档](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L25)新增了在声明的 `config.plugins` 内应用操作的 `preset` Patch 描述。静态源码核对发现，`composeEntries()` 直接把各层展平给 `applyEntryPatches()`；后者只有按条目 id 覆盖和 `insert` 分支，索引仅递归 `group` 的数组 `config`，并未进入 Preset 的对象 `config.plugins`。兼容性预检接收完成组合后的条目，没有增加 Preset selector 分派。因此本页保留该描述为文档与实现差异，不提供可执行的 `preset` Patch 示例；可核对的覆盖方式仍是重述声明的完整配置与子列表。
+最新[上游架构文档](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L25)新增了在声明的 `config.plugins` 内应用操作的 `preset` Patch 描述。静态源码核对发现，`composeEntries()` 直接把各层展平给 `applyEntryPatches()`；后者只有按条目 id 覆盖和 `insert` 分支，索引仅递归 `group` 的数组 `config`，并未进入 Preset 的对象 `config.plugins`。兼容性预检接收完成组合后的条目，没有增加 Preset selector 分派。因此本页保留该描述为文档与实现差异，不提供可执行的 `preset` Patch 示例；可核对的覆盖方式仍是重述声明的完整配置与子列表。
 
 每个声明立即建立 Registry 所有的 Scope 和内存 Loader 树。声明更新或移除后，已绑定 Agent、子 Agent 和临时历史读取继续持有旧修订；最后一个引用释放时才清理退役树。子 Agent 的 `composeFrom()` 继承父 Agent 的同一修订。进程重启按日志中的 Preset id 查找当前定义，缺失定义拒绝恢复。
 
@@ -92,23 +92,23 @@ Registry entry 的 volatile 字段 `selectedDefault` 保存用户默认值，新
 
 | Preset id | 声明 | 产品模式 |
 |---|---|---|
-| `cordis` | [cordis.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/bundle/web-app/presets/cordis.patch.yml#L1-L10) | Creator mode |
-| `minimal` | [minimal.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/bundle/web-app/presets/minimal.patch.yml#L1-L10) | Minimal mode；Preset 自身提供持久 Shell，有效工具还可包含 Host 全局工具 |
-| `ptc` | [ptc.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/bundle/web-app/presets/ptc.patch.yml#L1-L10) | PTC mode |
-| `standard` | [standard.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/bundle/web-app/presets/standard.patch.yml#L1-L10) | Standard mode |
+| `cordis` | [cordis.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/cordis.patch.yml#L1-L10) | Creator mode |
+| `minimal` | [minimal.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L1-L10) | Minimal mode；Preset 自身提供持久 Shell，有效工具还可包含 Host 全局工具 |
+| `ptc` | [ptc.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/ptc.patch.yml#L1-L10) | PTC mode |
+| `standard` | [standard.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/standard.patch.yml#L1-L10) | Standard mode |
 
 ## 源码导读
 
 | 主题 | 固定来源 | 核对重点 |
 |---|---|---|
-| Profile 名录与层次 | [模板](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/boot/app-boot/src/profile.ts#L178-L195)；[组合顺序与 YAML HMR](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L21-L29) | 模板只有有序 Bundle，重载取决于插件配置。 |
-| Patch 与重载 | [Bundle、兼容性与 watcher](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/boot/app-boot/README.md#L50-L63)；[失败策略](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/boot/app-boot/README.md#L94-L113) | 完整 config 替换、被跳过的 Bundle 与局部失败。 |
-| `preset` Patch 文档差异 | [架构描述](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L25)；[实际组合入口](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/boot/app-boot/src/profile.ts#L807-L821)；[id 与 insert 分派](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/vendor/include/src/index.ts#L57-L123)；[兼容性预检](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/boot/app-boot/src/compatibility-preflight.ts#L180-L186) | 没有把文档中的新描述当作已运行验证的语法。 |
-| Preset 声明 | [id 与子列表](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset/README.md#L40-L60)；[定义来源与限制](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/README.md#L46-L60) | 不扫描目录、没有复制 API。 |
-| 修订与回收 | [注册、退役与回收](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/src/index.ts#L81-L152)；[Agent 引用与子级继承](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/src/index.ts#L265-L310) | 退役且零引用后 disposal。 |
-| 选择与恢复 | [select 门禁](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/src/index.ts#L341-L361)；[进程重启限制](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/README.md#L97-L99) | 运行中修订保留不等于跨重启保留。 |
-| Service Realm 与组合检查 | [解析边界与 inspection](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/README.md#L56-L62)；[Registry 所有的修订查询](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/src/index.ts#L154-L171)；[保留组合的 Service 查询](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/src/index.ts#L319-L327) | Scope 注册继承与 Cordis Service 解析分别负责不同边界。 |
-| 默认 Preset | [字段与优先级](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/src/index.ts#L54-L75)；[旧字段兼容](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/README.md#L46-L48) | `selectedDefault` 优先，`modeSelectionEnabled` 不再参与决策。 |
+| Profile 名录与层次 | [模板](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/util/official-bundles/src/bundles.ts#L9-L26)；[组合顺序与 YAML HMR](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L21-L29) | 模板只有有序 Bundle，重载取决于插件配置。 |
+| Patch 与重载 | [Bundle、兼容性与 watcher](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/app-boot/README.md#L50-L65)；[失败策略](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/app-boot/README.md#L96-L115) | 完整 config 替换、被跳过的 Bundle 与局部失败。 |
+| `preset` Patch 文档差异 | [架构描述](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L25)；[实际组合入口](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/app-boot/src/profile.ts#L747-L761)；[id 与 insert 分派](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/include/src/index.ts#L57-L123)；[兼容性预检](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/app-boot/src/compatibility-preflight.ts#L180-L186) | 没有把文档中的新描述当作已运行验证的语法。 |
+| Preset 声明 | [id 与子列表](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset/README.md#L40-L60)；[定义来源与限制](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/README.md#L46-L60) | 不扫描目录、没有复制 API。 |
+| 修订与回收 | [注册、退役与回收](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/src/index.ts#L97-L168)；[Agent 引用与子级继承](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/src/index.ts#L281-L326) | 退役且零引用后 disposal。 |
+| 选择与恢复 | [select 门禁](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/src/index.ts#L357-L382)；[进程重启限制](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/README.md#L97-L99) | 运行中修订保留不等于跨重启保留。 |
+| Service Realm 与组合检查 | [解析边界与 inspection](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/README.md#L56-L62)；[Registry 所有的修订查询](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/src/index.ts#L170-L187)；[保留组合的 Service 查询](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/src/index.ts#L335-L343) | Scope 注册继承与 Cordis Service 解析分别负责不同边界。 |
+| 默认 Preset | [字段与优先级](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/src/index.ts#L56-L82)；[旧字段兼容](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/README.md#L46-L48) | `selectedDefault` 优先，`modeSelectionEnabled` 不再参与决策。 |
 
 ## 限制与失败
 

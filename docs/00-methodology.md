@@ -4,7 +4,7 @@
 
 ## 基线权威
 
-手册唯一的上游基线是 DeepSeek Harness commit `d743267388641bc76f17c45ce8b4c231aed1d32c`，验证日期为 `2026-10-10`。该 commit 而非 package version、最近 tag 或 `master` 决定本手册中“上游事实”的含义；精确值由 [`evidence/baseline.json`](../evidence/baseline.json) 保管。
+手册唯一的上游基线是 DeepSeek Harness commit `f3803c96974ad4a94195fb97e5c637e9c2a3afe3`，验证日期为 `2026-10-10`。该 commit 而非 package version、最近 tag 或 `master` 决定本手册中“上游事实”的含义；精确值由 [`evidence/baseline.json`](../evidence/baseline.json) 保管。
 
 上游文件在手册中始终使用包含完整 40 位 commit 的 GitHub `blob` URL，并标明一个包含端点的行号范围。上游树、观察结果、Claim 记录和手册文本都不自动跟随分支漂移。
 

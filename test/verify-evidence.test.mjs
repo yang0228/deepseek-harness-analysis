@@ -425,9 +425,9 @@ for (const [name, mutate, path] of [
 test('live verification surfaces Profile parse drift', async t => {
   const fixture = await createFixtureRepository(template)
   t.after(fixture.cleanup)
-  const profilePath = join(fixture.root, 'packages/boot/app-boot/src/profile.ts')
+  const profilePath = join(fixture.root, 'packages/util/official-bundles/src/bundles.ts')
   await writeFile(profilePath, "export const PROFILE_TEMPLATES: Record<string, ProfileTemplate> = {\n  alpha: { bundles: ['bundle-c'], unexpected: 'live' },\n}\n")
-  await git(fixture.root, ['add', 'packages/boot/app-boot/src/profile.ts'])
+  await git(fixture.root, ['add', 'packages/util/official-bundles/src/bundles.ts'])
   await git(fixture.root, ['commit', '-m', 'profile syntax drift'])
   const commit = (await git(fixture.root, ['rev-parse', 'HEAD'])).trim()
   const gitDescribe = (await git(fixture.root, ['describe', '--tags', '--always', '--long'])).trim()

@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: deepseek-ai/deepseek-harness
-          ref: d743267388641bc76f17c45ce8b4c231aed1d32c
+          ref: f3803c96974ad4a94195fb97e5c637e9c2a3afe3
           path: upstream
           fetch-depth: 0
           fetch-tags: true
