@@ -43,7 +43,7 @@ Profile 决定一个 `dsh` 应用如何启动，Agent Preset 决定一个会话�
 | Application Profile | `sdk-minimal` | 启动由独立 Bundle 拥有的显式最小 SDK 树，不叠加 `dsh-base`。 |
 | Application Profile | `acp` | 启动仅用于自动化的 ACP server，默认关闭 HMR，在启动时应用 Patch。 |
 | Agent Preset | `standard` | 为会话提供文件编辑、Shell、文件与 Web 检索、Skill、Plan、Goal、子 Agent 和 Workflow。 |
-| Agent Preset | `minimal` | Preset 自身提供持久 Shell，有效工具还可包含 Host 全局工具；POSIX 使用 [bash 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L40-L59)，Windows 使用 [pwsh 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L60-L78)。 |
+| Agent Preset | `minimal` | Preset 自身提供持久 Shell、read_image 与 compaction，有效工具还可包含 Host 全局工具；POSIX 使用 [bash 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L40-L59)，Windows 使用 [pwsh 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L60-L78)。 |
 | Agent Preset | `ptc` | 通过 PTC SDK 呈现工具；默认禁用 Workflow engine 与通用 Workflow tool；Ralph 由独立的可选实验 Bundle 提供。 |
 | Agent Preset | `cordis` | 在 Standard 能力之上加入 runtime inspection、plugin experiment 和 preset-authoring guidance，用于创建自定义 Agent Preset。 |
 
