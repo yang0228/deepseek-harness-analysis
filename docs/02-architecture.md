@@ -74,9 +74,9 @@ Profile Patch 重组应用树，Preset 选择改变 Agent 的能力组合，两�
 
 <a id="claim-dsh-arch-006"></a> **Claim `DSH-ARCH-006`:** 一个 Turn 包含零个或多个模型与工具 Step，并由类型化 waterfall 扩展点控制。
 
-Driver 先记录 `turn/start`，再认领输入。`agent/pre-step` 可以拒绝输入或把首个提议改为空，使 Turn 直接结束而不进入 Step。进入 Step 后，`agent/request` 与 `prepareCall()` 先确定实际模型路由，再刷新注册的 runtime context、协调 system prompt，并提交已接受的 user 输入和 request 记录；这两个异步阶段内取消，不会提交该次 system 或 user 输入。
+Driver 先记录 `turn/start`，再认领输入。`agent/pre-step` 可以拒绝输入或把首个提议改为空，使 Turn 直接结束而不进入 Step。Driver 在组装 prompt 前固定 Session 的 provider、model 和显式 reasoning effort，并解析本 Step 的工具准入集合；组装与 `agent/pre-step` 接收同一模型选择。进入 Step 后，已弃用的 `agent/request` 仍可修改采样等参数，但改变模型选择会在输入提交前使 Step 失败。`prepareCall()` 随后绑定 adapter 并解析默认值，再刷新 runtime context、协调 system prompt 和提交获接纳输入与 request 记录；这两个异步阶段内取消，不会提交该次 system 或 user 输入。
 
-重试保留本 Step 已接受的 prompt 与工具 assembly，不重跑 assembly waterfall、`agent/pre-step` 或用户输入提交。每次请求尝试会刷新注册的 runtime facts，并在需要时恢复已被历史替换移除的 runtime context；只由 assembly waterfall 添加的 context 保持已接受值。
+重试保留本 Step 的模型选择、已接受的 prompt 与工具准入集合，不重跑 assembly waterfall、`agent/pre-step` 或用户输入提交。每次请求尝试会刷新注册的 runtime facts，并在需要时恢复已被历史替换移除的 runtime context；只由 assembly waterfall 添加的 context 保持已接受值。
 
 ```mermaid
 sequenceDiagram
@@ -85,12 +85,13 @@ sequenceDiagram
   participant Hooks as Live events
   participant Model
   Driver->>Log: turn/start
+  Driver->>Driver: snapshot model; resolve admitted tools
   Driver->>Hooks: agent/pre-step
   alt rejected or empty first claim
     Driver->>Log: turn/end (zero Step)
   else entered Step
     Driver->>Log: step/start
-    Driver->>Hooks: agent/request
+    Driver->>Hooks: agent/request (controls only)
     Driver->>Driver: prepareCall; refresh runtime facts; reconcile prompt
     Driver->>Log: system/message, accepted user/message, runtime context, request metadata
     Driver->>Model: frozen request derived from log
@@ -126,7 +127,7 @@ sequenceDiagram
 
 日志用连续 `seq` 排序事实，`deriveMessages()` 从当前 surface 派生模型历史。System prompt 作为 `system/message` 进入历史；`request/header` 保存调用配置、adapter defaults 和当前工具 schema。与前一个 header 比较工具名时，新增与移除会产生 `developer/message`，新增还引用新的 header。该记录不依赖模型能力；模型请求携带 `Session.toolHistory()`，供 LLM runtime 构造 Provider 的工具声明。
 
-实际 `prepareCall()` 返回的能力控制 prompt 准入。继续中的请求 series 在同时支持 system prompt 与 tool update 的路由上可追加非空 prompt 更新；不支持工具更新的路由在工具列表变化时合并 prompt。新的 series 或不支持 in-history prompt 的路由把非空 prompt 合并到首个 system 节点；空 rendering 清空所有有效 system 节点。`request/context` 记录已解析路由和能力信息，不能替代本次 prepared call 的判断。请求路由先确定，已接受输入再落日志，模型请求随后从日志构造。
+实际 `prepareCall()` 返回的能力控制 prompt 准入。继续中的请求 series 在同时支持 system prompt 与 tool update 的路由上可追加非空 prompt 更新；工具 schema 变化且路由不支持 tool update 时按新 series 规则处理。不支持 in-history prompt 的路由按需把非空 prompt 合并到首个 system 节点；支持该能力的路由在新 series 的有效 prompt 改变时归并，最新存活节点已保存相同 rendering 时不新增 system 事件并保留原前缀；空 rendering 清空所有有效 system 节点。`request/context` 记录已解析路由和能力信息，不能替代本次 prepared call 的判断。请求路由先确定，已接受输入再落日志，模型请求随后从日志构造。
 
 `agent/assistant-stream` 的 start、chunk、end 是实时帧。请求结算时，完整 timed compact stream 写入一个 `assistant/message` 或 log-only `assistant/attempt`；后者保存失败、重试或取消尝试的证据，不增加模型消息。结算前的进程硬终止不会留下该 attempt 的 durable stream。当前日志不把 `assistant/chunk` 作为逐块持久事件。
 
@@ -138,15 +139,15 @@ sequenceDiagram
 
 | Claim | 证据信心 | 固定来源 |
 |---|---|---|
-| `DSH-ARCH-001` | `qualified` | [fiber.ts 418–441](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L418-L441)；[fiber.ts 675–695](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L702-L722) |
-| `DSH-ARCH-002` | `verified` | [architecture.md 67–75](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L67-L75)；[runtime-types.ts 354–363](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent/src/runtime-types.ts#L390-L399) |
-| `DSH-ARCH-003` | `verified` | [architecture.md 130–134](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L134-L138) |
-| `DSH-ARCH-004` | `qualified` | [architecture.md 23–29](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L23-L29)；[README.md 50–63](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/app-boot/README.md#L50-L65) |
-| `DSH-ARCH-005` | `verified` | [Preset 与 Realm 46–62](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/README.md#L46-L62)；[Scope 父链 32–50](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/scope/src/index.ts#L32-L50)；[修订检查 154–171](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/src/index.ts#L170-L187) |
-| `DSH-ARCH-006` | `verified` | [architecture.md 79–114](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L79-L116)；[每次请求尝试 400–442](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/agent.ts#L435-L479)；[runtime context 刷新 569–597](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/system-prompt/src/index.ts#L578-L606) |
-| `DSH-ARCH-007` | `verified` | [architecture.md 118–126](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L122-L130)；[历史派生 120–150](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/surface.ts#L120-L150)；[请求构造 615–703](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/agent.ts#L655-L743)；[prompt 准入 120–122](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/README.md#L120-L122) |
-| `DSH-ARCH-008` | `verified` | [architecture.md 49–53](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L49-L53)；[Host 启动 18–30](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/apps/desktop-host/src/index.ts#L22-L36)；[Desktop 运行时与随附 CLI 79–105](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/apps/desktop/README.md#L118-L146) |
-| `DSH-ARCH-009` | `qualified` | [失败 Step 124–130](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/README.md#L124-L130)；[Driver 补写 331–359](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/agent.ts#L351-L393)；[工具错误结果 151–193](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/repair.ts#L151-L193) |
+| `DSH-ARCH-001` | `qualified` | [fiber.ts 418–441](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L418-L441)；[fiber.ts 702–722](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/vendor/cordis/src/fiber.ts#L702-L722) |
+| `DSH-ARCH-002` | `verified` | [architecture.md 67–75](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L67-L75)；[runtime-types.ts 390–399](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent/src/runtime-types.ts#L390-L399) |
+| `DSH-ARCH-003` | `verified` | [architecture.md 134–138](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L134-L138) |
+| `DSH-ARCH-004` | `qualified` | [architecture.md 23–29](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L23-L29)；[README.md 50–65](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/app-boot/README.md#L50-L65) |
+| `DSH-ARCH-005` | `verified` | [Preset 与 Realm 46–62](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/README.md#L46-L62)；[Scope 父链 32–50](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/scope/src/index.ts#L32-L50)；[修订检查 170–187](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/src/index.ts#L170-L187) |
+| `DSH-ARCH-006` | `verified` | [architecture.md 79–116](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L79-L116)；[每次请求尝试 435–479](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/agent.ts#L435-L479)；[runtime context 刷新 578–606](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/system-prompt/src/index.ts#L578-L606) |
+| `DSH-ARCH-007` | `verified` | [architecture.md 122–130](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L122-L130)；[历史派生 120–150](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/surface.ts#L120-L150)；[请求构造 655–743](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/agent.ts#L655-L743)；[prompt 准入 120–122](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/README.md#L120-L122) |
+| `DSH-ARCH-008` | `verified` | [architecture.md 49–53](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L49-L53)；[Host 启动 22–36](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/apps/desktop-host/src/index.ts#L22-L36)；[Desktop 运行时与随附 CLI 118–146](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/apps/desktop/README.md#L118-L146) |
+| `DSH-ARCH-009` | `qualified` | [失败 Step 124–130](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/README.md#L124-L130)；[Driver 补写 351–393](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/agent.ts#L351-L393)；[工具错误结果 151–193](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/repair.ts#L151-L193) |
 
 ## 限制与适用范围
 
