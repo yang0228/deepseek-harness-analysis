@@ -12,7 +12,7 @@
 
 “可能减少往返”描述交互结构，没有量化速度、成本或质量收益。
 
-<a id="claim-dsh-dd-tools-001"></a> **Claim `DSH-DD-TOOLS-001`:** 注册工具携带执行与取消元数据，调用依次经过 pre-execute、单调 guard、execute 与 post-execute 阶段，再冻结最终结果。
+<a id="claim-dsh-dd-tools-001"></a> **Claim `DSH-DD-TOOLS-001`:** 注册工具携带执行与取消元数据；内置 executor 的调用依次经过 pre-execute、单调 guard、execute 与 post-execute 阶段，再冻结最终结果。
 
 <a id="claim-dsh-dd-tools-002"></a> **Claim `DSH-DD-TOOLS-002`:** `run_code` 的子调用复用普通工具执行的分阶段受保护管线，保留可见性、审批、排序与日志规则。
 
@@ -23,6 +23,8 @@
 ## 机制
 
 ### 注册与执行
+
+`register(definition, { when })` 的条件每个模型 Step 求值一次，接收 Agent、该 Step 固定的模型选择和取消 signal。false 同时从模型描述、PTC bindings 与执行集合中排除工具；条件抛错以 `TOOL_ACTIVATION_FAILED` 终止准备。重试复用同一集合，没有解析集合的独立调用不能执行条件工具。[条件与准入](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/src/index.ts#L243-L296)。
 
 `defineTool` 同时声明参数 schema、canonical JSON output 和执行函数；参数在执行前验证。工具只向模型暴露允许的 schema，不把执行函数、收尾函数或内部元数据放进请求；见[模型 schema 投影](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/README.md#L88-L112)。[工具注册](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/README.md#L26-L77)
 
@@ -43,13 +45,13 @@ flowchart LR
 
 ### PTC 呈现与值
 
-当前呈现模式只有 `native` 与 `ptc`：前者呈现普通工具 schema，后者只呈现 `run_code` 与生成的 SDK；已移除 `both`。在 `ptc` 模式，模型直接调用其他工具名会在 policy 前得到 `UNKNOWN_TOOL`，程序应通过 `tools.name(args)` bindings 调用。当前绑定捕获工具 schema，子调用仍遵守 scope 可见性、审批与原生并发约定。[当前模式与配置](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/README.md#L75-L84)与[呈现与 PTC](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/README.md#L52-L64)给出证据。
+工具行为由作用域内挂载的 executor 选择：`dsh-tool-executor-native` 呈现普通工具 schema，`dsh-tool-executor-ptc` 只呈现 `run_code` 与生成的 SDK。最近的 Scope 注册优先，同一 Scope 只能有一个 executor；已选 executor 卸载后，新 batch 拒绝执行，直到注册替代者，不回退到父级或 native。内置 PTC executor 对模型直接调用其他工具名在 policy 前返回 `UNKNOWN_TOOL`，程序应通过 `tools.name(args)` bindings 调用。子调用仍遵守 scope 可见性、审批与并发约定。[当前模式与配置](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/README.md#L75-L84)与[呈现与 PTC](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/README.md#L52-L64)给出证据。
 
 PTC 运行时服务是 [`ctx.ptcRuntime`](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/README.md#L38-L40)。TypeScript 程序是 async function body，可使用顶层 `await` 和 `return`；仅接受可擦除类型语法。binding 的普通返回值留在程序内；模型主要看到外层结果，成功子调用的图片和子调用附带的 `additionalContexts` 仍会[进入后续模型上下文](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L598-L610)。图片上下文以 `source.kind: ptc-mode` 归因，其他附加上下文保留产生它的工具归因。中间值是执行期数据，不能假定日志保存了完整程序状态。[Provider 使用方式](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L26-L28)；[返回值](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L64-L68)
 
 ### 受保护子调用与日志
 
-子调用使用 `prepare → dispatch → finalize / finish` 阶段；开始和 policy 收尾走单条有序通道，只有明确被分类为并发安全的 around-dispatch/body 可以重叠。结果按提交调用的顺序收尾；其他调用形成 exclusive barrier，持续到 post-execute 完成。默认 `maxParallelSubCalls=10`，不会把所有 JavaScript 并发都等同于可并发工具操作。[默认限制](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/config.ts#L4-L13)；[阶段与调度顺序](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L380-L395)
+子调用使用 `prepare → dispatch → complete / finish` 阶段；开始和 policy 收尾走单条有序通道，只有明确被分类为并发安全的 around-dispatch/body 可以重叠。结果按提交调用的顺序收尾；其他调用形成 exclusive barrier，持续到 post-execute 完成。PTC executor 的默认配置为 `maxParallelSubCalls=10`，不会把所有 JavaScript 并发都等同于可并发工具操作。[默认限制](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/config.ts#L4-L13)；[阶段与调度顺序](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L380-L395)
 
 当前 durable 事件是 `tool/ptc-dispatch-start` 与 `tool/ptc-dispatch`。start 保存调用配对 id、工具名和参数；settle 保存渲染 content、可选展示 meta 和结构化错误信息。新子调用 id 使用 `<parent>:ptc:<n>`，消费者按完整 id 配对，不解析其内部含义；历史 id 保留原字节。子调用事件是 log-only，不重复进入模型消息历史。[事件定义](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/types.ts#L11-L61)界定持久化内容。
 

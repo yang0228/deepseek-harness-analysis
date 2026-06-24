@@ -83,6 +83,7 @@ sequenceDiagram
   participant Driver
   participant Log as Session log
   participant Hooks as Live events
+  participant Executor as Tool executor
   participant Model
   Driver->>Log: turn/start
   Driver->>Driver: snapshot model; resolve admitted tools
@@ -103,11 +104,12 @@ sequenceDiagram
     Driver->>Log: assistant/message or assistant/attempt (compact stream)
     Driver-->>Hooks: agent/assistant-stream committed end
     opt tool calls from committed message
-      Driver->>Log: tool/call
-      Driver->>Hooks: tools/pre-execute, execute, post-execute
-      Driver->>Driver: finalizeContent
-      Driver-->>Hooks: tools/result
-      Driver->>Log: tool/result
+      Driver->>Executor: complete raw batch + admitted tools
+      Executor->>Log: tool/call
+      Executor->>Hooks: tools/pre-execute, execute, post-execute
+      Executor->>Executor: finalizeContent
+      Executor-->>Hooks: tools/result
+      Executor->>Log: tool/result
     end
     Driver->>Log: step/end
     Driver->>Hooks: agent/turn-stopping
@@ -115,7 +117,7 @@ sequenceDiagram
   end
 ```
 
-图只展开一次 Step；工具或新输入可以使同一 Turn 继续。Waterfall listener 调用 `next()` 才委托后续处理；`agent/turn-stopping` 是 serial 事件，没有 `next()`。工具流水线在 `finalizeContent` 后发布 live `tools/result`，随后 Driver 才写 durable `tool/result`。[工具流水线](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/tool-execution-pipeline.md#L1-L63)提供细节。
+图只展开一次 Step；工具或新输入可以使同一 Turn 继续。Waterfall listener 调用 `next()` 才委托后续处理；`agent/turn-stopping` 是 serial 事件，没有 `next()`。Driver 把完整原始 batch、本 Step 的工具准入集合与并发上限交给 `ctx.tools.execute()`。内置 executor 复用共享管线，在 `finalizeContent` 后发布 live `tools/result`，再由 batch 结算器写 durable `tool/result`；自定义 executor 实现 `describe()` 与 `execute()`，共享管线是可选复用。[工具流水线](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/tool-execution-pipeline.md#L1-L63)提供细节。
 
 <a id="claim-dsh-arch-009"></a> **Claim `DSH-ARCH-009`:** 失败 Step 关闭前，Driver 为未答复的 assistant 工具调用补写错误结果，并区分已记录调用与尚未记录开始的调用。
 

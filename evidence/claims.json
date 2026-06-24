@@ -1386,7 +1386,7 @@
     },
     {
       "id": "DSH-DD-TOOLS-001",
-      "statement": "注册工具携带执行与取消元数据，调用依次经过 pre-execute、单调 guard、execute 与 post-execute 阶段，再冻结最终结果。",
+      "statement": "注册工具携带执行与取消元数据；内置 executor 的调用依次经过 pre-execute、单调 guard、execute 与 post-execute 阶段，再冻结最终结果。",
       "kind": "upstream-fact",
       "confidence": "verified",
       "maturity": "released",
@@ -1429,6 +1429,33 @@
           "startLine": 28,
           "endLine": 83,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/src/contracts.ts#L28-L83"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/core/tools/src/index.ts",
+          "startLine": 243,
+          "endLine": 296,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/src/index.ts#L243-L296"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/core/tools/src/index.ts",
+          "startLine": 319,
+          "endLine": 376,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/src/index.ts#L319-L376"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/core/tools/src/batch.ts",
+          "startLine": 243,
+          "endLine": 268,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/src/batch.ts#L243-L268"
         }
       ]
     },
