@@ -16,7 +16,7 @@
 
 <a id="claim-dsh-dd-tools-002"></a> **Claim `DSH-DD-TOOLS-002`:** `run_code` 的子调用复用普通工具执行的分阶段受保护管线，保留可见性、审批、排序与日志规则。
 
-<a id="claim-dsh-dd-tools-003"></a> **Claim `DSH-DD-TOOLS-003`:** 内置 Node PTC Provider 为每次运行创建新进程，并分别约束执行期限、输出、控制流量与堆内存。
+<a id="claim-dsh-dd-tools-003"></a> **Claim `DSH-DD-TOOLS-003`:** 内置 Node PTC Provider 默认每次运行创建新进程，也可显式选择按 Agent 保留内存的 REPL 或 Script 模式；执行期限、输出、控制流量与堆内存分别受限。
 
 <a id="claim-dsh-dd-tools-004"></a> **Claim `DSH-DD-TOOLS-004`:** 工具 canonical value、模型 content 与展示 meta 分开；仅替换或脱敏 content 不会撤销 PTC 程序取得 canonical value 的能力。
 
@@ -47,7 +47,7 @@ flowchart LR
 
 工具行为由作用域内挂载的 executor 选择：`dsh-tool-executor-native` 呈现普通工具 schema，`dsh-tool-executor-ptc` 只呈现 `run_code` 与生成的 SDK。最近的 Scope 注册优先，同一 Scope 只能有一个 executor；已选 executor 卸载后，新 batch 拒绝执行，直到注册替代者，不回退到父级或 native。内置 PTC executor 对模型直接调用其他工具名在 policy 前返回 `UNKNOWN_TOOL`，程序应通过 `tools.name(args)` bindings 调用。子调用仍遵守 scope 可见性、审批与并发约定。[当前模式与配置](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/README.md#L75-L84)与[呈现与 PTC](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/README.md#L52-L64)给出证据。
 
-PTC 运行时服务是 [`ctx.ptcRuntime`](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/README.md#L38-L40)。TypeScript 程序是 async function body，可使用顶层 `await` 和 `return`；仅接受可擦除类型语法。binding 的普通返回值留在程序内；模型主要看到外层结果，成功子调用的图片和子调用附带的 `additionalContexts` 仍会[进入后续模型上下文](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L598-L610)。图片上下文以 `source.kind: ptc-mode` 归因，其他附加上下文保留产生它的工具归因。中间值是执行期数据，不能假定日志保存了完整程序状态。[Provider 使用方式](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L26-L28)；[返回值](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L64-L68)
+PTC 运行时服务是 [`ctx.ptcRuntime`](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/README.md#L38-L40)。Node Provider 默认 `executionMode: per-call`，程序是支持顶层 `await` 与 `return` 的 async function body。`vm-script` 支持顶层声明、`await` 与最终表达式，不支持顶层 `return` 或静态 `import`/`export`；默认每次重建，`scriptPersistence: true` 时按 Agent 保留上下文。`persistent-in-memory` 使用按 Agent 保留的 REPL，也不支持顶层 `return`。三种模式只接受可擦除 TypeScript。binding 的普通返回值留在程序内；模型主要看到外层结果，成功子调用的图片和子调用附带的 `additionalContexts` 仍会[进入后续模型上下文](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L598-L610)。图片上下文以 `source.kind: ptc-mode` 归因，其他附加上下文保留产生它的工具归因。中间值是执行期数据，不能假定日志保存了完整程序状态。[Provider 使用方式](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L26-L28)；[返回值](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L64-L68)
 
 ### 受保护子调用与日志
 
@@ -59,9 +59,11 @@ PTC 运行时服务是 [`ctx.ptcRuntime`](https://github.com/deepseek-ai/deepsee
 
 ### Node 进程、策略与资源
 
+保留内存不写入 Session log；恢复或 Fork 从空内存开始。重启、Agent disposal、取消、超时、输出溢出或进程失败可清空环境，执行异常仍可能留下此前的内存修改或外部副作用。Session 权限模式变化会取消受影响调用并释放旧环境，后续调用等待清理；单次批准的提权使用独立临时环境，不能访问原环境的变量。没有 `stateOwner` 的服务调用使用临时进程，因此 Workflow 不复用 Agent 的保留环境。[执行模式](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L49-L98)；[Agent owner 与单次提权](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L659-L694)。
+
 | 约束 | 默认值或行为 | 不代表什么 |
 |---|---|---|
-| 新程序状态 | 每次启动新的 Node 子进程 | 不支持跨调用保留变量、yield/wait 或自动重放 |
+| 程序状态 | 默认 per-call 每次新进程；REPL 或启用 scriptPersistence 的 Script 可按 Agent 保留 | 内存不随日志恢复或 Fork，也不自动重放程序 |
 | `timeoutMs` / `maxTimeoutMs` | 120,000 / 600,000 ms，含运行中的嵌套工具及其审批等待 | 不是 CPU 忙碌时间；清理可在期限后继续结算 |
 | `maxOutputBytes` | 67,108,864 bytes | 不是所有中间值的内存上限 |
 | `maxMessageBytes` | 134,217,728 bytes | 不约束 Host binding 生成结果时的内部内存 |
@@ -69,9 +71,9 @@ PTC 运行时服务是 [`ctx.ptcRuntime`](https://github.com/deepseek-ai/deepsee
 | `maxOldGenerationSizeMb` | 512 MiB | 不是整个进程或后代进程的 RSS 限额 |
 | 文件策略 | 继承 Session Sandbox，批准后可对单次程序放宽 | 不改变会话既有策略，嵌套工具仍保留自己的授权 |
 
-数值是配置默认值而非 benchmark。完整程序的提权审批发生在 runtime 启动之前，不计入 Provider 的 elapsed deadline；见[提权与启动顺序](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L354-L370)和[实际运行调用](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L675-L694)。程序启动前从 `workingDirectory` 捕获 Session 当前 cwd；程序内部的 cwd 保持初值，嵌套目录切换会影响后续工具调用使用的 Session cwd。Agent 所属的 `run_code` 缺少该服务时明确失败。[cwd 解析](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L251-L257)与[程序目录契约](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/README.md#L25-L29)提供证据。
+数值是配置默认值而非 benchmark。完整程序的提权审批发生在 runtime 启动之前，不计入 Provider 的 elapsed deadline；见[提权与启动顺序](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L354-L370)和[实际运行调用](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L675-L694)。程序启动前从 `workingDirectory` 捕获 Session 当前 cwd；每次 evaluation 开始时使用已解析 cwd；嵌套工具切换 Session cwd 不会自动改变当前程序目录，但会影响后续工具调用。程序仍可自行调用 `process.chdir()`，该变更不跨 evaluation 保留。Agent 所属的 `run_code` 缺少该服务时明确失败。[cwd 解析](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/src/ptc.ts#L251-L257)与[程序目录契约](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L94-L98)提供证据。
 
-Provider 在运行前解析 cwd、deadline 和权限，再通过 Sandbox 与 subprocess 服务启动；结束或取消清理可管理的进程范围。`launch` 显式选择 `node-script` 或 `embedded` carrier；远程部署的 executable 与 bootstrap 必须位于 subprocess 的执行环境，不能假定 Host 路径在那里可用。更宽的 `sandbox_permissions` 要求非空理由并提前批准，拒绝后不会自动重新执行可能已产生副作用的程序。[Provider 配置与运行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L30-L110)、[启动选择](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/src/launch.ts#L7-L62)与[程序授权](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tools/README.md#L132)界定责任。
+Provider 在运行前解析 cwd、deadline 和权限，再通过 Sandbox 与 subprocess 服务启动；一次性运行结束、取消或环境释放时清理可管理的进程范围。`launch` 显式选择 `node-script` 或 `embedded` carrier；远程部署的 executable 与 bootstrap 必须位于 subprocess 的执行环境，不能假定 Host 路径在那里可用。更宽的 `sandbox_permissions` 要求非空理由并提前批准，拒绝后不会自动重新执行可能已产生副作用的程序。[Provider 配置与运行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L30-L110)、[启动选择](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/src/launch.ts#L7-L62)与[程序授权](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/tool-executor-ptc/README.md#L58-L64)界定责任。
 
 ## 源码导读
 
