@@ -1509,7 +1509,7 @@
     },
     {
       "id": "DSH-DD-TOOLS-003",
-      "statement": "内置 Node PTC Provider 为每次运行创建新进程，并分别约束执行期限、输出、控制流量与堆内存。",
+      "statement": "内置 Node PTC Provider 默认每次运行创建新进程，也可显式选择按 Agent 保留内存的 REPL 或 Script 模式；执行期限、输出、控制流量与堆内存分别受限。",
       "kind": "upstream-fact",
       "confidence": "qualified",
       "maturity": "released",
@@ -1561,6 +1561,24 @@
           "startLine": 240,
           "endLine": 258,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/src/worker.ts#L240-L258"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/ptc-runtime/ptc-runtime-node/src/config.ts",
+          "startLine": 33,
+          "endLine": 64,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/src/config.ts#L33-L64"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/ptc-runtime/ptc-runtime-node/README.md",
+          "startLine": 94,
+          "endLine": 98,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L94-L98"
         }
       ],
       "qualification": "期限与堆限制不是进程树 CPU/RSS 上限；文件约束继承所选 Sandbox 的 enforcement，脱离管理范围的后代进程可能无法清理。"
