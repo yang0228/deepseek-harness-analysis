@@ -140,7 +140,7 @@ AgentLoop resume 先取得 write handle 所有权，再读取物理有效前缀�
 
 新 Fork child 写入带 `inherited: true` 的 `session/end-seed`，最后一个带该标记的事件记录当前 Session 的继承切点；普通 restore/replay 的非 tagged marker 仅标识生命周期。持久化 handle 仍暴露精确 `inheritedEventCount`，不能把任意 seed marker 当成并发写所有权信号。
 
-`SessionStore.fork` 接受 store 中的 live Session 或其 id，按包含端点的事件序号截取前缀，并记录 `parentSession`、`isSeeded`、继承长度和 cwd。当前前缀可以结束于未完成 Turn；子日志在继承标记后补未结工具调用的合成结果与 Step、Turn 结束记录，原因是 `forked`。这些补充不计入 `inheritedEventCount`，也不修改来源日志；已经关闭的 Step 与 Turn 保持原样。传入对象必须是 store 保存的同一实例，detached 副本不能走这条策略 API。
+`SessionStore.fork` 接受 store 中的 live Session 或其 id，按包含端点的事件序号截取前缀，并记录 `isSeeded`、继承长度和 cwd。普通 Fork 不写入 `parentSession`；该字段表示 subagent 的直接创建者，历史普通 Fork 可能仍保留来源 id，应使用 `origin` 判断 subagent 身份。当前前缀可以结束于未完成 Turn；子日志在继承标记后补未结工具调用的合成结果与 Step、Turn 结束记录，原因是 `forked`。这些补充不计入 `inheritedEventCount`，也不修改来源日志；已经关闭的 Step 与 Turn 保持原样。传入对象必须是 store 保存的同一实例，detached 副本不能走这条策略 API。
 
 ## 源码导读
 

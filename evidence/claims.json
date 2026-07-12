@@ -1398,6 +1398,15 @@
           "startLine": 14,
           "endLine": 39,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/repair.ts#L14-L39"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/core/session/src/types.ts",
+          "startLine": 104,
+          "endLine": 120,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/types.ts#L104-L120"
         }
       ],
       "qualification": "Fork 可选择未完成 Turn 内的前缀，并在子日志中补工具结果与 Step、Turn 结束记录；这些补充不属于继承前缀，持久化 Provider 仍负责耐久性与格式拒绝。恢复的是已提交历史，不承诺恢复执行现场或撤销外部副作用。"
