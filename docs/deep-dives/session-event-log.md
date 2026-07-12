@@ -44,6 +44,8 @@ Fork 可选择未完成 Turn 内的前缀，并在子日志中补工具结果与
 
 ### 追加、提交与广播
 
+Store 拥有的 Session 在 prepare、enter 与同步 `session/created` 分发期间只读，announce 成功后才允许追加。Agent 初始化先存 constructor 历史并完成 Session 公布，再运行可写的 setup、进入 AgentRegistry 并等待 `agent/created`；setup 失败仍释放资源，已经存储的事件不会回滚。[Session 公布](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/index.ts#L1279-L1315)；[初始化顺序](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/index.ts#L621-L639)。
+
 事件封套包含 `type`、`seq`、`time`、`data`。`append()` 按当前日志长度分配 `seq`，用 `Date.now()` 记录时间；顺序由序列位置决定，不由时间戳决定。
 
 追加先快照数据、验证事件与 surface 转换，再收集 observer。任何提交前失败都使日志不变；`log.push(event)` 是内存提交点，随后调用 `session/event` observer。每个 observer 的抛错或 rejection 被隔离，已提交事件不回滚，后续 observer 仍被调用。广播期间同步重入 append 会被拒绝。[追加顺序](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/index.ts#L806-L911)与[observer 隔离](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/index.ts#L395-L417)提供实现证据。
@@ -87,7 +89,7 @@ v4 的消息角色包含 `system`、`developer`、`user`、`assistant`、`tool`�
 
 LLM 根据已解析路由的 `toolUpdate` 投影：`in-history` 保留历史定义并发送增删块；`addition-only` 发送可用的 addition，并从声明集合去掉当前已移除的工具；不支持更新的路由省略 developer 消息，使用当前立即可用的声明。普通 Loop 请求和 compaction 都传入同一 `toolHistory`；辅助请求前缀缺少必要更新时也回退到当前声明。Chat 和 Trajectory 已渲染工具变化通知。这里证明的是表示与投影链路，没有量化缓存或性能收益。[路由投影](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/llm/llm/src/content.ts#L381-L492)、[Loop 请求](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/agent.ts#L726-L743)、[compaction 请求](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/compaction/compaction-basic/src/summarizer.ts#L152-L163)与[格式消费者](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/session/session-format-v3-to-v4/README.md#L253-L262)共同界定范围。
 
-`SessionProjectionRegistry` 只订阅一次 `session/event`，驱动注册 unit 的同步纯 `apply`；可选 `wire.view` 生成 schema 验证后的 Client 值，snapshot 的共同 `asOfSeq` 标记读取位置。晚注册 unit 可从内存日志惰性重建；同 key 注册被计数，最后一个注册卸载后该 key 才从 snapshot 消失。Projection 是可重建视图，不是日志的替代存储。
+`SessionProjectionRegistry` 只订阅一次 `session/event`，驱动注册 unit 的同步纯 `apply`；可选 `wire.view` 生成 schema 验证后的 Client 值，snapshot 的共同 `asOfSeq` 标记读取位置。`await register(definition)` 返回带同步 `stateOf(session)`、`readerFor(session)` 和异步 `dispose()` 的 handle。同 key、同 stateVersion 的注册共享状态；最后一个注册释放后，key 从全局驱动、snapshot 和 checkpoint 消失，既有 handle 仍保留原 unit 并按需折叠新事件。领域服务持有 handle 并提供业务读取方法；Projection 是可重建视图，不是日志的替代存储。
 
 ### Inbox：待处理输入与接纳
 
