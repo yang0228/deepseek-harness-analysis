@@ -3140,7 +3140,7 @@
     },
     {
       "id": "DSH-DD-CORDIS-004",
-      "statement": "Agent loop 的 Factory 卸载保留共享投影，直至全部 Agent teardown 和启动任务结算。",
+      "statement": "Agent loop 的 Factory 卸载期间，保留的 Projection handle 在全局注册移除后仍可读取状态，支持 Agent teardown 完成。",
       "kind": "upstream-fact",
       "confidence": "verified",
       "maturity": "released",
@@ -3183,6 +3183,24 @@
           "startLine": 495,
           "endLine": 544,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/index.ts#L495-L544"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/core/agent-loop/src/index.ts",
+          "startLine": 329,
+          "endLine": 338,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/agent-loop/src/index.ts#L329-L338"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/session/session-projection/src/index.ts",
+          "startLine": 398,
+          "endLine": 419,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/session/session-projection/src/index.ts#L398-L419"
         }
       ]
     },

@@ -16,7 +16,7 @@ Cordis 为插件建立子 Fiber 与 Context，清理通过生命周期 API 登�
 
 <a id="claim-dsh-dd-cordis-003"></a> **Claim `DSH-DD-CORDIS-003`:** Event Listener 由 Fiber 拥有，Waterfall Listener 通过显式调用 `next()` 委托后续处理。
 
-<a id="claim-dsh-dd-cordis-004"></a> **Claim `DSH-DD-CORDIS-004`:** Agent loop 的 Factory 卸载保留共享投影，直至全部 Agent teardown 和启动任务结算。
+<a id="claim-dsh-dd-cordis-004"></a> **Claim `DSH-DD-CORDIS-004`:** Agent loop 的 Factory 卸载期间，保留的 Projection handle 在全局注册移除后仍可读取状态，支持 Agent teardown 完成。
 
 ## 机制
 
@@ -57,7 +57,7 @@ Fiber 卸载从 `DisposableList` 取得逆序 wrapper，以独立任务启动并
 
 Provider 变化会重算已声明依赖的 epoch：active Fiber 先 unload，再按新依赖重新执行入口。Loader 更新 Entry isolation map 时也通知相关 Fiber。这个过程不会迁移插件内存状态，也不会撤销插件未登记的外部副作用。
 
-Agent loop 在这些原语之上另行组织 teardown：停止并排空 Driver，再清理 Agent Scope、关闭 Session 写入句柄，最后移出 Agent 与 Session Registry。Factory 卸载保留 inbox 与 turn-boundary projections，直至全部 Agent teardown 和启动任务结算，包括清理失败路径。调用者卸载、Factory 卸载和 handle disposal 等待同一个 teardown；这是 loop 的资源所有权规则，不能推广为 Cordis 所有 Effect 的全局清理顺序。
+Agent loop 在这些原语之上另行组织 teardown：停止并排空 Driver，再清理 Agent Scope、关闭 Session 写入句柄，最后移出 Agent 与 Session Registry。Factory 发布前等待 model-selection 与 inbox 投影注册完成；卸载期间全局注册可以先移除，保留的 handle 仍按原 unit 折叠已提交事件，供 Scope 清理和取消监听器读取。调用者卸载、Factory 卸载和 handle disposal 等待同一个 teardown；这是 loop 的资源所有权规则，不能推广为 Cordis 所有 Effect 的全局清理顺序。
 
 ## 源码导读
 
