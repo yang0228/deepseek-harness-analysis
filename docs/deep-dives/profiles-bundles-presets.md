@@ -93,7 +93,7 @@ Registry entry 的 volatile 字段 `selectedDefault` 保存用户默认值，新
 | Preset id | 声明 | 产品模式 |
 |---|---|---|
 | `cordis` | [cordis.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/cordis.patch.yml#L1-L10) | Creator mode |
-| `minimal` | [minimal.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L1-L10) | Minimal mode；Preset 自身提供持久 Shell，有效工具还可包含 Host 全局工具 |
+| `minimal` | [minimal.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L1-L10) | Minimal mode；Preset 自身提供持久 Shell、read_image 与 compaction，有效工具还可包含 Host 全局工具 |
 | `ptc` | [ptc.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/ptc.patch.yml#L1-L10) | PTC mode |
 | `standard` | [standard.patch.yml](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/standard.patch.yml#L1-L10) | Standard mode |
 
