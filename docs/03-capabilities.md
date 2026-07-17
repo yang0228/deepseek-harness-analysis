@@ -25,7 +25,7 @@ Application Profile 组合 Host 与应用入口；Web 的 Agent Preset 选择 Se
 | Web | 已发布；默认启用 HMR | `profile:web` | `dsh-base` + `dsh-web-app` 提供 HTTP/Web runtime、浏览器插件与四个 Preset 声明，默认选择 `standard` | 模型工具由 Preset scope 与 Host global tools 共同决定；全文搜索默认 `openAt: never` |
 | Headless | 已发布；默认禁用 HMR | `profile:headless` | `dsh-base` + `dsh-headless` 创建一次 Agent，等待子任务及其 root summary 收敛后从 durable interval 输出最终结果 | 无监听端口；stdout 为最终文本，reasoning delta 在 stderr |
 | SDK | 已发布；默认禁用 HMR | `profile:sdk` | `dsh-base` + `dsh-sdk-app` 在 stdio 上提供 SDK JSON-RPC | stdout 专用于协议；工具来自 Profile 组合 |
-| SDK Minimal | 已发布；独立完整树 | `profile:sdk-minimal` | `dsh-sdk-minimal` 直接组合 SDK server、DeepSeek adapter、平台持久 Shell、`working_directory` 与 JSONL Session | 默认没有 filesystem editor 或 compaction；`danger-full-access` 允许访问进程可访问的路径 |
+| SDK Minimal | 已发布；独立完整树 | `profile:sdk-minimal` | `dsh-sdk-minimal` 直接组合 SDK server、DeepSeek adapter、平台持久 Shell、`working_directory` 与 JSONL Session | 默认没有文本文件读写或编辑工具；提供 read_image 与自动 compaction；`danger-full-access` 允许访问进程可访问的路径 |
 | ACP | 已发布；默认禁用 HMR | `profile:acp` | `dsh-base` + `dsh-acp-app` 装载 automation-only ACP server | stdout 专用于 ACP |
 
 [Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/util/official-bundles/src/bundles.ts#L9-L26)；[Base HMR](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/base/cordis.patch.yml#L27-L32)；[Headless 禁用 HMR](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/headless/cordis.patch.yml#L35-L36)；[SDK 禁用 HMR](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/sdk-app/cordis.patch.yml#L23-L24)；[ACP 禁用 HMR](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/acp-app/cordis.patch.yml#L22-L23)；[Headless 命令行为](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/apps/cli/reference/README.md#L34-L44)；[Headless 子任务收敛](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/headless/src/index.ts#L420-L437)；[SDK Minimal 组合](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/sdk-minimal/README.md#L12-L43)。Desktop 是独立 Host 启动路径，见[组合专题](deep-dives/profiles-bundles-presets.md)，不计入上述五个模板。
@@ -35,8 +35,8 @@ Application Profile 组合 Host 与应用入口；Web 的 Agent Preset 选择 Se
 | Agent Preset | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
 | Standard | 已发布、Bundle 声明的 Preset | `preset:standard` | native tools：Shell、文件检索、Job、Skill、Goal/Plan、Schedule、compaction、进程内 spawn/fork、Workflow、ask-user、todo、Web 与 present | Schedule 工具默认启用；Ralph、Codex 与 Claude Code 由独立可选 Bundle 加入 |
-| Minimal | 已发布、Bundle 声明的 Preset | `preset:minimal` | 固定完整 persona 与一个按平台选择的持久 Shell；PTY 使用独立 realm | 不包含 filesystem editor、可选运行时上下文或 compaction；必需目录上下文与 Host global tools 仍可出现，Shell 消费 Host sandbox policy |
-| PTC | 已发布、Bundle 声明的 Preset | `preset:ptc` | `mode: ptc` 将工具目录呈现为 `run_code`，依赖 Host 的 TypeScript PTC runtime | Workflow engine 与通用 workflow 工具默认 disabled；可选 Ralph Bundle 拥有自己的独立 engine |
+| Minimal | 已发布、Bundle 声明的 Preset | `preset:minimal` | 固定完整 persona、按平台选择的持久 Shell、read_image 与独立 compaction；PTY 使用独立 realm | 不提供文本文件读写或编辑工具；省略可选运行时上下文；必需目录上下文与 Host global tools 仍可出现，Shell 消费 Host sandbox policy |
+| PTC | 已发布、Bundle 声明的 Preset | `preset:ptc` | Preset 装载 scoped `dsh-tool-executor-ptc`，将工具目录呈现为 `run_code`，依赖 Host 的 TypeScript PTC runtime | Workflow engine 与通用 workflow 工具默认 disabled；可选 Ralph Bundle 拥有自己的独立 engine |
 | Cordis / Creator | 已发布、Bundle 声明的 Preset | `preset:cordis` | 在编码工具上提供运行时检查/装载、组合创作 Skill 与 `plugin_manager` | `cordis_mount` 求值模型编写的 JavaScript；管理工具每次调用需要 Full access 或审批，安装的 Host 插件在 workspace sandbox 外执行 |
 
 [Standard delegation 与工具](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/standard.patch.yml#L83-L127)；[Minimal 完整组合](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L4-L78)；[PTC Workflow 禁用行与工具呈现](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/ptc.patch.yml#L102-L123)。
@@ -45,7 +45,7 @@ Preset 由 Web Bundle 的 `presets/*.patch.yml` 注册，默认选择 `standard`
 
 ### Plugin Manager
 
-Base 提供 Profile 级 Plugin Manager，Web Plugins 页面可安装、启停和移除 Bundle 及可独立定位的 plugin row；Standard/PTC 的模型管理工具默认禁用，Creator 启用。操作影响使用同一 Profile 的会话，HMR 决定立即应用还是重启生效。命名 registry/local spec 的不兼容安装在 pnpm 运行前拒绝；git/tarball 可能在安装后发现不兼容并尝试恢复 manifest/lockfile，已批准 build-script 的副作用可能保留；启动或重组时，不兼容或不可读取的 Bundle 被跳过，保存的 Bundle 选择仍保留，其余组合能否启动取决于所需服务是否齐全。例外授权只绑定精确插件版本与 DSH runtime 版本，不能代替依赖构建脚本授权。[管理范围、权限与应用](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/plugin-manager/README.md#L28-L42)；[兼容性与精确版本例外](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/plugin-manager/README.md#L74-L83)；[启动跳过与保存状态](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/app-boot/README.md#L50-L54)。
+Base 提供 Profile 级 Plugin Manager，Web Plugins 页面可安装、启停和移除 Bundle 及可独立定位的 plugin row；Standard 与 Creator 在具备 `profileContext` 时启用模型管理工具，PTC 默认禁用。操作影响使用同一 Profile 的会话，HMR 决定立即应用还是重启生效。命名 registry/local spec 的不兼容安装在 pnpm 运行前拒绝；git/tarball 可能在安装后发现不兼容并尝试恢复 manifest/lockfile，已批准 build-script 的副作用可能保留；启动或重组时，不兼容或不可读取的 Bundle 被跳过，保存的 Bundle 选择仍保留，其余组合能否启动取决于所需服务是否齐全。例外授权只绑定精确插件版本与 DSH runtime 版本，不能代替依赖构建脚本授权。[管理范围、权限与应用](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/plugin-manager/README.md#L28-L42)；[兼容性与精确版本例外](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/plugin-manager/README.md#L74-L83)；[启动跳过与保存状态](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/boot/app-boot/README.md#L50-L54)。
 
 ### LLM
 
@@ -181,10 +181,11 @@ Office sidecar 与 authoring runtime 独立下载；SDK 启动不自动取得缺
 
 ### SDK access
 
+
 | Capability | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
 | Full SDK runtime | 已发布 SDK application | `profile:sdk` | stdio JSON-RPC；prompt 返回 message id；`run()` 收集 receipt 至下次 idle，`session/wait` 可另等 managed descendants 与 root summaries | 无 prompt cancel 或 per-session close；`run()` 区间不表示某一 prompt 的因果独占答复，`wait` 不创建会话 |
-| Minimal SDK runtime | 已发布独立 SDK application | `profile:sdk-minimal` | 相同 server 与 wire，默认提供持久 Shell 与 `working_directory` | 不包含 full base feature set；执行为 `danger-full-access` |
+| Minimal SDK runtime | 已发布独立 SDK application | `profile:sdk-minimal` | 相同 server 与 wire，默认提供持久 Shell、read_image、working_directory 与自动 compaction | 不包含 full base feature set；执行为 `danger-full-access` |
 
 [SDK server 与 wait](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/README.md#L50-L67)；[TypeScript run 与低层 wait](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/client/README.md#L54-L62)；[协议限制](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/protocol/README.md#L129-L135)。有效工作目录通过日志记录与 SDK get/set 操作改变，仍受原项目的 Sandbox 写入根限制，详见[目录状态与权限](05-getting-started.md#claim-dsh-start-004)。客户端字段与一次性目录示例见[上手章节](05-getting-started.md)。
 

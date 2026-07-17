@@ -467,6 +467,15 @@
           "startLine": 46,
           "endLine": 60,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/preset/agent-preset-registry/README.md#L46-L60"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/bundle/web-app/presets/minimal.patch.yml",
+          "startLine": 17,
+          "endLine": 33,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/minimal.patch.yml#L17-L33"
         }
       ],
       "probe": "preset:standard"
