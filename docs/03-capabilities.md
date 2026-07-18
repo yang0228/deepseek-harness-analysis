@@ -101,7 +101,7 @@ Stagehand 的 AI-assisted 操作另用配置的 native model；请求和用量�
 
 | Capability | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
-| Base local Sandbox | 默认 `workspace-write` 与 approval `ask` | `profile:web` | Linux bwrap/Landlock、macOS Seatbelt、Windows ACL restricted-token backend 执行文件 effect policy | Windows ACL 与部分受支持的 Landlock ABI 可返回 `partial`；不承诺通用网络、进程或凭据隔离 |
+| Base local Sandbox | 默认 `workspace-write` 与 approval `ask` | `profile:web` | Linux bwrap/Landlock、macOS Seatbelt、Windows ACL restricted-token backend 执行文件 effect policy | Windows ACL 与部分 Landlock ABI 可返回 `partial`；Windows ACL 的 workspace-write subprocess 拒绝额外可写目录；不承诺通用网络、进程或凭据隔离 |
 | SDK Minimal direct execution | 随 SDK Minimal 启用 | `profile:sdk-minimal` | `danger-full-access` 绕过文件 confinement | 一次性工作区不扩大操作系统本身的隔离保证 |
 
 ### Session

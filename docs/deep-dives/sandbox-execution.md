@@ -24,12 +24,12 @@ Windows ACL 与部分受支持的 Landlock ABI 可能诚实返回 `partial`。
 
 ### 每次调用解析策略
 
-`ctx.sandboxPolicy.resolve()` 按“显式批准的模式 → Session 最近的 `sandbox/mode` → 部署默认值”解析；Session header 的不可变 cwd 是原项目与 workspace-write root，缺失时才用配置 fallback；新 `working-directory/change` 只改变该 Session 的有效目录，不扩大这个写入根。Provider 在对应执行环境解析真实路径，不能假定本地路径就是 SSH 远端路径。[解析实现](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-policy/src/index.ts#L188-L213)；[执行环境与策略](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/subsystems/sandbox.md#L5-L86)
+`ctx.sandboxPolicy.resolve()` 按“显式批准的模式 → Session 最近的 `sandbox/mode` → 部署默认值”解析；Session header 的不可变 cwd 是原项目与 workspace-write root，缺失时才用配置 fallback；workspace-write 还可携带部署明确声明的额外可写目录；新 `working-directory/change` 只改变该 Session 的有效目录，不扩大这个写入根。Provider 在对应执行环境解析真实路径，不能假定本地路径就是 SSH 远端路径。[解析实现](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-policy/src/index.ts#L188-L213)；[执行环境与策略](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/subsystems/sandbox.md#L5-L86)
 
 | 模式 | 行为 |
 |---|---|
 | `read-only` | 拒绝一般写入，POSIX 保留必要的 `/dev/null` 等 sink |
-| `workspace-write` | 允许 workspace root 和 backend 承诺的临时区域 |
+| `workspace-write` | 允许 workspace root、部署显式配置的 `additionalWritableRoots` 和 backend 承诺的临时区域 |
 | `danger-full-access` | Consumer 使用原始 argv，不调用 confining Provider |
 
 模式词汇只描述文件效果，不承诺统一的网络限制或进程可见性规则。个别 backend 可以有更强机制，但不能泛化为所有平台共同保证。[模式与 enforcement](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/subsystems/sandbox.md#L9-L35)
@@ -38,11 +38,13 @@ Windows ACL 与部分受支持的 Landlock ABI 可能诚实返回 `partial`。
 
 ### 平台提供方
 
+额外可写目录由部署显式声明，不从 repository 或 gitfile 自动发现。执行方每次在实际执行主机验证路径，缺失、非目录或符号链接以 `SANDBOX_INVALID_ROOT` 拒绝；`read-only` 不采用这些 grants。Windows ACL 暂不支持带额外可写目录的 workspace-write subprocess，在启动前以 `SANDBOX_UNSUPPORTED_POLICY` 拒绝；filesystem tools 可独立执行这些授权。[部署配置](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-policy/src/index.ts#L99-L109)；[执行主机验证](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox/src/roots.ts#L30-L84)；[Windows 拒绝路径](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-local/src/index.ts#L369-L372)。
+
 | 平台 | 选择与机制 | enforcement / 限制 |
 |---|---|---|
 | Linux | bwrap 优先，Landlock 备选；竞争候选用功能探针选择 | bwrap 使用只读根、私有 PID namespace 和 workspace bind；Landlock 仅按 grants 限制文件效果，旧 ABI 可为 `partial` |
 | macOS | Seatbelt / `sandbox-exec` | 拒绝文件写入再放行允许 roots；依赖平台仍提供该执行器 |
-| Windows | ACL restricted-token runner | workspace 写入 SID 与 Session 私有 temp SID 分离；NTFS hard link、读取未约束，以及 AppContainer ACL 目录对低完整性子进程不可读等限制使其为 `partial` |
+| Windows | ACL restricted-token runner | 带额外可写目录的 workspace-write subprocess 在启动前被拒绝；workspace 写入 SID 与 Session 私有 temp SID 分离；NTFS hard link、读取未约束，以及 AppContainer ACL 目录对低完整性子进程不可读等限制使其为 `partial` |
 
 Linux 的两条路径也有区别：bwrap 的 workspace-write 用私有 `tmpfs /tmp`；Landlock 的同模式 grant 包含宿主 `/tmp` 和 workspace，不提供同样的私有 PID namespace。两者都不能由文件效果策略推导网络或凭据保密。[profile builders](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-local/src/profiles.ts#L16-L35)。
 

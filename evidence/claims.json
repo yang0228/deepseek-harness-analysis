@@ -615,6 +615,15 @@
           "startLine": 12,
           "endLine": 43,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/sdk-minimal/README.md#L12-L43"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sandbox/sandbox-local/src/index.ts",
+          "startLine": 369,
+          "endLine": 372,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-local/src/index.ts#L369-L372"
         }
       ],
       "qualification": "Windows ACL 与部分受支持的 Landlock ABI 可能返回 `partial`，而 `danger-full-access` 明确绕过约束；这些模式不承诺通用网络、进程或凭据隔离。"
@@ -1655,6 +1664,24 @@
           "startLine": 5,
           "endLine": 15,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/subsystems/working-directory.md#L5-L15"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sandbox/sandbox-policy/src/index.ts",
+          "startLine": 99,
+          "endLine": 109,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-policy/src/index.ts#L99-L109"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sandbox/sandbox/src/roots.ts",
+          "startLine": 30,
+          "endLine": 84,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox/src/roots.ts#L30-L84"
         }
       ],
       "qualification": "该模式约束文件系统副作用，不构成通用网络、进程或凭据隔离。"
@@ -1695,6 +1722,15 @@
           "startLine": 16,
           "endLine": 35,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-local/src/profiles.ts#L16-L35"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sandbox/sandbox-local/src/index.ts",
+          "startLine": 369,
+          "endLine": 372,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sandbox/sandbox-local/src/index.ts#L369-L372"
         }
       ],
       "qualification": "Windows ACL 与部分受支持的 Landlock ABI 可能诚实返回 `partial`。"
