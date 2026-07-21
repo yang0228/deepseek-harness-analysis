@@ -2720,6 +2720,33 @@
           "startLine": 64,
           "endLine": 78,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/scripts/experimental-package-policy.ts#L64-L78"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/experimental/cua-bundle/README.md",
+          "startLine": 12,
+          "endLine": 44,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/experimental/cua-bundle/README.md#L12-L44"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/experimental/cua/README.md",
+          "startLine": 38,
+          "endLine": 42,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/experimental/cua/README.md#L38-L42"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/experimental/cua-macos/README.md",
+          "startLine": 70,
+          "endLine": 70,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/experimental/cua-macos/README.md#L70"
         }
       ],
       "qualification": "这些 Provider 仍为实验性 opt-in；发布族配置不表示默认启用或生产就绪。"

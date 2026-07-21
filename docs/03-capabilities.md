@@ -95,6 +95,10 @@ MCP stdio transport 合并 scrubbed ambient env 与显式配置的 env，但由 
 
 Stagehand 的 AI-assisted 操作另用配置的 native model；请求和用量尚未纳入 DSH Session model routing/usage accounting。浏览器 MCP 在 future Agent 创建或恢复时完成 discovery，busy attachment 不会在同一 activation 后续重试。[初始化与独立模型边界](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/subsystems/browser-use.md#L27-L37)。
 
+### macOS CUA
+
+另有独立的 macOS CUA Bundle，默认关闭且隐藏于默认列表；显式启用后只为 PTC Session 注册工具，可用于源码 Web 或未打包 Desktop。逐应用 consent 与 macOS 系统权限分别控制访问，consent 不是 OS sandbox；已送达输入不能靠取消撤回，操作结果需重新观察确认。[Bundle 归属与启用条件](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/experimental/cua-bundle/README.md#L12-L44)；[授权与操作结果](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/experimental/cua/README.md#L38-L42)；[consent 的安全边界](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/experimental/cua-macos/README.md#L70)。它与上表的 Cua Driver 接入路径分开，组合归属为 `experimental:packages/experimental/cua-bundle`。
+
 ### Sandbox
 
 <a id="claim-dsh-cap-005"></a> **Claim `DSH-CAP-005`:** 本地 Sandbox 提供方约束文件系统副作用，并报告实际 enforcement 状态。
