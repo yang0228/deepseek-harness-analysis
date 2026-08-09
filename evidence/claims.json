@@ -1847,6 +1847,15 @@
           "startLine": 57,
           "endLine": 101,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/subagent/tool-subagent/README.md#L57-L101"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/subagent/tool-subagent/README.md",
+          "startLine": 66,
+          "endLine": 73,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/subagent/tool-subagent/README.md#L66-L73"
         }
       ],
       "qualification": "Provider 可注册不等于对应模型工具已在当前 Preset 中启用。"

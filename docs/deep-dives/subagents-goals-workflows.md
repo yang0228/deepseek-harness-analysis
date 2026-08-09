@@ -58,6 +58,7 @@ Resume 或 Fork 后需要重新激活 Goal；Goal 本身不是调度器。
 
 ### 委托与 Activation 时序
 
+进程内 spawn 可以通过 `agentPreset` 选择独立组合；省略时加入 parent 当前 revision，fork 与外部 backend 拒绝独立选择。工具配置中的 `persona` 与 `toolFilter` 会报迁移错误，不能再用它们构造 child 能力。[child 组合选择](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/subagent/tool-subagent/README.md#L66-L73)。
 ```mermaid
 sequenceDiagram
   participant Parent as Parent Agent
