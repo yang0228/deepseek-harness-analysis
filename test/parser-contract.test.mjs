@@ -4,14 +4,14 @@ import test from 'node:test'
 import { parsePresetMetadata, parseProfileTemplates } from '../scripts/inspect-upstream.mjs'
 
 const profileSource = `export const PROFILE_TEMPLATES: Record<string, ProfileTemplate> = {
-  'beta-minimal': { bundles: ['bundle-b', 'bundle-a'], patchReload: 'startup' },
-  alpha: { bundles: ['bundle-c'], patchReload: 'live' },
+  'beta-minimal': { bundles: ['bundle-b', 'bundle-a'] },
+  alpha: { bundles: ['bundle-c'] },
 }\n`
 
 test('Profile parser returns sorted ids without reordering bundles', () => {
   assert.deepEqual(parseProfileTemplates(profileSource), [
-    { id: 'alpha', bundles: ['bundle-c'], patchReload: 'live' },
-    { id: 'beta-minimal', bundles: ['bundle-b', 'bundle-a'], patchReload: 'startup' },
+    { id: 'alpha', bundles: ['bundle-c'] },
+    { id: 'beta-minimal', bundles: ['bundle-b', 'bundle-a'] },
   ])
 })
 
@@ -19,10 +19,10 @@ const profileFailures = [
   ['renamed declaration', profileSource.replace('PROFILE_TEMPLATES', 'RENAMED')],
   ['spread entry', profileSource.replace("  'beta-minimal':", '  ...sharedProfiles,\n  \'beta-minimal\':')],
   ['computed bundle value', profileSource.replace("['bundle-c']", '[resolveBundle()]')],
-  ['missing patchReload', profileSource.replace(", patchReload: 'live'", '')],
+  ['obsolete patchReload', profileSource.replace("['bundle-c']", "['bundle-c'], patchReload: 'live'")],
   ['missing entry comma', profileSource.replace(" },\n  alpha", " }\n  alpha")],
   ['duplicate profile id', profileSource.replace('  alpha:', "  'beta-minimal':")],
-  ['trailing property', profileSource.replace("patchReload: 'live' }", "patchReload: 'live', label: 'extra' }")],
+  ['trailing property', profileSource.replace("['bundle-c'] }", "['bundle-c'], label: 'extra' }")],
   ['unconsumed token', profileSource.replace("  alpha: {", '  unexpected\n  alpha: {')],
   ['header only in a block comment', `/* ${profileSource} */`],
   ['header only in line comments', profileSource.split('\n').map(line => `// ${line}`).join('\n')],
@@ -46,78 +46,85 @@ for (const [name, source] of profileFailures) {
 test('Profile parser ignores commented and quoted decoys around one live declaration', () => {
   const decoys = `/* ${profileSource} */\n// ${profileSource.split('\n')[0]}\nconst example = ${JSON.stringify(profileSource)}\n`
   assert.deepEqual(parseProfileTemplates(decoys + profileSource + decoys), [
-    { id: 'alpha', bundles: ['bundle-c'], patchReload: 'live' },
-    { id: 'beta-minimal', bundles: ['bundle-b', 'bundle-a'], patchReload: 'startup' },
+    { id: 'alpha', bundles: ['bundle-c'] },
+    { id: 'beta-minimal', bundles: ['bundle-b', 'bundle-a'] },
   ])
 })
 
-test('Preset parser accepts the exact metadata triplet', () => {
-  assert.deepEqual(
-    parsePresetMetadata('name: 合成模式\ndescription: 只用于测试\norder: 7\n', 'preset.yml'),
-    { name: '合成模式', description: '只用于测试', order: 7 },
-  )
+const presetSource = `# A shipped declaration
+- insert:
+    - id: preset-example
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: example
+        order: 7
+        plugins:
+          - id: sample
+            name: '@example/plugin'
+            disabled: !!js globalThis.__presetInspectorExecuted = true
+            config:
+              prompt: |
+                id: decoy
+                order: 999
+`
+
+test('Preset parser extracts declaration metadata without evaluating child expressions', () => {
+  delete globalThis.__presetInspectorExecuted
+  assert.deepEqual(parsePresetMetadata(presetSource, 'fixture/example.patch.yml'), { id: 'example', order: 7 })
+  assert.equal(globalThis.__presetInspectorExecuted, undefined)
 })
 
 const presetFailures = [
-  ['missing key', 'name: 合成模式\norder: 7\n', 2],
-  ['duplicate key', 'name: 合成模式\nname: 重复名称\norder: 7\n', 2],
-  ['unknown key', 'name: 合成模式\nsummary: 未知字段\norder: 7\n', 2],
-  ['reordered key', 'description: 只用于测试\nname: 合成模式\norder: 7\n', 1],
-  ['indented key', ' name: 合成模式\ndescription: 只用于测试\norder: 7\n', 1],
-  ['multiline value', 'name: 合成模式\ndescription: 第一行\n第二行\norder: 7\n', 3],
-  ['malformed order', 'name: 合成模式\ndescription: 只用于测试\norder: 07\n', 3],
+  ['missing id', presetSource.replace('        id: example\n', '')],
+  ['duplicate id', presetSource.replace('        id: example', '        id: example\n        id: other')],
+  ['wrong plugin', presetSource.replace('@deepseek-ai/dsh-agent-preset', '@example/unrelated')],
+  ['duplicate declaration', presetSource + presetSource],
+  ['second inserted row', presetSource + '    - id: other\n      name: other\n'],
+  ['second config', presetSource + '      config:\n        id: other\n'],
+  ['trailing metadata', presetSource + '        order: 99\n'],
+  ['extra top-level property', presetSource.replace('      config:', '      disabled: true\n      config:')],
+  ['unknown config property', presetSource.replace('        order: 7', '        displayName: Example\n        order: 7')],
+  ['reordered metadata', presetSource.replace('        id: example\n        order: 7', '        order: 7\n        id: example')],
+  ['malformed order', presetSource.replace('order: 7', 'order: 07')],
+  ['fractional order', presetSource.replace('order: 7', 'order: 7.5')],
+  ['unsafe integer', presetSource.replace('order: 7', 'order: 9007199254740993')],
+  ['tagged order', presetSource.replace('order: 7', 'order: !!js 7')],
+  ['indented root', presetSource.replace('- insert:', ' - insert:')],
+  ['tab indentation', presetSource.replace('        id:', '\tid:')],
+  ['flow plugins', presetSource.replace('plugins:', 'plugins: []')],
+  ['missing plugins', presetSource.slice(0, presetSource.indexOf('        plugins:'))],
+  ['empty plugins', presetSource.slice(0, presetSource.indexOf('          - id:'))],
+  ['non-list plugins', presetSource.replace('          - id: sample', '          id: sample')],
+  ['different declaration id', presetSource.replace('preset-example', 'preset-other')],
 ]
-
-for (const [name, source, line] of presetFailures) {
+for (const [name, source] of presetFailures) {
   test(`Preset parser rejects ${name}`, () => {
-    const path = `fixtures/${name}/preset.yml`
     assert.throws(
-      () => parsePresetMetadata(source, path),
+      () => parsePresetMetadata(source, 'fixture/example.patch.yml'),
       error => error.code === 'PRESET_METADATA_PARSE_ERROR'
-        && error.details.path === path
-        && error.details.line === line,
+        && error.details.path === 'fixture/example.patch.yml'
+        && Number.isInteger(error.details.line),
     )
   })
 }
 
-for (const [name, scalar] of [
-  ['alias', '*missing'],
-  ['anchor', '&copy value'],
-  ['local tag', '!text value'],
-  ['standard tag', '!!str value'],
-  ['verbatim tag', '!<tag:example.com,2026:text> value'],
-  ['flow sequence', '[value]'],
-  ['flow mapping', '{name: value}'],
-  ['inline comment', 'value # comment'],
-  ['quoted inline comment', '"value" # comment'],
-  ['unterminated double quote', '"unterminated'],
-  ['unterminated single quote', "'unterminated"],
-  ['unopened quote', 'unterminated"'],
-  ['quoted escape', '"escaped\\nvalue"'],
-  ['literal multiline indicator', '|'],
-  ['folded multiline indicator', '>-'],
-]) {
-  test(`Preset parser rejects unsupported scalar ${name}`, () => {
-    const path = 'fixture/preset.yml'
-    assert.throws(
-      () => parsePresetMetadata(`name: ${scalar}\ndescription: 合成说明\norder: 7\n`, path),
-      error => error.code === 'PRESET_METADATA_PARSE_ERROR'
-        && error.details.path === path && error.details.line === 1,
-    )
+for (const scalar of ['*missing', '&copy example', '!!js run()', '[example]', '{id: example}', 'example # comment', '"example" # comment', '"unterminated', "'unterminated", '"escaped\\nvalue"', '|', '>-']) {
+  test(`Preset parser rejects unsupported id scalar ${scalar}`, () => {
+    assert.throws(() => parsePresetMetadata(presetSource.replace('id: example', `id: ${scalar}`), 'fixture/example.patch.yml'),
+      error => error.code === 'PRESET_METADATA_PARSE_ERROR' && error.details.line === 6)
   })
 }
 
-test('Preset parser ignores comment-only YAML examples and decodes supported quotes', () => {
-  assert.deepEqual(parsePresetMetadata(
-    '# Example: | !!str &copy *copy [value]\nname: "合成模式"\n  # description: !<tag:example.com,2026:text> value\ndescription: \'合成说明 # 字面内容\'\norder: 7\n',
-    'fixture/preset.yml',
-  ), { name: '合成模式', description: '合成说明 # 字面内容', order: 7 })
+test('Preset parser retains physical line locations after blank lines and comments', () => {
+  assert.throws(
+    () => parsePresetMetadata(presetSource.replace('        id: example', '\n# note\n        id: *missing'), 'fixture/example.patch.yml'),
+    error => error.code === 'PRESET_METADATA_PARSE_ERROR' && error.details.line === 8,
+  )
 })
 
-test('Preset parser retains original line locations after comments', () => {
-  assert.throws(
-    () => parsePresetMetadata('# note\nname: 合成模式\n# note\ndescription: *missing\norder: 7\n', 'fixture/preset.yml'),
-    error => error.code === 'PRESET_METADATA_PARSE_ERROR'
-      && error.details.path === 'fixture/preset.yml' && error.details.line === 4,
+test('Preset parser accepts quoted ids and trailing blank lines', () => {
+  assert.deepEqual(
+    parsePresetMetadata(presetSource.replace('id: example', 'id: "example"') + '\n', 'fixture/example.patch.yml'),
+    { id: 'example', order: 7 },
   )
 })

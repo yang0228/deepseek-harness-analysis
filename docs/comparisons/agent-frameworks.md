@@ -2,7 +2,7 @@
 
 本章按[固定的七项框架标准](methodology.md)比较 LangGraph、Microsoft AutoGen 与 OpenAI Agents SDK，并把 DSH 对应项限制在固定上游基线已经记录的机制。所有外部页面均于 2026-09-08（Asia/Shanghai）访问；页面没有提供可登记的固定文档版本或不可变 commit，因此来源只记录 publisher 与访问日期。AutoGen 的维护状态来自获准使用的可变 `main` README，不作为不可变 commit 证据。
 
-本次仅将 DSH 对应项更新至 2026-09-15 的固定源码；外部项目仍是上述访问日期的资料快照，并未在本次升级中重新核验。
+本次仅将 DSH 对应项更新至 2026-09-23 的固定源码；外部项目仍是上述访问日期的资料快照，并未在本次升级中重新核验。
 
 ## LangGraph
 

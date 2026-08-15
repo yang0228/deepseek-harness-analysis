@@ -1,0 +1,9 @@
+- insert:
+    - id: preset-cordis
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: cordis
+        order: 40
+        plugins:
+          - id: synthetic
+            name: '@example/synthetic'

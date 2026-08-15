@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="710" viewBox="0 0 1000 710" role="img" aria-labelledby="title desc">
   <title id="title">DeepSeek Harness：应用装配与运行协作</title>
-  <desc id="desc">CLI 的 dsh 选择 Application Profile，按顺序组合 Bundle 与 Patch，由 Cordis 装载插件树。Desktop 由 Electron 启动独立 Node Host，用管道和 dsh-app 协议传输，应用传输不开 Web 端口。模型经模型适配器与 Agent loop 双向交互，loop 调用工具服务、记录 Session Event Log，工具连接外部世界。Application Profile 与 Agent Preset 分别负责应用级和每个 Agent 的能力组合；分组不代表安全隔离。</desc>
+  <desc id="desc">CLI 的 dsh 选择 Application Profile，按顺序组合 Bundle 与 Patch，由 Cordis 装载插件树。Desktop 在 Electron Node 模式启动私有 Host，复用 Profile runner 与完整 Web 应用；带认证的 Web Host 默认端口为 19387，Node IPC 负责启动与生命周期通知。模型经模型适配器与 Agent loop 双向交互，loop 调用工具服务、记录 Session Event Log，工具连接外部世界。Application Profile 与 Agent Preset 分别负责应用级和每个 Agent 的能力组合；分组不代表安全隔离。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526781"/></marker>
     <style>
@@ -31,8 +31,8 @@
   <path d="M 823 188 V 308 H 660 V 330" class="line"/>
 
   <rect x="36" y="208" width="572" height="82" rx="12" fill="#f0fdfa" stroke="#99f6e4"/>
-  <text x="58" y="238" class="label">Desktop · Electron → 独立 Node Host</text>
-  <text x="58" y="264" class="body">管道 / dsh-app:// · 应用传输不开 Web 端口</text>
+  <text x="58" y="238" class="label">Desktop · Electron Node → Web Host</text>
+  <text x="58" y="264" class="body">共享 Profile runner · 认证 Web · 默认端口 19387</text>
   <path d="M 324 292 V 316 H 340 V 330" class="line"/>
 
   <g transform="translate(0,90)">
@@ -72,6 +72,6 @@
 
   <text x="36" y="574" class="body">Application Profile：应用级组合</text>
   <text x="964" y="574" text-anchor="end" class="body">Agent Preset：每个 Agent 的 prompt / tools / services</text>
-  <text x="36" y="603" class="small">基线 0d1f5000 · 模型适配器、循环、工具和会话能力均由插件提供</text>
+  <text x="36" y="603" class="small">基线 46a7f68b · 模型适配器、循环、工具和会话能力均由插件提供</text>
   </g>
 </svg>

@@ -2,7 +2,7 @@
 
 ## 基线
 
-DeepSeek Harness commit `0d1f50007f9bca3f52b06e1c3074fa14d5fb0720`。本页描述 Cordis 自身的 Context、Service 解析和 Effect 清理；应用是否因某条插件失败而停止，由上层启动策略决定。
+DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`。本页描述 Cordis 自身的 Context、Service 解析和 Effect 清理；应用是否因某条插件失败而停止，由上层启动策略决定。
 
 ## 一句话结论
 
@@ -57,12 +57,12 @@ Provider 变化会重算已声明依赖的 epoch：active Fiber 先 unload，再
 
 | 主题 | 固定来源 | 核对重点 |
 |---|---|---|
-| Context 与 Service 解析 | [Context 继承与 isolate](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/context.ts#L99-L125)；[Service 父链解析](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/reflect.ts#L144-L166) | 子 Context 与 isolation symbol 决定可见实现。 |
-| Loader Realm | [Realm 定义与配置映射](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/loader/src/config/isolate.ts#L25-L101) | Entry 专属或按标签共享的 Service symbol。 |
-| Fiber 创建与 disposal | [子 Context、父 Effect 与 pending cleanup](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L222-L295) | 注册所有权、入口和激活前 Effect 的卸载。 |
-| 依赖重载 | [实现快照与 epoch](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L597-L639) | 只有声明依赖进入当前 Fiber 的门控和重载计算。 |
-| Effect 清理 | [Effect 与逆序链](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L405-L441)；[disposer 调用](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L114-L117)；[unload](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L675-L695)；[wrapper 逆序读取](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/utils.ts#L27-L31) | 单个 Effect 的串接和不同 wrapper 的并行结算。 |
-| Listener 与 waterfall | [waterfall 与 Effect 注册](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/events.ts#L234-L259)；[Listener 所有权](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/events.ts#L277-L301) | 显式委托与自动移除。 |
+| Context 与 Service 解析 | [Context 继承与 isolate](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/context.ts#L99-L125)；[Service 父链解析](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/reflect.ts#L144-L166) | 子 Context 与 isolation symbol 决定可见实现。 |
+| Loader Realm | [Realm 定义与配置映射](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/loader/src/config/isolate.ts#L25-L101) | Entry 专属或按标签共享的 Service symbol。 |
+| Fiber 创建与 disposal | [子 Context、父 Effect 与 pending cleanup](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/fiber.ts#L222-L295) | 注册所有权、入口和激活前 Effect 的卸载。 |
+| 依赖重载 | [实现快照与 epoch](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/fiber.ts#L597-L639) | 只有声明依赖进入当前 Fiber 的门控和重载计算。 |
+| Effect 清理 | [Effect 与逆序链](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/fiber.ts#L405-L441)；[disposer 调用](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/fiber.ts#L114-L117)；[unload](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/fiber.ts#L675-L695)；[wrapper 逆序读取](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/utils.ts#L27-L31) | 单个 Effect 的串接和不同 wrapper 的并行结算。 |
+| Listener 与 waterfall | [waterfall 与 Effect 注册](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/events.ts#L234-L259)；[Listener 所有权](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/vendor/cordis/src/events.ts#L277-L301) | 显式委托与自动移除。 |
 
 ## 限制与失败
 

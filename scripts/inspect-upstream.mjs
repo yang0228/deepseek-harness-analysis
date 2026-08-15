@@ -9,9 +9,9 @@ const runFile = promisify(execFile)
 
 /** @typedef {{ stdout: { write(chunk: string): unknown }, stderr: { write(chunk: string): unknown } }} CommandIO */
 /** @typedef {{ repository: string, commit: string, commitDate: string, gitDescribe: string, rootPackageVersion: string, verificationDate: string }} Baseline */
-/** @typedef {{ id: string, bundles: string[], patchReload: 'live' | 'startup' }} ProfileObservation */
-/** @typedef {{ id: string, name: string, description: string, order: number }} PresetObservation */
-/** @typedef {{ schemaVersion: 1, repository: string, commit: string, commitDate: string, gitDescribe: string, rootPackageVersion: string, profiles: ProfileObservation[], presets: PresetObservation[], probes: Record<string, unknown> }} UpstreamFacts */
+/** @typedef {{ id: string, bundles: string[] }} ProfileObservation */
+/** @typedef {{ id: string, order: number, sourcePath: string }} PresetObservation */
+/** @typedef {{ schemaVersion: 2, repository: string, commit: string, commitDate: string, gitDescribe: string, rootPackageVersion: string, profiles: ProfileObservation[], presets: PresetObservation[], probes: Record<string, unknown> }} UpstreamFacts */
 /** @typedef {{ path?: string, line?: number, offset?: number, operation?: string, expected?: unknown, actual?: unknown, dirtyPaths?: string[] }} UpstreamInspectionDetails */
 
 /** A stable inspection failure with a detached copy of its diagnostic fields. */
@@ -288,14 +288,9 @@ function parseProfileEntry(cursor) {
   cursor.expectIdentifier('bundles')
   cursor.expect(':')
   const bundles = parseBundleList(cursor)
-  cursor.expect(',')
-  cursor.expectIdentifier('patchReload')
-  cursor.expect(':')
-  const patchReload = cursor.readString()
-  if (patchReload !== 'live' && patchReload !== 'startup') cursor.fail()
   if (cursor.peek(',')) cursor.expect(',')
   cursor.expect('}')
-  return { id, bundles, patchReload }
+  return { id, bundles }
 }
 
 /**
@@ -347,33 +342,51 @@ export function parseSingleLineScalar(source) {
 }
 
 /**
- * Parse ordered name, description, and integer order fields, ignoring comment-only lines.
- * Text values use parseSingleLineScalar; blank lines, extra keys, and multiline content are rejected.
- * @param {string} sourceText - Preset metadata text.
+ * Read the fixed single-insert Web preset declaration's id and integer order.
+ * Declaration fields have exact indentation and order; comments and blank lines are ignored.
+ * The child plugins list is opaque indented text, not validated YAML or executed JavaScript.
+ * Display labels belong to UI localization and are not observations from this declaration.
+ * @param {string} sourceText - Complete preset patch text.
  * @param {string} sourcePath - Path retained in parse diagnostics.
- * @returns {Omit<PresetObservation, 'id'>} Newly allocated display metadata.
+ * @returns {Omit<PresetObservation, 'sourcePath'>} Declared preset id and order.
  * @throws {UpstreamInspectionError} PRESET_METADATA_PARSE_ERROR with the physical source line.
  */
 export function parsePresetMetadata(sourceText, sourcePath) {
-  const lines = sourceText.replace(/\n$/u, '').split('\n')
-    .map((text, index) => ({ text, line: index + 1 }))
-    .filter(({ text }) => !text.trimStart().startsWith('#'))
-  const patterns = [/^name: (\S.*)$/u, /^description: (\S.*)$/u, /^order: (-?(?:0|[1-9]\d*))$/u]
-  const values = lines.map(({ text, line }, index) => {
-    const match = patterns[index]?.exec(text)
-    if (match === null || match === undefined) {
-      throw new UpstreamInspectionError('PRESET_METADATA_PARSE_ERROR', { path: sourcePath, line })
-    }
-    const value = index === 2 ? match[1] : parseSingleLineScalar(match[1])
-    if (value === undefined || value === '') {
-      throw new UpstreamInspectionError('PRESET_METADATA_PARSE_ERROR', { path: sourcePath, line })
-    }
-    return value
-  })
-  if (lines.length !== 3) {
-    throw new UpstreamInspectionError('PRESET_METADATA_PARSE_ERROR', { path: sourcePath, line: 4 })
+  const physical = sourceText.split('\n')
+  const fail = line => {
+    throw new UpstreamInspectionError('PRESET_METADATA_PARSE_ERROR', { path: sourcePath, line })
   }
-  return { name: values[0], description: values[1], order: Number(values[2]) }
+  const lines = physical.map((text, index) => ({ text, line: index + 1 }))
+    .filter(({ text }) => text.trim() !== '' && !text.trimStart().startsWith('#'))
+  const patterns = [
+    /^- insert:$/u,
+    /^    - id: (.+)$/u,
+    /^      name: (.+)$/u,
+    /^      config:$/u,
+    /^        id: (.+)$/u,
+    /^        order: (-?(?:0|[1-9]\d*))$/u,
+    /^        plugins:$/u,
+  ]
+  const values = patterns.map((pattern, index) => {
+    const record = lines[index]
+    if (record === undefined) fail(physical.length)
+    const match = pattern.exec(record.text)
+    if (match === null) fail(record.line)
+    return match[1]
+  })
+  const id = parseSingleLineScalar(values[4])
+  if (id === undefined || !/^[a-z][a-z0-9-]*$/u.test(id)) fail(lines[4].line)
+  if (parseSingleLineScalar(values[1]) !== 'preset-' + id) fail(lines[1].line)
+  if (parseSingleLineScalar(values[2]) !== '@deepseek-ai/dsh-agent-preset') fail(lines[2].line)
+  const order = Number(values[5])
+  if (!Number.isSafeInteger(order)) fail(lines[5].line)
+  const payload = lines.slice(patterns.length)
+  if (payload.length === 0) fail(physical.length)
+  if (!/^          - id: \S/u.test(payload[0].text)) fail(payload[0].line)
+  for (const { text, line } of payload) {
+    if (!/^ {10,}\S/u.test(text) || /[\x00-\x1f\x7f]/u.test(text)) fail(line)
+  }
+  return { id, order }
 }
 
 function requiredFileError(error, path) {
@@ -392,13 +405,14 @@ async function readRequiredText(path) {
 }
 
 /**
- * Read each immediate Preset directory's required metadata, using its directory name as id.
+ * Read the immediate Web preset patch files; ids come from declarations, not filenames.
  * @param {string} source - Absolute upstream checkout directory.
  * @returns {Promise<PresetObservation[]>} Preset records sorted by id.
  * @throws {UpstreamInspectionError} A structured file-read or metadata-parse failure.
  */
 export async function readPresetRoster(source) {
-  const root = join(source, 'packages/preset/agent-presets/presets')
+  const relativeRoot = 'packages/bundle/web-app/presets'
+  const root = join(source, relativeRoot)
   let entries
   try {
     entries = await readdir(root, { withFileTypes: true })
@@ -406,12 +420,19 @@ export async function readPresetRoster(source) {
     throw requiredFileError(error, root)
   }
   const result = []
-  for (const entry of entries.filter(value => value.isDirectory()).sort((a, b) => a.name.localeCompare(b.name, 'en'))) {
-    const sourcePath = join(root, entry.name, 'preset.yml')
-    const metadata = parsePresetMetadata(await readRequiredText(sourcePath), sourcePath)
-    result.push({ id: entry.name, ...metadata })
+  const ids = new Set()
+  for (const entry of entries.filter(value => value.name.endsWith('.patch.yml')).sort((a, b) => a.name.localeCompare(b.name, 'en'))) {
+    const sourcePath = relativeRoot + '/' + entry.name
+    if (!entry.isFile() || !isCanonicalUpstreamPath(sourcePath)) {
+      throw new UpstreamInspectionError('PRESET_ROSTER_PARSE_ERROR', { path: sourcePath })
+    }
+    const metadata = parsePresetMetadata(await readRequiredText(join(source, sourcePath)), sourcePath)
+    if (ids.has(metadata.id)) throw new UpstreamInspectionError('PRESET_ROSTER_PARSE_ERROR', { path: sourcePath })
+    ids.add(metadata.id)
+    result.push({ ...metadata, sourcePath })
   }
-  return result
+  if (result.length === 0) throw new UpstreamInspectionError('PRESET_ROSTER_PARSE_ERROR', { path: relativeRoot })
+  return result.sort((left, right) => left.id < right.id ? -1 : left.id > right.id ? 1 : 0)
 }
 
 async function gitRead(source, args) {
@@ -496,7 +517,7 @@ async function inspectUpstreamChecked({ source, baseline }) {
   for (const profile of profiles) probes[`profile:${profile.id}`] = profile
   for (const preset of presets) probes[`preset:${preset.id}`] = preset
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     repository: baseline.repository,
     commit,
     commitDate,

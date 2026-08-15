@@ -1,12 +1,12 @@
 # 能力与组合归属
 
-基线：DeepSeek Harness commit `0d1f50007f9bca3f52b06e1c3074fa14d5fb0720`。
+基线：DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`。
 
 ## 一句话结论
 
 DeepSeek Harness 的能力是否可用，取决于 Application Profile、Agent Preset 与显式加入的可选包。包是否进入发布族、是否仍为 experimental、是否默认启用，是三个独立问题。
 
-<a id="claim-dsh-cap-001"></a> **Claim `DSH-CAP-001`:** 固定基线发布 `web`、`headless`、`sdk`、`sdk-minimal` 与 `acp` 五个 Application Profile，并记录各自的 Bundle 与重载模式。
+<a id="claim-dsh-cap-001"></a> **Claim `DSH-CAP-001`:** 固定基线发布 `web`、`headless`、`sdk`、`sdk-minimal` 与 `acp` 五个 Application Profile，并记录各自的 Bundle。
 
 <a id="claim-dsh-cap-002"></a> **Claim `DSH-CAP-002`:** 固定基线发布 `standard`、`minimal`、`ptc` 与 `cordis` 四个 Agent Preset，并为它们配置不同的工具呈现。
 
@@ -18,28 +18,34 @@ Application Profile 组合 Host 与应用入口；Web 的 Agent Preset 选择 Se
 
 ### Application Profile 矩阵
 
-固定基线的 `PROFILE_TEMPLATES` 保留五行；Web 使用 live Patch reload，其余四个只在启动时应用 Patch。
+固定基线的 `PROFILE_TEMPLATES` 保留五行，仅声明 Bundle 列表。重载由最终 YAML 中的 HMR 插件决定：Base 默认启用配置重载，Headless、SDK 与 ACP 的 Bundle 显式禁用，独立的 SDK Minimal 也不装载 HMR。
 
 | Application Profile | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
-| Web | 已发布；Patch live reload | `profile:web` | `dsh-base` + `dsh-web-app` 提供 HTTP/Web runtime、浏览器插件与四个系统 Preset，默认选择 `standard` | 模型工具由所选 Preset 决定；全文搜索默认 `openAt: never` |
-| Headless | 已发布；Patch startup-only | `profile:headless` | `dsh-base` + `dsh-headless` 创建一次 Agent，等待静止并从 durable interval 输出最终结果 | 无监听端口；stdout 为最终文本，reasoning delta 在 stderr |
-| SDK | 已发布；Patch startup-only | `profile:sdk` | `dsh-base` + `dsh-sdk-app` 在 stdio 上提供 SDK JSON-RPC | stdout 专用于协议；工具来自 Profile 组合 |
+| Web | 已发布；默认启用 HMR | `profile:web` | `dsh-base` + `dsh-web-app` 提供 HTTP/Web runtime、浏览器插件与四个 Preset 声明，默认选择 `standard` | 模型工具由所选 Preset 决定；全文搜索默认 `openAt: never` |
+| Headless | 已发布；默认禁用 HMR | `profile:headless` | `dsh-base` + `dsh-headless` 创建一次 Agent，等待静止并从 durable interval 输出最终结果 | 无监听端口；stdout 为最终文本，reasoning delta 在 stderr |
+| SDK | 已发布；默认禁用 HMR | `profile:sdk` | `dsh-base` + `dsh-sdk-app` 在 stdio 上提供 SDK JSON-RPC | stdout 专用于协议；工具来自 Profile 组合 |
 | SDK Minimal | 已发布；独立完整树 | `profile:sdk-minimal` | `dsh-sdk-minimal` 直接组合 SDK server、DeepSeek adapter、一个平台持久 Shell 与 JSONL Session | 默认没有 filesystem editor 或 compaction；`danger-full-access` 允许访问进程可访问的路径 |
-| ACP | 已发布；Patch startup-only | `profile:acp` | `dsh-base` + `dsh-acp-app` 装载 automation-only ACP server | stdout 专用于 ACP |
+| ACP | 已发布；默认禁用 HMR | `profile:acp` | `dsh-base` + `dsh-acp-app` 装载 automation-only ACP server | stdout 专用于 ACP |
 
-[Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/src/profile.ts#L138-L160)；[Headless 命令行为](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/cli/reference/README.md#L32-L42)；[SDK Minimal 组合](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/sdk-minimal/README.md#L12-L41)。Desktop 是独立 Host 启动路径，见[组合专题](deep-dives/profiles-bundles-presets.md)，不计入上述五个模板。
+[Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/boot/app-boot/src/profile.ts#L157-L174)；[Base HMR](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/base/cordis.patch.yml#L27-L32)；[Headless 禁用 HMR](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/headless/cordis.patch.yml#L33-L34)；[SDK 禁用 HMR](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/sdk-app/cordis.patch.yml#L24-L25)；[ACP 禁用 HMR](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/acp-app/cordis.patch.yml#L23-L24)；[Headless 命令行为](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/apps/cli/reference/README.md#L32-L42)；[SDK Minimal 组合](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/sdk-minimal/README.md#L12-L41)。Desktop 是独立 Host 启动路径，见[组合专题](deep-dives/profiles-bundles-presets.md)，不计入上述五个模板。
 
 ### Agent Preset 矩阵
 
 | Agent Preset | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
-| Standard | 已发布、只读系统 Preset | `preset:standard` | native tools：Shell、文件检索、Job、Skill、Goal/Plan、compaction、进程内 spawn/fork、Workflow、ask-user、todo、Web 与 present | Ralph、Codex 与 Claude Code 工具行默认 disabled |
-| Minimal | 已发布、只读系统 Preset | `preset:minimal` | 固定完整 persona 与一个按平台选择的持久 Shell；PTY 使用独立 realm | 不包含 filesystem editor、运行时上下文或 compaction；Shell 仍消费 Host sandbox policy |
-| PTC | 已发布、只读系统 Preset | `preset:ptc` | `mode: ptc` 将工具目录呈现为 `run_code`，依赖 Host 的 TypeScript PTC runtime | Workflow engine、通用 workflow 工具与 Ralph 均 disabled；若启用 Ralph，须同时恢复 engine |
-| Cordis / Creator | 已发布、只读系统 Preset | `preset:cordis` | 在编码工具上提供运行时检查/装载与组合创作 Skill | `cordis_mount` 求值模型编写的 JavaScript；自定义组合与 Shell 属于同等信任级别 |
+| Standard | 已发布、Bundle 声明的 Preset | `preset:standard` | native tools：Shell、文件检索、Job、Skill、Goal/Plan、compaction、进程内 spawn/fork、Workflow、ask-user、todo、Web 与 present | Ralph、Codex 与 Claude Code 工具行默认 disabled |
+| Minimal | 已发布、Bundle 声明的 Preset | `preset:minimal` | 固定完整 persona 与一个按平台选择的持久 Shell；PTY 使用独立 realm | 不包含 filesystem editor、运行时上下文或 compaction；Shell 仍消费 Host sandbox policy |
+| PTC | 已发布、Bundle 声明的 Preset | `preset:ptc` | `mode: ptc` 将工具目录呈现为 `run_code`，依赖 Host 的 TypeScript PTC runtime | Workflow engine、通用 workflow 工具与 Ralph 均 disabled；若启用 Ralph，须同时恢复 engine |
+| Cordis / Creator | 已发布、Bundle 声明的 Preset | `preset:cordis` | 在编码工具上提供运行时检查/装载、组合创作 Skill 与 `plugin_manager` | `cordis_mount` 求值模型编写的 JavaScript；管理工具每次调用需要 Full access 或审批，安装的 Host 插件在 workspace sandbox 外执行 |
 
-[Standard delegation 与工具](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L158-L262)；[Minimal 完整组合](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L1-L69)；[PTC 禁用行与 runtime 依赖](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/ptc/agent.cordis.yml#L229-L283)。
+[Standard delegation 与工具](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/presets/standard.patch.yml#L80-L146)；[Minimal 完整组合](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/presets/minimal.patch.yml#L4-L61)；[PTC 禁用行与 runtime 依赖](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/presets/ptc.patch.yml#L119-L152)。
+
+Preset 由 Web Bundle 的 `presets/*.patch.yml` 注册，默认选择 `standard`。Web 只读展示组合；新增或覆盖 Preset 通过 Bundle Patch，Creator 可在对话中编写这类 Bundle。[注册与修改方式](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/preset/agent-preset-registry/README.md#L46-L58)。
+
+### Plugin Manager
+
+Base 提供 Profile 级 Plugin Manager，Web Plugins 页面可安装、启停和移除 Bundle；Standard/PTC 的模型管理工具默认禁用，Creator 启用。操作影响使用同一 Profile 的会话，HMR 决定立即应用还是重启生效。不兼容的安装会被拒绝；启动或重组时，不兼容或不可读取的 Bundle 被跳过，保存的 Bundle 选择仍保留，其余组合能否启动取决于所需服务是否齐全。例外授权只绑定精确插件版本与 DSH runtime 版本，不能代替依赖构建脚本授权。[管理范围、权限与应用](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/boot/plugin-manager/README.md#L28-L42)；[兼容性与精确版本例外](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/boot/plugin-manager/README.md#L60-L69)；[启动跳过与保存状态](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/boot/app-boot/README.md#L50-L54)。
 
 ### LLM
 
@@ -52,7 +58,7 @@ pi-ai 可声明兼容提供方，但固定组合没有预先启用所有目录�
 | DeepSeek 默认路由 | base-backed 组合启用 | `profile:web` | Agent 默认选择 `deepseek-official` / `deepseek-flash` | SDK initialization 可显式选择自己的 route，不能把 Web 默认值当成所有客户端的默认值 |
 | pi-ai 路由 | 已装载、初始 dormant | `profile:web` | `llm-pi-ai:` 用户设置增加、更新或移除 live provider route | 目录中存在某 provider 不等于该部署已配置凭据并启用它 |
 
-[Base 默认模型与 dormant pi-ai](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L75-L108)。
+[Base 默认模型与 dormant pi-ai](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/base/cordis.patch.yml#L80-L128)。
 
 ### 工具、MCP 与图形操作
 
@@ -71,7 +77,7 @@ pi-ai 可声明兼容提供方，但固定组合没有预先启用所有目录�
 |---|---|---|---|---|
 | MCP 外部服务 | Client 可选；共享资源服务随 Profile 提供 | `optional-package:packages/mcp/mcp-client` | 每个 entry 配置一个 stdio 或 Streamable HTTP server；工具为 `mcp__<server>__<tool>`，资源可查询/读取，server instructions 进入已记录提示词 | 默认无 server；不支持 MCP prompt templates；图片需要支持 image 的模型与 attachment store |
 
-[MCP 配置、资源与结果](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/mcp/mcp-client/README.md#L12-L93)；[Base 资源服务](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L471-L472)。
+[MCP 配置、资源与结果](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/mcp/mcp-client/README.md#L12-L93)；[Base 资源服务](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/base/cordis.patch.yml#L491-L492)。
 
 <a id="claim-dsh-cap-010"></a> **Claim `DSH-CAP-010`:** Browser use 与 Computer use 各有单一 Provider 注册服务，其公开实验性 Provider 需要显式启用。
 
@@ -82,7 +88,7 @@ pi-ai 可声明兼容提供方，但固定组合没有预先启用所有目录�
 | Browser use | 公开实验性 Provider，显式启用 | `experimental:packages/experimental/browser-use-runtime` | `ctx.browserUse` 注册一个 Provider；Playwright MCP、Chrome DevTools MCP 或 Stagehand 提供实际操作 | 初始引擎 Chromium；launched browser 随 live Session 回收，resume/fork 不恢复登录状态；attached browser 的 reservation 只在 Provider 实例内有效 |
 | Computer use | 公开实验性 Provider，显式启用 | `experimental:packages/experimental/computer-use-cua-driver-native` | `ctx.computerUse` 注册一个 Provider；Cua Driver 提供 MCP 或 native 接入 | 单一 Provider 不等于 Session 独占桌面；平台权限由 Provider 要求，已送达的输入不能靠取消撤回 |
 
-[Browser use 归属与生命周期](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/browser-use.md#L5-L37)；[Computer use 归属与共享桌面](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/computer-use.md#L5-L26)。
+[Browser use 归属与生命周期](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/subsystems/browser-use.md#L5-L37)；[Computer use 归属与共享桌面](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/subsystems/computer-use.md#L5-L26)。
 
 ### Sandbox
 
@@ -95,11 +101,11 @@ pi-ai 可声明兼容提供方，但固定组合没有预先启用所有目录�
 
 ### Session
 
-<a id="claim-dsh-cap-006"></a> **Claim `DSH-CAP-006`:** Session 提供持久化、投影、恢复、Transcript 与已完成 Turn 的 Fork 原语。
+<a id="claim-dsh-cap-006"></a> **Claim `DSH-CAP-006`:** Session 提供持久化、投影、恢复、Transcript 与按事件前缀 Fork 的原语。
 
 | Capability | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
-| Durable Web Session | 随 Web 的 base 组合启用 | `profile:web` | append-only Event Log、持久化、投影、恢复、Transcript 与稳定轮次边界的 Fork | 投影为派生视图；新基线的格式与迁移要求见[Session 专题](deep-dives/session-event-log.md) |
+| Durable Web Session | 随 Web 的 base 组合启用 | `profile:web` | append-only Event Log、持久化、投影、恢复、Transcript 与按事件前缀的 Fork；开放尾部补写 synthetic closers | 投影为派生视图；新基线的格式与迁移要求见[Session 专题](deep-dives/session-event-log.md) |
 | Minimal SDK Session | 随 SDK Minimal 启用 | `profile:sdk-minimal` | 独立树装载 JSONL persistence 与同一 SDK server | 保留最小工具组合及 `danger-full-access` 执行策略 |
 
 ### Delegation 与 Agent Teams
@@ -116,10 +122,9 @@ Provider 在 Host 中可用不等于模型已经获得对应工具。
 | ACP provider | 可选包 | `optional-package:packages/subagent/subagent-acp` | ACP subprocess | Standard 无预置工具行，需自行组合 Consumer |
 | DSH SDK provider | 可选包 | `optional-package:packages/subagent/subagent-dsh-sdk` | TypeScript SDK 与 stdio JSON-RPC | Standard 无预置工具行，需自行组合 Consumer |
 | Agent Team domain/tools | 公开实验性包，opt-in | `experimental:packages/experimental/agent-team` | 持久 roster、成员 mailbox 与 shared task DAG；工具由 sibling Consumer 提供 | 需要 durable Session storage；共享 checkout，无 worktree isolation 或文件锁 |
-| Agent Team Profile layer | 公开实验性 Bundle，opt-in | `experimental:packages/experimental/agent-team-profile` | 在 base 上加入 Team domain/tools，以 `spawn_teammate` 选择 fresh/fork，禁用普通直接委托与重叠全局 controls | 不是第六个 shipped Profile；Workflow 仍用 fresh one-shot child |
-| Agent Team Web layer | 公开实验性 Bundle，opt-in | `experimental:packages/experimental/agent-team-web-profile` | 另加 Team roster、task board 与 teammate navigation | 需先装 Host Team layer；现有 Web Preset scoped controls 可与 Team UI 同时出现 |
+| Agent Team Bundle | 随安装提供但默认关闭的实验性 Bundle | `experimental:packages/experimental/agent-team-profile` | 一次启用 Team domain/tools 与 Web roster/task board/navigation；`spawn_teammate` 选择 fresh/fork，禁用 Host 普通委托与重叠 controls | 不是第六个 shipped Profile；Workflow 仍用 fresh one-shot child；Preset scoped controls 仍可能同时出现 |
 
-[Subagent 工具与 Provider 启用步骤](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/cli/reference/README.md#L57-L67)；[Team 组合](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team-profile/README.md#L12-L41)；[Team Web 限制](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team-web-profile/README.md#L82-L88)。
+[Subagent 工具与 Provider 启用步骤](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/apps/cli/reference/README.md#L83-L93)；[Team 组合](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/experimental/agent-team-profile/README.md#L12-L51)；[Team 默认状态与限制](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/experimental/agent-team-profile/README.md#L102-L109)。
 
 ### Goal、Workflow 与 Schedule
 
@@ -130,10 +135,10 @@ Goal 状态不负责调度；Workflow 的 VM 不是安全隔离层，文件约�
 | Capability | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
 | Current Goal | 随 Standard 启用 | `preset:standard` | `goal/change` 持久化目标 mutation，process-local activation 决定 continuation eligibility | Resume/Fork 后须重新激活；何时续轮由 driver 消费方决定 |
-| Workflow | 随 Standard 启用 | `preset:standard` | `workflow-ptc` 复用 Node PTC runtime，每次在新建 Node 进程中运行 JS orchestration，通过 hooks 启动 Subagent | 没有整体 elapsed deadline；caller cancellation 与工具 deadline 仍适用；必须 dispose |
+| Workflow | 随 Standard 启用 | `preset:standard` | `workflow-ptc` 复用 Node PTC runtime，每次在新建 Node 进程中运行 JS orchestration，通过 hooks 启动 Subagent；工具可等待完成或返回后台 Job | 没有整体 elapsed deadline；前台服从 caller/tool deadline；后台由 Job/owner 取消并负责 dispose |
 | Ralph | Preset 行默认 disabled | `preset:standard` | 显式启用后通过同一 Workflow engine 执行 fresh-agent iteration | PTC Preset 还须恢复 engine；完成是 worker 自报，不是独立评估 |
 
-[Workflow 执行、文件策略与取消](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/README.md#L12-L61)。该 engine 只接受 TypeScript PTC runtime；改用 Python PTC 时必须禁用 Workflow/Ralph 对应行。
+[Workflow 执行、文件策略与取消](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/workflow/workflow-ptc/README.md#L12-L61)。该 engine 只接受 TypeScript PTC runtime；改用 Python PTC 时必须禁用 Workflow/Ralph 对应行。
 
 <a id="claim-dsh-cap-012"></a> **Claim `DSH-CAP-012`:** Schedule 以可选组合提供持久化的一次性或固定间隔提醒，并在同一会话的 live root Agent 空闲时投递。
 
@@ -143,7 +148,22 @@ Goal 状态不负责调度；Workflow 的 VM 不是安全隔离层，文件约�
 |---|---|---|---|---|
 | Schedule | 可选 overlay；Web UI row 默认 disabled | `optional-package:packages/schedule/schedule` | Session log 保存提醒；到期后以 ordinary follow-up 送入同一 idle conversation | 固定间隔至少五分钟；不提供日历规则、cold-session scheduler 或会话外通知；只作用于插件加载后创建的 root Agent |
 
-[Schedule 配置与投递](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/schedule/schedule/README.md#L12-L83)；[Web 默认禁用行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/web-app/cordis.patch.yml#L308-L313)。
+[Schedule 配置与投递](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/schedule/schedule/README.md#L12-L83)；[Web 默认禁用行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/cordis.patch.yml#L349-L354)。
+
+<a id="office-skills"></a>
+
+### Office Skills 与资源
+
+<a id="claim-dsh-cap-013"></a> **Claim `DSH-CAP-013`:** Office Skills 提供 DOCX、PPTX 与 XLSX 工作流；打包的 Python SDK 默认组合运行时查询工具与 Office Skills。
+
+源码 SDK 在没有 carrier 默认资源时仍需显式配置；运行时查询工具与 Office Skills 可分别禁用，Skill 本身不安装解释器或编写库。
+
+| Capability | Availability | Owner | Mechanism | Limit |
+|---|---|---|---|---|
+| Office Skills | 可选 Provider；打包 Python SDK 默认组合 | `optional-package:packages/skill/skill-office` | Skill catalog 按需加载 `office-docx`、`office-pptx`、`office-xlsx`，提供 OOXML 检查脚本与 LibreOffice Kit 路径 | 结构检查不证明分页、字体或图表视觉正确；部署仍需解释器、编写库、执行与交付工具 |
+| SDK Office 运行时 | 打包 Python SDK 默认；源码 SDK opt-in | `profile:sdk` | `load_workspace_dependencies` 查询 carrier 的运行时资源；`DSH_PRIMARY_RUNTIME` 可替换资源路径 | 空值显式禁用；外部 payload 平台、架构或内容无效时拒绝使用 |
+
+[Office 工作流与部署要求](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/skill/skill-office/README.md#L28-L50)；[资源布局与 SDK 默认](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/skill/tool-workspace-dependencies/README.md#L38-L47)；[SDK 条件组合](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/sdk-app/cordis.patch.yml#L27-L41)。Web Bundle 还提供 Office 到 PDF 的文档预览；它与模型控制浏览器或桌面的实验性 Provider 分属不同能力。[文档预览与浏览器 UI 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/cordis.patch.yml#L244-L255)。
 
 ### Webhook
 
@@ -152,7 +172,7 @@ Goal 状态不负责调度；Workflow 的 VM 不是安全隔离层，文件约�
 | Generic Webhook runtime | 显式部署组合 | `optional-package:packages/webhook/webhook` | authenticated delivery 经 trusted rule 创建 Workspace-backed root Session | Fire-and-forget；没有 queue、retry、dedupe、crash replay 或 completion result |
 | GitHub webhook adapter | 显式部署组合 | `optional-package:packages/webhook/webhook-github` | 在解析前验证原始 JSON body，内存 dispatch 后返回 `202` | adapter 负责 intake；rule 验证事件字段并执行外部调用 |
 
-[Webhook runtime 与 GitHub adapter](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/webhook.md#L5-L37)。
+[Webhook runtime 与 GitHub adapter](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/subsystems/webhook.md#L5-L37)。
 
 ### SDK access
 
@@ -161,7 +181,7 @@ Goal 状态不负责调度；Workflow 的 VM 不是安全隔离层，文件约�
 | Full SDK runtime | 已发布 SDK application | `profile:sdk` | newline-delimited stdio JSON-RPC；初始化验证 route，prompt 返回 message id，客户端收集 durable receipt 至 idle 的活动区间 | 无 prompt cancel 或 per-session close；区间结果不表示某一 prompt 的因果独占答复 |
 | Minimal SDK runtime | 已发布独立 SDK application | `profile:sdk-minimal` | 相同 server 与 wire，默认仅一个持久 Shell | 不包含 full base feature set；执行为 `danger-full-access` |
 
-[SDK server](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sdk/server/README.md#L42-L52)；[TypeScript run 结果](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sdk/client/README.md#L48-L54)；[协议限制](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sdk/protocol/README.md#L110-L116)。客户端字段与安全的一次性目录示例见[上手章节](05-getting-started.md)。
+[SDK server](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/sdk/server/README.md#L42-L52)；[TypeScript run 结果](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/sdk/client/README.md#L48-L54)；[协议限制](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/sdk/protocol/README.md#L110-L116)。客户端字段与安全的一次性目录示例见[上手章节](05-getting-started.md)。
 
 ## 证据
 
@@ -169,18 +189,19 @@ Claim 分类、限定、probe 与全部不可变来源由 [`evidence/claims.json
 
 | Claim | 种类 | 证据信心 | DeepSeek Harness 成熟度 | 固定来源 |
 |---|---|---|---|---|
-| `DSH-CAP-001` | `upstream-fact` | `verified` | `released` | [Profile templates](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/src/profile.ts#L138-L160) |
-| `DSH-CAP-002` | `upstream-fact` | `verified` | `released` | [Standard Preset](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L1-L262) |
-| `DSH-CAP-003` | `upstream-fact` | `qualified` | `released` | [默认模型与 pi-ai](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L75-L108) |
-| `DSH-CAP-004` | `upstream-fact` | `verified` | `released` | [Base tools 与 runtime](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L243-L378) |
-| `DSH-CAP-005` | `upstream-fact` | `qualified` | `released` | [Sandbox modes](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/sandbox.md#L5-L79) |
-| `DSH-CAP-006` | `upstream-fact` | `verified` | `released` | [Session 与 fork](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/session.md#L659-L665) |
-| `DSH-CAP-007` | `upstream-fact` | `qualified` | `released` | [Standard delegation](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L175-L220) |
-| `DSH-CAP-008` | `upstream-fact` | `qualified` | `released` | [Goal activation](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/goal/goal/README.md#L54-L72)；[Workflow runtime](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/README.md#L12-L61) |
-| `DSH-CAP-009` | `analysis-inference` | `qualified` | `released` | [Session log](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/session.md#L5)；[Replay fixtures](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/testing.md#L11-L17) |
-| `DSH-CAP-010` | `upstream-fact` | `qualified` | `experimental` | [Browser](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/browser-use.md#L5-L37)；[Computer](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/computer-use.md#L5-L26) |
-| `DSH-CAP-011` | `upstream-fact` | `verified` | `released` | [MCP client](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/mcp/mcp-client/README.md#L12-L28) |
-| `DSH-CAP-012` | `upstream-fact` | `qualified` | `released` | [Schedule](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/schedule/schedule/README.md#L12-L83) |
+| `DSH-CAP-001` | `upstream-fact` | `verified` | `released` | [Profile templates](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/boot/app-boot/src/profile.ts#L157-L174) |
+| `DSH-CAP-002` | `upstream-fact` | `verified` | `released` | [Standard Preset](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/presets/standard.patch.yml#L4-L146) |
+| `DSH-CAP-003` | `upstream-fact` | `qualified` | `released` | [默认模型与 pi-ai](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/base/cordis.patch.yml#L80-L128) |
+| `DSH-CAP-004` | `upstream-fact` | `verified` | `released` | [Base tools 与 runtime](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/base/cordis.patch.yml#L263-L398) |
+| `DSH-CAP-005` | `upstream-fact` | `qualified` | `released` | [Sandbox modes](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/subsystems/sandbox.md#L5-L79) |
+| `DSH-CAP-006` | `upstream-fact` | `verified` | `released` | [Session fork 实现](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/core/session/src/index.ts#L1221-L1254) |
+| `DSH-CAP-007` | `upstream-fact` | `qualified` | `released` | [Standard delegation](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/presets/standard.patch.yml#L86-L118) |
+| `DSH-CAP-008` | `upstream-fact` | `qualified` | `released` | [Goal activation](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/goal/goal/README.md#L54-L72)；[Workflow runtime](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/workflow/workflow-ptc/README.md#L12-L61) |
+| `DSH-CAP-009` | `analysis-inference` | `qualified` | `released` | [Session log](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/subsystems/session.md#L5)；[Replay fixtures](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/testing.md#L11-L17) |
+| `DSH-CAP-010` | `upstream-fact` | `qualified` | `experimental` | [Browser](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/subsystems/browser-use.md#L5-L37)；[Computer](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/subsystems/computer-use.md#L5-L26) |
+| `DSH-CAP-011` | `upstream-fact` | `verified` | `released` | [MCP client](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/mcp/mcp-client/README.md#L12-L28) |
+| `DSH-CAP-012` | `upstream-fact` | `qualified` | `released` | [Schedule](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/schedule/schedule/README.md#L12-L83) |
+| `DSH-CAP-013` | `upstream-fact` | `qualified` | `released` | [Office Skills](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/skill/skill-office/README.md#L28-L44)；[SDK 默认](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/sdk-app/cordis.patch.yml#L27-L41) |
 
 ## 限制与适用范围
 

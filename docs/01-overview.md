@@ -1,6 +1,6 @@
 # 项目概览
 
-基线：DeepSeek Harness commit `0d1f50007f9bca3f52b06e1c3074fa14d5fb0720`。
+基线：DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`。
 
 ## 一句话结论
 
@@ -12,7 +12,7 @@
 
 ### 一切皆插件
 
-模型适配器、工具注册表、Session Event Log 与 Agent loop 都通过插件装载。插件贡献服务、类型化事件和可逆 Effect；扩展通常是在现有插件旁装载新插件，而不是修改不可替换的产品核心。[架构定义](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L9-L13)
+模型适配器、工具注册表、Session Event Log 与 Agent loop 都通过插件装载。插件贡献服务、类型化事件和可逆 Effect；扩展通常是在现有插件旁装载新插件，而不是修改不可替换的产品核心。[架构定义](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L9-L13)
 
 ```mermaid
 flowchart LR
@@ -33,15 +33,15 @@ flowchart LR
 
 这是一项 `analysis-inference`。限定为：可替换描述配置和能力接口，不承诺活动组件可以任意热替换；Desktop 不是第六个 CLI Profile 模板。
 
-CLI 保留 `web`、`headless`、`sdk`、`sdk-minimal`、`acp` 五种模板。Electron Desktop 则启动独立的私有 Host，用捆绑的 Node、后端和客户端资源构成桌面应用，通过字节管道与 `dsh-app://` 通信，应用传输不启动 Web server 或 loopback port。上游架构的通用 CLI 启动规则需与其单列的 Desktop 章节合读。[CLI 与 Desktop](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L41-L53)
+CLI 保留 `web`、`headless`、`sdk`、`sdk-minimal`、`acp` 五种模板。Electron Desktop 在 Electron Node 模式下启动私有 Host，复用 CLI Profile runner 与完整 Web 应用。窗口立即加载打包的 Web 资源，等待启动数据后在同一页面激活客户端；Desktop carrier 将页面接入带认证的 Web Host，Node IPC 负责启动、就绪、错误与关闭通知。Desktop 默认端口为 `19387`，可在 Profile 中改写；公共 CLI 不能管理保留的 `desktop` Profile。[CLI 与 Desktop](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L43-L55)
 
 ## 证据
 
 | Claim | 种类 / 证据信心 | 固定来源 |
 |---|---|---|
-| `DSH-OVR-001` | `upstream-fact / verified` | [README](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/README.md#L1-L7)；[插件定义](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L9-L13) |
-| `DSH-OVR-002` | `analysis-inference / qualified` | [应用装配](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L15-L53) |
-| `DSH-OVR-003` | `upstream-fact / qualified` | [开发者预览](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/README.md#L11-L15) |
+| `DSH-OVR-001` | `upstream-fact / verified` | [README](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/README.md#L1-L7)；[插件定义](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L9-L13) |
+| `DSH-OVR-002` | `analysis-inference / qualified` | [应用装配](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L15-L55) |
+| `DSH-OVR-003` | `upstream-fact / qualified` | [开发者预览](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/README.md#L11-L15) |
 
 正式记录与成熟度见 [Claim ledger](../evidence/claims.json)，核对方式见[证据方法](00-methodology.md)。
 
