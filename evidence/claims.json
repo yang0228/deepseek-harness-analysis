@@ -1896,6 +1896,15 @@
           "startLine": 157,
           "endLine": 161,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/goal/goal/README.md#L157-L161"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/goal/goal-round-driver/README.md",
+          "startLine": 49,
+          "endLine": 57,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/goal/goal-round-driver/README.md#L49-L57"
         }
       ],
       "qualification": "Resume 或 Fork 后需要重新激活 Goal；Goal 本身不是调度器。"
@@ -1972,6 +1981,24 @@
           "startLine": 200,
           "endLine": 228,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/workflow/workflow-ptc/src/host.ts#L200-L228"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/workflow/workflow-ptc/src/host.ts",
+          "startLine": 290,
+          "endLine": 301,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/workflow/workflow-ptc/src/host.ts#L290-L301"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/ptc-runtime/ptc-runtime-node/README.md",
+          "startLine": 98,
+          "endLine": 98,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/ptc-runtime/ptc-runtime-node/README.md#L98"
         }
       ],
       "qualification": "文件约束和进程清理由所选 Provider 决定；Workflow 无整体 elapsed deadline，VM 与协作式 fan-out limits 不构成安全隔离或强制配额。"
@@ -2819,7 +2846,7 @@
     },
     {
       "id": "DSH-CAP-012",
-      "statement": "Schedule 随 Web 默认组合提供 Host 持久任务、一次性和多种周期提醒，到期可恢复原会话并接纳 follow-up。",
+      "statement": "Schedule 随 Web 与完整 SDK 组合提供 Host 持久任务、一次性和多种周期提醒，到期通过所属应用的激活入口恢复原会话并接纳 follow-up。",
       "kind": "upstream-fact",
       "confidence": "qualified",
       "maturity": "released",
@@ -2889,6 +2916,33 @@
           "startLine": 19,
           "endLine": 35,
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/standard.patch.yml#L19-L35"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/bundle/sdk-app/cordis.patch.yml",
+          "startLine": 54,
+          "endLine": 62,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/sdk-app/cordis.patch.yml#L54-L62"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sdk/server/src/server.ts",
+          "startLine": 134,
+          "endLine": 167,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/src/server.ts#L134-L167"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/schedule/tool-schedule/src/index.ts",
+          "startLine": 229,
+          "endLine": 237,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/tool-schedule/src/index.ts#L229-L237"
         }
       ],
       "qualification": "投递回执确认 inbox 持久接纳，不证明模型执行；Session flush 与 task-row 更新分开，崩溃或写入失败可能重复投递。"

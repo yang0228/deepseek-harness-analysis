@@ -149,13 +149,13 @@ Goal 状态不负责调度；Workflow 的 VM 不是安全隔离层，文件约�
 
 [Workflow 执行、文件策略与取消](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/workflow/workflow-ptc/README.md#L12-L61)。该 engine 只接受 TypeScript PTC runtime；改用 Python PTC 时必须禁用相关 engine 与工具。[Ralph 的独立 Host group](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/experimental/ralph-bundle/README.md#L28-L40)。
 
-<a id="claim-dsh-cap-012"></a> **Claim `DSH-CAP-012`:** Schedule 随 Web 默认组合提供 Host 持久任务、一次性和多种周期提醒，到期可恢复原会话并接纳 follow-up。
+<a id="claim-dsh-cap-012"></a> **Claim `DSH-CAP-012`:** Schedule 随 Web 与完整 SDK 组合提供 Host 持久任务、一次性和多种周期提醒，到期通过所属应用的激活入口恢复原会话并接纳 follow-up。
 
 投递回执确认 inbox 持久接纳，不证明模型执行；Session flush 与 task-row 更新分开，崩溃或写入失败可能重复投递。
 
 | Capability | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
-| Schedule | Web 默认 service/UI；Standard、Cordis、PTC 默认工具 | `profile:web` | Host storage-domain 保存任务、历史与下次目标；支持 after/at/every/daily/weekly/cron，到期恢复原 Session 并 follow-up | every 至少 60 秒；每个周期任务只补最新 missed occurrence；依赖 Web Session controller 和 persistence，不能单独装载到 SDK/headless |
+| Schedule | Web 默认 service/UI；Standard、Cordis、PTC 默认工具；完整 SDK 默认 service/tools | `profile:web` | Host storage-domain 保存任务、历史与下次目标；支持 after/at/every/daily/weekly/cron，到期恢复原 Session 并 follow-up | every 至少 60 秒；每个周期任务只补最新 missed occurrence；依赖原 Session 的激活入口与 persistence；Web 使用 Session controller，SDK 注册自己的 handler |
 
 [Schedule 配置与投递](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/schedule/README.md#L12-L77)；[Web 默认 service/UI](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/cordis.patch.yml#L126-L132)。
 

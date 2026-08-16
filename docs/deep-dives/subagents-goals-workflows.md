@@ -2,7 +2,7 @@
 
 ## 基线
 
-本章描述 DeepSeek Harness commit `f3803c96974ad4a94195fb97e5c637e9c2a3afe3` 中的委托、目标状态、规划和程序化编排，并区分可选 Agent Teams 与随 Web 默认组合启用的 Schedule。源码链接固定到该提交；进程位置、发布族与默认启用状态分别核对。
+本章描述 DeepSeek Harness commit `f3803c96974ad4a94195fb97e5c637e9c2a3afe3` 中的委托、目标状态、规划和程序化编排，并区分可选 Agent Teams 与随 Web 与完整 SDK 默认组合启用的 Schedule。源码链接固定到该提交；进程位置、发布族与默认启用状态分别核对。
 
 ## 一句话结论
 
@@ -59,6 +59,7 @@ Resume 或 Fork 后需要重新激活 Goal；Goal 本身不是调度器。
 ### 委托与 Activation 时序
 
 进程内 spawn 可以通过 `agentPreset` 选择独立组合；省略时加入 parent 当前 revision，fork 与外部 backend 拒绝独立选择。工具配置中的 `persona` 与 `toolFilter` 会报迁移错误，不能再用它们构造 child 能力。[child 组合选择](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/subagent/tool-subagent/README.md#L66-L73)。
+
 ```mermaid
 sequenceDiagram
   participant Parent as Parent Agent
@@ -89,6 +90,8 @@ child 初始 cwd 由请求或 parent 当前有效目录捕获，相对路径针�
 直接列表读取 parent `subagentCatalog`，descendant 列表递归遍历可达 catalogs；external rows 为 leaf，未出现在可达 catalog 中的 Session（包括普通 fork）不会被发现。`list_agents` 的 `running` / `inactive` 只描述活动，不证明任务完成或消息可达。[catalog 枚举](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/subsystems/subagent.md#L375-L381)。
 
 ### Goal 与 Plan mode
+
+Goal driver 除等待 whole-agent idle，还在装载 Subagent service 时等待正在推进的 descendants 收敛，再决定续轮；不能仅凭 root 空闲判断委托任务已结束。[续轮时机](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/goal/goal-round-driver/README.md#L49-L57)。
 
 Goal 的 durable 事实来自 `goal/change`：目标文本、phase、revision 与轮数可重放。activation 为 process-local；任何 Session start 都把它 disarm，即使 durable phase 仍为 `active`，仍需显式 resume 才重新允许 continuation。上限是 admitted rounds，不是 token、费用或时间预算；completion 由 caller 记录，尚无 independent evaluator。[Goal 生命周期与恢复](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/goal/goal/README.md#L54-L82)；[Goal 限制](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/goal/goal/README.md#L157-L161)。同进程插件可直接写 Session 事件，strict replay 能检测 malformed/inconsistent records，但不隔离 trusted producer。
 
@@ -134,9 +137,9 @@ Team 验证 exact caller membership、拒绝 self-message，并按 sender-framed
 
 ### Schedule 与 Goal 的区别
 
-Schedule 已随 Web 默认装载 service/UI；Standard、Cordis、PTC 在自己的 scope 中提供四个提醒工具与 time context，spawn/fork child 显式过滤这些工具。Goal 仍保存当前 objective/phase/round budget，不决定 wall-clock 调度。[Web Schedule service](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/cordis.patch.yml#L126-L132)；[Preset 工具与 child 过滤](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/standard.patch.yml#L19-L35)；[spawn/fork filter](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/standard.patch.yml#L90-L101)。
+Schedule 随 Web 默认装载 service/UI，随完整 SDK 装载 service/tools；Standard、Cordis、PTC 在自己的 scope 提供四个提醒工具与 time context。当前 Preset 不用 spawn/fork 的 toolFilter 隐藏这些工具，而由 tool layer 按持久 delegation depth 拒绝 child 调用；service 另拒绝 child 创建或更新任务。Goal 仍保存当前 objective/phase/round budget，不决定 wall-clock 调度。[Web Schedule service](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/cordis.patch.yml#L126-L132)；[Preset 工具](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/bundle/web-app/presets/standard.patch.yml#L19-L35)；[child authority](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/tool-schedule/src/index.ts#L229-L237)。
 
-Schedule 的权威任务记录移到 Host `storage-domain`，支持 after、at、固定间隔 every、daily、weekly 与五字段 cron；后四种周期每次只补最新 missed occurrence。同 Session 的 due recurring tasks 可批成一个 follow-up；到期通过 Session controller 恢复 cold Session，再写 inbox 并要求 `session/flush` 确认。不能单独装载到没有 Web Session controller 的 headless/SDK 组合。[默认组合与时间规则](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/schedule/README.md#L26-L45)；[到期恢复与投递实现](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/schedule/src/runtime.ts#L88-L143)。
+Schedule 的权威任务记录移到 Host `storage-domain`，支持 after、at、固定间隔 every、daily、weekly 与五字段 cron；后四种周期每次只补最新 missed occurrence。同 Session 的 due recurring tasks 可批成一个 follow-up；到期通过 `schedule/resolve-agent` 恢复原 Session，先写 inbox，再由 `ctx.sessions.flush()` 确认持久接纳，随后更新 Host task row。没有定制 handler 时使用 Web Session controller，完整 SDK 注册自己的 handler；其他应用需提供对应激活入口。[默认组合与时间规则](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/schedule/README.md#L26-L45)；[到期恢复与投递实现](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/schedule/src/runtime.ts#L88-L143)。
 
 receipt 只证明 inbox 持久接纳，不证明模型已执行；Session flush 与 task-row put 是两次持久写，崩溃或 task-write failure 可能使已投递消息无回执并重复投递。管理和投递共享 FIFO，update 用 complete-record compare-and-set；archive 需先删除 active reminders，unarchive 不会恢复这些任务。旧 Session `schedule/change` 历史仅兼容读取，不自动迁移到 Host task table；缺失必需 title 的 Host task 会使整个 domain 打开失败。[投递与历史兼容](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/schedule/README.md#L63-L77)；[archive admission](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/schedule/schedule/README.md#L47-L55)。
 
