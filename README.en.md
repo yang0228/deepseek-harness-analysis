@@ -4,6 +4,8 @@
 
 DeepSeek Harness Analysis is an independent, evidence-linked guide for developers, technical decision-makers, and open-source contributors. It explains the architecture, capability ownership, differentiators, and reproducible entry paths of DeepSeek Harness without acting as official DeepSeek documentation or support.
 
+Choose your next step in the Chinese handbook: [read online, no setup required](README.md#read-online), [verify evidence locally, optional](README.md#verify-locally), or [run the upstream application](README.md#run-harness). The [worked evidence example](README.md#evidence-example) links directly to the pinned rule, request-header fields, and message-projection implementation, with their limitations.
+
 ## Baseline
 
 All upstream findings are pinned to DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`. This snapshot is a reproducible analysis target, not a statement about the current upstream release or production readiness.
@@ -38,7 +40,7 @@ The Chinese handbook is primary; the chapters keep upstream English names and ex
 
 ## Verification
 
-From this repository, use a clean checkout of the pinned upstream source:
+Local verification is optional and separate from reading the handbook or running the upstream application. It requires Git and Node.js `^22.19.0 || >=24.0.0`, but no third-party dependencies or model API key. From this repository, use a clean checkout of the pinned upstream source:
 
 ```sh
 npm test
