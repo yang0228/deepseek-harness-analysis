@@ -120,6 +120,14 @@ TypeScript 的 Session handle 提供 `getWorkingDirectory()`、`setWorkingDirect
 
 SDK Server 把用户 prompt 构造成 `source.kind: user` 的消息并交给 Agent inbox；Session v4 的消息与来源格式详见[Session 专题](deep-dives/session-event-log.md)。这些 string prompt 示例无需手工构造底层 Session 事件。[SDK prompt 接纳](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/src/server.ts#L248-L269)。
 
+### 保存与恢复会话
+
+<a id="claim-dsh-start-005"></a> **Claim `DSH-START-005`:** SDK 通过 `session/resume` 显式恢复持久化会话；恢复保留历史与目录，不自动提交新输入，也不恢复外部进程。
+
+TypeScript 使用 `await harness.resumeSession(savedId)`，Python 使用 `harness.resume_session(saved_id)`；需保存原 session id，并复用原 Harness Home、存储与工作区。`session(id)`／`start_session(id)` 只是惰性 handle，不替代恢复请求。未知、不可读、格式不兼容或已占用的会话会失败，不会悄悄创建替代会话；恢复会修补中断的最后一个 Turn。初始化选择的模型 route 会用于恢复后的 Agent，因此不保证恢复原模型配置。[恢复约定](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/protocol/README.md#L59-L61)；[客户端入口](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/client/README.md#L29-L35)；[服务端恢复与模型选择](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/src/server.ts#L481-L510)。
+
+上面的入门示例在退出时删除一次性目录，适合实验；需要跨进程继续会话时，应改用调用方保留的 Harness Home 与工作区，不沿用删除目录的清理步骤。
+
 ### 5. Python SDK
 
 <a id="python-sdk"></a>

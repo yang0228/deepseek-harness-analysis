@@ -78,7 +78,7 @@ handbook_root="$PWD" &&
 {
   "ok": true,
   "inspectedUpstream": true,
-  "claimCount": 81
+  "claimCount": 82
 }
 ```
 

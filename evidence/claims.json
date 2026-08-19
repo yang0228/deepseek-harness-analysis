@@ -3605,6 +3605,46 @@
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/experimental/agent-team-profile/README.md#L106"
         }
       ]
+    },
+    {
+      "id": "DSH-START-005",
+      "statement": "SDK 通过 `session/resume` 显式恢复持久化会话；恢复保留历史与目录，不自动提交新输入，也不恢复外部进程。",
+      "kind": "upstream-fact",
+      "confidence": "qualified",
+      "maturity": "released",
+      "qualification": "需要原 Harness Home、存储与工作区；未知、不可读、不兼容或已占用的会话拒绝恢复，初始化模型选择可覆盖存储中的选择。",
+      "documents": [
+        "docs/05-getting-started.md#claim-dsh-start-005"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sdk/protocol/README.md",
+          "startLine": 59,
+          "endLine": 61,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/protocol/README.md#L59-L61"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sdk/client/README.md",
+          "startLine": 32,
+          "endLine": 34,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/client/README.md#L32-L34"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sdk/server/src/server.ts",
+          "startLine": 481,
+          "endLine": 510,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/src/server.ts#L481-L510"
+        }
+      ]
     }
   ]
 }
