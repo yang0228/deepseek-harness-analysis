@@ -128,6 +128,17 @@ TypeScript 使用 `await harness.resumeSession(savedId)`，Python 使用 `harnes
 
 上面的入门示例在退出时删除一次性目录，适合实验；需要跨进程继续会话时，应改用调用方保留的 Harness Home 与工作区，不沿用删除目录的清理步骤。
 
+### 由调用方回答提问与审批
+
+<a id="claim-dsh-start-006"></a> **Claim `DSH-START-006`:** SDK 支持显式启用的客户端审批和原生用户提问；调用方负责接收、回答与取消后的资源清理。
+
+| 场景 | TypeScript | Python | 必须满足的条件 |
+|---|---|---|---|
+| 回答 `ask_user_question` | `onUserQuestion` 回调 | `on_user_question` 回调 | 完整返回每个问题 id；按取消信号结束调用方工作，取消后的答案被忽略。 |
+| 审批工具操作 | `client.start()` 后安装 `client.onRequest()`，再以 `approvalRequests: true` 初始化 | 并发处理 `next_request()`，再启用 `approval_requests=True` | 等待 Agent 时仍须收发请求；只有 `allowed-once` 放行一次操作，拒绝、异常与断线不放行。 |
+
+未启用客户端能力时保留运行时已有应答链；缺少提问应答者会报告 `NO_PROVIDER`。问题请求 id 只在当前进程有效，不能在重启后继续回答。TypeScript 的 `AbortSignal` 与 Python 的取消 Event 用于释放调用方资源；SDK 忽略迟到答案不代表可以终止不配合的回调。[协议与取消](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/protocol/README.md#L30-L68)；[TypeScript 回调](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/client/README.md#L64-L69)；[Python 审批](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/python/sdk/README.md#L63-L82)。这两条 Claim 是附带上述存储与交互条件的 `upstream-fact / qualified / released`。
+
 ### 5. Python SDK
 
 <a id="python-sdk"></a>

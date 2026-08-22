@@ -3645,6 +3645,46 @@
           "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/src/server.ts#L481-L510"
         }
       ]
+    },
+    {
+      "id": "DSH-START-006",
+      "statement": "SDK 支持显式启用的客户端审批和原生用户提问；调用方负责接收、回答与取消后的资源清理。",
+      "kind": "upstream-fact",
+      "confidence": "qualified",
+      "maturity": "released",
+      "qualification": "审批须在等待 Agent 期间继续处理请求，仅 allowed-once 放行；问题请求 id 不跨进程持久，取消后的答案被忽略而回调资源仍由调用方释放。",
+      "documents": [
+        "docs/05-getting-started.md#claim-dsh-start-006"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sdk/protocol/README.md",
+          "startLine": 30,
+          "endLine": 68,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/protocol/README.md#L30-L68"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sdk/server/src/server.ts",
+          "startLine": 113,
+          "endLine": 130,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/src/server.ts#L113-L130"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "f3803c96974ad4a94195fb97e5c637e9c2a3afe3",
+          "path": "packages/sdk/server/src/user-questions.ts",
+          "startLine": 20,
+          "endLine": 73,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/src/user-questions.ts#L20-L73"
+        }
+      ]
     }
   ]
 }

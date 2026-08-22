@@ -185,10 +185,11 @@ Office sidecar 与 authoring runtime 独立下载；SDK 启动不自动取得缺
 
 ### SDK access
 
+显式恢复与客户端交互的接入条件见[SDK 入门](05-getting-started.md#claim-dsh-start-005)及[上游恢复和审批接口](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/client/README.md#L30-L32)。
 
 | Capability | Availability | Owner | Mechanism | Limit |
 |---|---|---|---|---|
-| Full SDK runtime | 已发布 SDK application | `profile:sdk` | stdio JSON-RPC；prompt 返回 message id；`run()` 收集 receipt 至下次 idle，`session/wait` 可另等 managed descendants 与 root summaries | 无 prompt cancel 或 per-session close；`run()` 区间不表示某一 prompt 的因果独占答复，`wait` 不创建会话 |
+| Full SDK runtime | 已发布 SDK application | `profile:sdk` | stdio JSON-RPC；prompt 返回 message id；run 收集至 idle，wait 等待托管后代，resume 恢复持久会话；可接入客户端审批与提问 | 无 prompt cancel 或 per-session close；`run()` 区间不表示某一 prompt 的因果独占答复，`wait` 不创建会话 |
 | Minimal SDK runtime | 已发布独立 SDK application | `profile:sdk-minimal` | 相同 server 与 wire，默认提供持久 Shell、read_image、working_directory 与自动 compaction | 不包含 full base feature set；执行为 `danger-full-access` |
 
 [SDK server 与 wait](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/server/README.md#L50-L67)；[TypeScript run 与低层 wait](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/client/README.md#L54-L62)；[协议限制](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/sdk/protocol/README.md#L129-L135)。有效工作目录通过日志记录与 SDK get/set 操作改变，仍受原项目的 Sandbox 写入根限制，详见[目录状态与权限](05-getting-started.md#claim-dsh-start-004)。客户端字段与一次性目录示例见[上手章节](05-getting-started.md)。
