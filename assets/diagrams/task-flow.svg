@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="820" viewBox="0 0 1000 820" role="img" aria-labelledby="title desc">
   <title id="title">一次任务如何运行：工具调用与最终答复</title>
-  <desc id="desc">简化成功路径：用户提交任务；Agent loop 开始 Turn 和第一个 Step，请求模型；模型返回工具调用；loop 先追加 tool/call，再经过策略和可选审批执行工具；结果以 tool/result 追加并结束 Step；下一个 Step 请求模型给出最终答复，然后结束 Step 和 Turn。模型流通过 live agent/assistant-stream 提供，结算后的 assistant/message 内嵌完整响应流；图中不显示全部扩展事件。</desc>
+  <desc id="desc">内置 executor 的简化成功路径：Agent loop 固定模型与工具准入集合后请求模型并追加 assistant/message；loop 将完整工具 batch 委托给 executor，后者记录 tool/call，经过策略、可选审批与执行处理后记录 tool/result。loop 结束 Step，再请求模型给出最终答复并结束 Turn。live 流与 durable 结算分开；图中不显示全部扩展事件。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/></marker>
     <marker id="log-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/></marker>
@@ -26,7 +26,7 @@
   <rect x="423" y="108" width="140" height="54" rx="10" fill="#e0e7ff"/>
   <text x="493" y="141" text-anchor="middle" class="label">Model</text>
   <rect x="618" y="108" width="150" height="54" rx="10" fill="#dbeafe"/>
-  <text x="693" y="141" text-anchor="middle" class="label">工具执行管线</text>
+  <text x="693" y="141" text-anchor="middle" class="label">Tool executor</text>
   <rect x="828" y="100" width="152" height="62" rx="10" fill="#ccfbf1"/>
   <text x="904" y="125" text-anchor="middle" class="label">Session Log</text>
   <text x="904" y="149" text-anchor="middle" font-size="14" fill="#0f766e">durable 持久记录</text>
@@ -43,16 +43,16 @@
   <path d="M 493 335 H 290" class="line reply"/>
   <text x="390" y="324" text-anchor="middle" class="body">响应与工具调用</text>
   <path d="M 288 379 H 902" class="log"/>
-  <text x="596" y="368" text-anchor="middle" class="body">assistant/message（内嵌响应流）→ tool/call</text>
+  <text x="596" y="368" text-anchor="middle" class="body">assistant/message（内嵌响应流）</text>
   <path d="M 288 423 H 691" class="line"/>
-  <text x="490" y="412" text-anchor="middle" class="body">策略 / 审批 → 执行 → 内容投影与策略</text>
-  <path d="M 693 467 H 290" class="line reply"/>
-  <text x="490" y="456" text-anchor="middle" class="body">返回工具结果</text>
-  <path d="M 288 511 H 902" class="log"/>
-  <text x="596" y="500" text-anchor="middle" class="body">tool/result → step/end</text>
+  <text x="490" y="412" text-anchor="middle" class="body">委托完整 batch：工具准入集合与并发上限</text>
+  <path d="M 693 467 H 902" class="log"/>
+  <text x="596" y="456" text-anchor="middle" class="body">tool/call → 策略与执行 → tool/result</text>
+  <path d="M 693 511 H 290" class="line reply"/>
+  <text x="490" y="500" text-anchor="middle" class="body">完成 batch（含审批与内容处理）</text>
 
   <path d="M 288 555 H 902" class="log"/>
-  <text x="596" y="544" text-anchor="middle" class="body">下一 Step：step/start</text>
+  <text x="596" y="544" text-anchor="middle" class="body">step/end → 下一 Step：step/start</text>
   <path d="M 288 599 H 491" class="line"/>
   <text x="390" y="588" text-anchor="middle" class="body">携带结果再次请求</text>
   <path d="M 493 643 H 290" class="line reply"/>
