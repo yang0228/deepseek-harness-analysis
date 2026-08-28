@@ -114,8 +114,8 @@ handbook_root="$PWD" &&
 
 | 核查点 | 直接打开证据 | 重点看什么 |
 |---|---|---|
-| 上游规定了什么？ | [架构规则，第 118–126 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L122-L130) | 模型可见输入必须可由日志重建；新增模型输入需要对应 Session 事件。 |
-| 请求配置与工具定义从哪里恢复？ | [`EpochHeader` 字段，第 234–250 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/types.ts#L240-L256) | 请求头记录调用配置和工具定义；系统提示属于消息历史。 |
+| 上游规定了什么？ | [架构规则，第 122–130 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/docs/architecture.md#L122-L130) | 模型可见输入必须可由日志重建；新增模型输入需要对应 Session 事件。 |
+| 请求配置与工具定义从哪里恢复？ | [`EpochHeader` 字段，第 240–256 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/types.ts#L240-L256) | 请求头记录调用配置和工具定义；系统提示属于消息历史。 |
 | 日志怎样变成模型消息？ | [`deriveEventMessage()` 实现，第 120–150 行](https://github.com/deepseek-ai/deepseek-harness/blob/f3803c96974ad4a94195fb97e5c637e9c2a3afe3/packages/core/session/src/surface.ts#L120-L150) | 用户消息、工具结果等可以投影为模型消息；任务边界和失败尝试等仅留在日志。 |
 
 **一个可直接复核的例子：** 在最后一个链接中，`user/message` 分支返回消息数据，未形成模型消息的日志事件返回 `null`。这说明“有日志记录”不等于“会发送给模型”；该函数展示消息投影的一条实现路径，不单独证明所有插件都遵守整个日志规则。
@@ -148,7 +148,7 @@ handbook_root="$PWD" &&
 | 模型逐次决定下一项调用 | 模型请求读 A → 工具结果返回模型 → 模型请求读 B → 工具结果返回模型 → 汇总。 |
 | PTC 程序组合调用 | 模型提交一段 `run_code` 程序 → 程序调用读 A、读 B 并处理结果 → 向模型返回所需内容。 |
 
-当前 PTC 为每次运行创建受会话文件策略约束的 Node 进程。普通工具调用也可以在一次模型响应中包含多次调用。PTC 的特点是把部分中间控制流交给程序表达；每次子调用仍受策略、取消、并发和资源约束。完整机制见[注册工具与 Programmatic Tool Calling](docs/deep-dives/tools-and-ptc.md)。
+PTC 默认每次运行创建新 Node 进程，也可显式配置按 Agent 保留内存的模式；所有模式都受会话文件策略约束，内存不随 Session 恢复或 Fork。普通工具调用也可以在一次模型响应中包含多次调用。PTC 的特点是把部分中间控制流交给程序表达；每次子调用仍受策略、取消、并发和资源约束。完整机制见[注册工具与 Programmatic Tool Calling](docs/deep-dives/tools-and-ptc.md)。
 
 </details>
 
@@ -156,11 +156,11 @@ handbook_root="$PWD" &&
 
 ### 本次基线值得关注的变化
 
-- [应用与预设组合](docs/deep-dives/profiles-bundles-presets.md)：Desktop 默认由系统分配端口；记录上游 `preset` Patch 文档与固定实现的差异，避免把文档新增描述直接当作可用功能。
-- [Session v4](docs/deep-dives/session-event-log.md)与[工具管线](docs/deep-dives/tools-and-ptc.md)：工具增删由日志记录并按模型路由投影；补充 durable inbox、失败工具结果和 PTC 返回值边界；工具呈现仅保留 `native` / `ptc`。
-- [SDK 与目录](docs/05-getting-started.md)：区分 `run()` 的 root idle 和 `session/wait` 的托管后代等待；会话切换目录不改变原项目权限根。
-- [能力矩阵](docs/03-capabilities.md)与[编排机制](docs/deep-dives/subagents-goals-workflows.md)：复核 Schedule、外部委托 Bundle、实验 Agent Teams 与 Ralph；Python Office 和编写资源改为独立显式下载。
-- [迁移建议](docs/04-differentiators.md)：按状态、执行入口、资源所有权、能力组合和委托等待的顺序应用到自有 Agent 项目。
+- [应用与预设组合](docs/deep-dives/profiles-bundles-presets.md)：Profile 名录迁入 official-bundles；Minimal 增加 read_image 与 compaction，Standard 的插件管理工具按 profileContext 启用。
+- [工具执行与 PTC](docs/deep-dives/tools-and-ptc.md)：按 Scope 选择 native/PTC executor，条件工具按 Step 准入；Node PTC 默认新进程，可显式启用保留内存的 REPL 或 Script。
+- [SDK 集成](docs/05-getting-started.md)：新增显式持久会话恢复、客户端审批和原生用户提问；区分恢复历史、等待任务和恢复外部进程。
+- [能力矩阵](docs/03-capabilities.md)与[编排机制](docs/deep-dives/subagents-goals-workflows.md)：Schedule 覆盖完整 SDK；补充独立 child Preset、macOS CUA 与 Sandbox 额外写入目录的限制。
+- [Session 生命周期](docs/deep-dives/session-event-log.md)：模型选择在组装前固定，Projection handle 在注册移除后仍可读取；普通 Fork 与 subagent 的 parentSession 含义分开。上游运行要求提高至 Node.js >=24.9.0。
 
 ### 按目标选择阅读路线
 

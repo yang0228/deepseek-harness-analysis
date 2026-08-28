@@ -14,12 +14,12 @@ Verified on 2026-10-28 against source version `0.2.2-alpha.2`. See the [baseline
 
 ## What changed in this baseline
 
-- Desktop uses an OS-assigned port by default; its bundled CLI can manage plugins in an initialized Desktop Profile while the application is fully quit.
-- The architecture document describes a nested `preset` patch, but static review found no matching selector dispatch in the pinned composition path; the handbook records this discrepancy. Active Agents retain their composition revision; restart still resolves the current definition.
-- Session v4 now records incremental tool changes through `developer/message`; model adapters project them according to route capabilities, and the UI presents the changes. Live chunks remain separate from durable settlements.
-- Tool presentation supports `native` and `ptc`; `both` has been removed. Failed steps record unresolved tool outcomes without claiming that external effects were reversed.
-- SDK `session/wait` covers progressing managed descendants and root summaries; `run()` keeps its next-idle interval. Session working-directory changes preserve original project identity and permission roots.
-- Python Office and authoring resources require explicit downloads. Schedule, external Subagent bundles and experimental orchestration are reviewed in the capability chapter.
+- Upstream requires Node.js `>=24.9.0`. Profile declarations moved to `official-bundles`; the roster remains five Profiles and four Web Presets. Minimal adds image reading and compaction.
+- Scoped native/PTC executors own tool batches. Conditional tools are admitted once per Step using the model selection captured before prompt assembly; retries reuse that selection.
+- Node PTC defaults to fresh processes, with explicit retained REPL or Script modes available. Retained memory is not restored from Session logs or inherited by Fork.
+- Projection handles remain readable after global unregistration. Ordinary Fork does not write `parentSession`; subagent identity uses `origin`. Session format remains v4.
+- SDKs expose persisted-session resume, opt-in client approvals and native user questions. Applications own concurrent request handling and callback cleanup; external processes are not restored.
+- Schedule also ships with the full SDK. The handbook adds macOS CUA conditions and explicit writable-root grants, including Windows subprocess rejection. The documented `preset` patch discrepancy remains qualified.
 
 ## Principal corrections
 
