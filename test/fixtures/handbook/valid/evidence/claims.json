@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "claims": [
+    {
+      "id": "DSH-FIX-FACT-001",
+      "statement": "固定基线中的事实。",
+      "kind": "upstream-fact",
+      "confidence": "verified",
+      "maturity": "released",
+      "documents": [
+        "docs/fact.md#claim-dsh-fix-fact-001"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "path": "README.md",
+          "startLine": 1,
+          "endLine": 1,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/README.md#L1"
+        }
+      ]
+    },
+    {
+      "id": "DSH-FIX-QUAL-001",
+      "statement": "带适用范围的事实。",
+      "kind": "upstream-fact",
+      "confidence": "qualified",
+      "maturity": "released",
+      "documents": [
+        "docs/qualified.md#claim-dsh-fix-qual-001"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "path": "README.md",
+          "startLine": 1,
+          "endLine": 1,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/README.md#L1"
+        }
+      ],
+      "qualification": "仅适用于固定基线。"
+    },
+    {
+      "id": "DSH-FIX-INFER-001",
+      "statement": "作者依据证据作出的推论。",
+      "kind": "analysis-inference",
+      "confidence": "qualified",
+      "maturity": "not-applicable",
+      "documents": [
+        "docs/inference.md#claim-dsh-fix-infer-001"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "path": "README.md",
+          "startLine": 1,
+          "endLine": 1,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/README.md#L1"
+        }
+      ],
+      "qualification": "这是作者推论，不是上游原文。"
+    },
+    {
+      "id": "CMP-FW-TEST-001",
+      "statement": "合成比较事实。",
+      "kind": "external-comparison",
+      "confidence": "verified",
+      "maturity": "not-applicable",
+      "documents": [
+        "docs/comparisons/sample.md#claim-cmp-fw-test-001"
+      ],
+      "sources": [
+        {
+          "type": "external",
+          "url": "https://docs.langchain.com/oss/python/langgraph/overview",
+          "publisher": "LangChain",
+          "accessDate": "2026-09-05"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+  "commitDate": "2026-09-03",
+  "gitDescribe": "dsh-v0.1.2-rc.1-99-g76fda72979",
+  "rootPackageVersion": "0.1.2-rc.1",
+  "profiles": [
+    {
+      "id": "acp",
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-acp-app"
+      ],
+      "patchReload": "startup"
+    },
+    {
+      "id": "headless",
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-headless"
+      ],
+      "patchReload": "startup"
+    },
+    {
+      "id": "sdk",
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-sdk-app"
+      ],
+      "patchReload": "startup"
+    },
+    {
+      "id": "sdk-minimal",
+      "bundles": [
+        "@deepseek-ai/dsh-sdk-minimal"
+      ],
+      "patchReload": "startup"
+    },
+    {
+      "id": "web",
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app"
+      ],
+      "patchReload": "live"
+    }
+  ],
+  "presets": [
+    {
+      "id": "cordis",
+      "name": "创造模式",
+      "description": "用于创建自定义 Agent preset：具备标准模式的全部能力，并提供运行时检查、插件实验和 preset 创作指导。",
+      "order": 4
+    },
+    {
+      "id": "minimal",
+      "name": "极简模式",
+      "description": "仅提供持久 bash 与 str_replace_editor 的双工具编码 Agent。",
+      "order": 3
+    },
+    {
+      "id": "ptc",
+      "name": "PTC 模式",
+      "description": "功能完整的编码 Agent，但默认不提供 workflow 工具；其他工具通过 PTC 模式 SDK 呈现，让模型用一个 TypeScript 程序组合多步操作。",
+      "order": 2
+    },
+    {
+      "id": "standard",
+      "name": "标准模式",
+      "description": "功能完整的编码 Agent，支持文件编辑、Shell、文件与网页检索、Skills、计划、目标、子代理和工作流。",
+      "order": 1
+    }
+  ],
+  "probes": {
+    "upstream.commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+    "upstream.commit-date": "2026-09-03",
+    "upstream.git-describe": "dsh-v0.1.2-rc.1-99-g76fda72979",
+    "upstream.root-package-version": "0.1.2-rc.1",
+    "profile:acp": {
+      "id": "acp",
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-acp-app"
+      ],
+      "patchReload": "startup"
+    },
+    "profile:headless": {
+      "id": "headless",
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-headless"
+      ],
+      "patchReload": "startup"
+    },
+    "profile:sdk": {
+      "id": "sdk",
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-sdk-app"
+      ],
+      "patchReload": "startup"
+    },
+    "profile:sdk-minimal": {
+      "id": "sdk-minimal",
+      "bundles": [
+        "@deepseek-ai/dsh-sdk-minimal"
+      ],
+      "patchReload": "startup"
+    },
+    "profile:web": {
+      "id": "web",
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app"
+      ],
+      "patchReload": "live"
+    },
+    "preset:cordis": {
+      "id": "cordis",
+      "name": "创造模式",
+      "description": "用于创建自定义 Agent preset：具备标准模式的全部能力，并提供运行时检查、插件实验和 preset 创作指导。",
+      "order": 4
+    },
+    "preset:minimal": {
+      "id": "minimal",
+      "name": "极简模式",
+      "description": "仅提供持久 bash 与 str_replace_editor 的双工具编码 Agent。",
+      "order": 3
+    },
+    "preset:ptc": {
+      "id": "ptc",
+      "name": "PTC 模式",
+      "description": "功能完整的编码 Agent，但默认不提供 workflow 工具；其他工具通过 PTC 模式 SDK 呈现，让模型用一个 TypeScript 程序组合多步操作。",
+      "order": 2
+    },
+    "preset:standard": {
+      "id": "standard",
+      "name": "标准模式",
+      "description": "功能完整的编码 Agent，支持文件编辑、Shell、文件与网页检索、Skills、计划、目标、子代理和工作流。",
+      "order": 1
+    }
+  }
+}

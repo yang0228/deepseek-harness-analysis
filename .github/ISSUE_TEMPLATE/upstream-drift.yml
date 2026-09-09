@@ -1,0 +1,40 @@
+name: 上游漂移
+description: 报告固定基线之后影响手册结论的上游变化
+title: "[Drift]: "
+labels: []
+body:
+  - type: input
+    id: upstream_revision
+    attributes:
+      label: 新的上游提交或 ref
+      description: 优先提供完整提交 SHA，并说明 ref 的来源。
+    validations:
+      required: true
+  - type: textarea
+    id: changed_paths
+    attributes:
+      label: 变化的路径
+      description: 列出与观察相关的上游仓库路径。
+    validations:
+      required: true
+  - type: textarea
+    id: affected_claim_ids
+    attributes:
+      label: 受影响的 claim id
+      description: 列出可能需要复核的结论。
+    validations:
+      required: true
+  - type: textarea
+    id: observed_behavior
+    attributes:
+      label: 观察到的行为变化
+      description: 描述新旧基线在可复核行为或组成上的差异。
+    validations:
+      required: true
+  - type: textarea
+    id: qualifications
+    attributes:
+      label: 需要新增或修改的限定
+      description: 说明哪些结论仍然成立以及适用范围。
+    validations:
+      required: true

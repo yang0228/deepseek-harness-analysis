@@ -1,0 +1,40 @@
+name: 分析建议
+description: 提议新的架构分析、深挖主题或比较内容
+title: "[Analysis]: "
+labels: []
+body:
+  - type: textarea
+    id: thesis
+    attributes:
+      label: 分析命题
+      description: 用可验证的语言说明希望分析的问题和预期结论。
+    validations:
+      required: true
+  - type: textarea
+    id: comparison_scope
+    attributes:
+      label: 比较范围
+      description: 如涉及比较，请说明对象、抽象层级和共同标准；不比较时请说明。
+    validations:
+      required: true
+  - type: textarea
+    id: official_sources
+    attributes:
+      label: 官方来源
+      description: 列出官方文档、官方仓库、规范或第一方发布说明。
+    validations:
+      required: true
+  - type: textarea
+    id: inference
+    attributes:
+      label: 作者推论
+      description: 明确区分来源直接陈述与需要人工审核的推论。
+    validations:
+      required: true
+  - type: textarea
+    id: exclusions
+    attributes:
+      label: 排除项与限制
+      description: 说明不覆盖的内容、证据缺口和不可推出的结论。
+    validations:
+      required: true

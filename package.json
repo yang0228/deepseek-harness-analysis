@@ -1,0 +1,12 @@
+{
+  "name": "deepseek-harness-analysis",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "^22.19.0 || >=24.0.0" },
+  "scripts": {
+    "inspect": "node scripts/inspect-upstream.mjs",
+    "test": "node --test",
+    "verify": "node scripts/verify-evidence.mjs"
+  }
+}

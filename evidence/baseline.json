@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+  "commitDate": "2026-09-03",
+  "gitDescribe": "dsh-v0.1.2-rc.1-99-g76fda72979",
+  "rootPackageVersion": "0.1.2-rc.1",
+  "verificationDate": "2026-09-04"
+}

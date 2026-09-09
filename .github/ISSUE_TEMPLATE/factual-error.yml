@@ -1,0 +1,61 @@
+name: 事实错误
+description: 报告手册结论与官方证据不一致的问题
+title: "[Fact]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: 安全漏洞或敏感信息不得在公开 Issue 中提交，请改用 SECURITY.md 说明的私密渠道。
+  - type: input
+    id: affected_document
+    attributes:
+      label: 受影响的文档
+      description: 请填写仓库相对路径和小节。
+    validations:
+      required: true
+  - type: input
+    id: claim_ids
+    attributes:
+      label: 相关 claim id
+      description: 如有多个，请全部列出；若尚无 id，请说明。
+    validations:
+      required: true
+  - type: textarea
+    id: current_statement
+    attributes:
+      label: 当前表述
+      description: 请准确引用或概括需要修正的结论。
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_correction
+    attributes:
+      label: 建议修正
+      description: 请给出更准确且带限定条件的表述。
+    validations:
+      required: true
+  - type: textarea
+    id: official_evidence
+    attributes:
+      label: 官方证据
+      description: 请提供官方仓库、官方文档、规范或第一方发布说明的链接。
+    validations:
+      required: true
+  - type: dropdown
+    id: baseline_impact
+    attributes:
+      label: 基线影响
+      description: 请选择是否需要更新固定的上游提交。
+      options:
+        - 不需要更新基线
+        - 可能需要更新基线
+        - 确认需要更新基线
+    validations:
+      required: true
+  - type: checkboxes
+    id: public_security_warning
+    attributes:
+      label: 公开安全确认
+      options:
+        - label: 此报告不包含漏洞利用细节、凭据或其他敏感信息
+          required: true

@@ -1,0 +1,3 @@
+  - uses: owner/repo@ABCDEF0123456789abcdef0123456789abcdef01
+  - uses: owner/repo@${{ matrix.ref }}
+  - uses: owner/repo@0123456789abcdef0123456789abcdef0123456

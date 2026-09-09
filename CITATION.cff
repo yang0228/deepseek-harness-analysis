@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: Cite this evidence handbook.
+title: DeepSeek Harness Analysis
+type: software
+authors:
+  - name: yang0228
+repository-code: https://github.com/yang0228/deepseek-harness-analysis
+version: snapshot-76fda729
+preferred-citation:
+  type: report
+  authors:
+    - name: yang0228
+  title: DeepSeek Harness Analysis
+  version: snapshot-76fda729
+  url: https://github.com/yang0228/deepseek-harness-analysis
+  year: 2026

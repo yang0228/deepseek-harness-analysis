@@ -1,0 +1,7 @@
+.worktrees/
+.DS_Store
+*.swp
+*.swo
+*.tmp
+node_modules/
+coverage/
