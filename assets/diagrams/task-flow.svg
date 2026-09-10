@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="820" viewBox="0 0 1000 820" role="img" aria-labelledby="title desc">
+  <title id="title">一次任务如何运行：工具调用与最终答复</title>
+  <desc id="desc">简化成功路径：用户提交任务；Agent loop 开始 Turn 和第一个 Step，请求模型；模型返回工具调用；loop 先追加 tool/call，再经过策略和可选审批执行工具；结果以 tool/result 追加并结束 Step；下一个 Step 请求模型给出最终答复，然后结束 Step 和 Turn。图中仅显示部分 durable 记录，不显示全部 assistant 事件或 live 扩展事件。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/></marker>
+    <marker id="log-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', sans-serif; }
+      .title { font-size: 28px; font-weight: 700; fill: #13243b; }
+      .label { font-size: 18px; font-weight: 600; fill: #13243b; }
+      .body { font-size: 16px; fill: #334155; paint-order: stroke; stroke: #f8fafc; stroke-width: 6; stroke-linejoin: round; }
+      .note { font-size: 15px; fill: #64748b; }
+      .line { fill: none; stroke: #2563eb; stroke-width: 2; marker-end: url(#arrow); }
+      .reply { stroke-dasharray: 5 4; }
+      .log { fill: none; stroke: #0f766e; stroke-width: 2; marker-end: url(#log-arrow); }
+    </style>
+  </defs>
+  <rect width="1000" height="820" rx="20" fill="#f8fafc"/>
+  <text x="36" y="40" font-size="13" font-weight="700" letter-spacing="2" fill="#2563eb">02 / TASK FLOW</text>
+  <text x="36" y="77" class="title">从一个工具调用，到一条最终答复</text>
+
+  <rect x="30" y="108" width="128" height="54" rx="10" fill="#e2e8f0"/>
+  <text x="94" y="141" text-anchor="middle" class="label">用户</text>
+  <rect x="210" y="108" width="156" height="54" rx="10" fill="#dbeafe"/>
+  <text x="288" y="141" text-anchor="middle" class="label">Agent loop</text>
+  <rect x="423" y="108" width="140" height="54" rx="10" fill="#e0e7ff"/>
+  <text x="493" y="141" text-anchor="middle" class="label">Model</text>
+  <rect x="618" y="108" width="150" height="54" rx="10" fill="#dbeafe"/>
+  <text x="693" y="141" text-anchor="middle" class="label">工具执行管线</text>
+  <rect x="828" y="100" width="152" height="62" rx="10" fill="#ccfbf1"/>
+  <text x="904" y="125" text-anchor="middle" class="label">Session Log</text>
+  <text x="904" y="149" text-anchor="middle" font-size="14" fill="#0f766e">durable 持久记录</text>
+
+  <g stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 5">
+    <path d="M 94 164 V 748"/><path d="M 288 164 V 748"/><path d="M 493 164 V 748"/><path d="M 693 164 V 748"/><path d="M 904 164 V 748"/>
+  </g>
+  <path d="M 94 203 H 286" class="line"/>
+  <text x="190" y="192" text-anchor="middle" class="body">提交任务</text>
+  <path d="M 288 247 H 902" class="log"/>
+  <text x="596" y="236" text-anchor="middle" class="body">turn/start → step/start → user/message</text>
+  <path d="M 288 291 H 491" class="line"/>
+  <text x="390" y="280" text-anchor="middle" class="body">模型请求</text>
+  <path d="M 493 335 H 290" class="line reply"/>
+  <text x="390" y="324" text-anchor="middle" class="body">响应与工具调用</text>
+  <path d="M 288 379 H 902" class="log"/>
+  <text x="596" y="368" text-anchor="middle" class="body">tool/call</text>
+  <path d="M 288 423 H 691" class="line"/>
+  <text x="490" y="412" text-anchor="middle" class="body">策略 / 可选审批 → 执行 → 结果整理</text>
+  <path d="M 693 467 H 290" class="line reply"/>
+  <text x="490" y="456" text-anchor="middle" class="body">返回工具结果</text>
+  <path d="M 288 511 H 902" class="log"/>
+  <text x="596" y="500" text-anchor="middle" class="body">tool/result → step/end</text>
+
+  <path d="M 288 555 H 902" class="log"/>
+  <text x="596" y="544" text-anchor="middle" class="body">下一 Step：step/start</text>
+  <path d="M 288 599 H 491" class="line"/>
+  <text x="390" y="588" text-anchor="middle" class="body">携带结果再次请求</text>
+  <path d="M 493 643 H 290" class="line reply"/>
+  <text x="390" y="632" text-anchor="middle" class="body">最终答复</text>
+  <path d="M 288 687 H 902" class="log"/>
+  <text x="596" y="676" text-anchor="middle" class="body">step/end → turn/end</text>
+  <path d="M 288 731 H 96" class="line reply"/>
+  <text x="190" y="720" text-anchor="middle" class="body">任务完成</text>
+
+  <text x="36" y="779" class="note">示例展示两个成功 Step；Turn 也可能没有 Step，或继续更多 Step。</text>
+  <text x="36" y="804" class="note">已省略 assistant/* 等响应记录与 live 扩展事件；绿色箭头只标注部分 durable 日志。</text>
+</svg>

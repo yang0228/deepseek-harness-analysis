@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="460" viewBox="0 0 1000 460" role="img" aria-labelledby="title desc">
+  <title id="title">从分析结论追溯到固定源码</title>
+  <desc id="desc">先阅读章节结论 DSH-ARCH-007，再查看 evidence/claims.json 中的分类、置信度和 sources，打开提交 76fda729 所对应的固定源码行，结合上下文与限定判断陈述是否成立。自动校验负责基线、结构、链接和观察一致性；人工复核负责代码语义、来源权威性与推论范围。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526781"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', sans-serif; }
+      .title { font-size: 28px; font-weight: 700; fill: #13243b; }
+      .heading { font-size: 20px; font-weight: 700; fill: #13243b; }
+      .body { font-size: 16px; fill: #475569; }
+      .number { font-size: 13px; font-weight: 700; letter-spacing: 1px; fill: #2563eb; }
+    </style>
+  </defs>
+  <rect width="1000" height="460" rx="20" fill="#f8fafc"/>
+  <text x="36" y="40" font-size="13" font-weight="700" letter-spacing="2" fill="#2563eb">03 / EVIDENCE CHAIN</text>
+  <text x="36" y="77" class="title">一条结论，怎样回到源码</text>
+
+  <rect x="32" y="116" width="210" height="176" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="52" y="147" class="number">01 / READ</text>
+  <text x="52" y="180" class="heading">章节结论</text>
+  <text x="52" y="214" class="body">DSH-ARCH-007</text>
+  <text x="52" y="244" class="body">先读陈述与相邻解释</text>
+  <text x="52" y="270" class="body">明确它讨论的对象</text>
+
+  <rect x="274" y="116" width="210" height="176" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="294" y="147" class="number">02 / LOOK UP</text>
+  <text x="294" y="180" class="heading">Claim 正式记录</text>
+  <text x="294" y="214" class="body">evidence/claims.json</text>
+  <text x="294" y="244" class="body">分类、信心、成熟度</text>
+  <text x="294" y="270" class="body">sources 与限定条件</text>
+
+  <rect x="516" y="116" width="210" height="176" rx="14" fill="#f0fdfa" stroke="#99f6e4"/>
+  <text x="536" y="147" class="number">03 / TRACE</text>
+  <text x="536" y="180" class="heading">固定源码</text>
+  <text x="536" y="214" class="body">76fda729… · 源码行</text>
+  <text x="536" y="244" class="body">规则声明与具体实现</text>
+  <text x="536" y="270" class="body">从引用行读到上下文</text>
+
+  <rect x="758" y="116" width="210" height="176" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="778" y="147" class="number">04 / REVIEW</text>
+  <text x="778" y="180" class="heading">复核结论</text>
+  <text x="778" y="214" class="body">引用是否支持陈述？</text>
+  <text x="778" y="244" class="body">是否遗漏适用条件？</text>
+  <text x="778" y="270" class="body">推论是否超出证据？</text>
+
+  <g fill="none" stroke="#526781" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M 245 204 H 270"/><path d="M 487 204 H 512"/><path d="M 729 204 H 754"/>
+  </g>
+  <rect x="32" y="322" width="452" height="92" rx="12" fill="#eaf1fc"/>
+  <text x="52" y="353" class="heading">自动校验</text>
+  <text x="52" y="385" class="body">基线、结构、链接与已记录观察的一致性</text>
+  <rect x="516" y="322" width="452" height="92" rx="12" fill="#e8f6f2"/>
+  <text x="536" y="353" class="heading">人工复核</text>
+  <text x="536" y="385" class="body">代码语义、来源权威性与推论的适用范围</text>
+  <text x="36" y="443" font-size="14" fill="#64748b">脚本通过不等于全部结论已获人工确认；完整 40 位基线与来源保存在证据记录中。</text>
+</svg>
