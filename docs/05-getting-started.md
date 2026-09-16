@@ -1,10 +1,10 @@
 # 可复现的入门路径
 
-基线：DeepSeek Harness 上游提交 `76fda729799fe9b3848dbe2c211d4b231032b81e`。
+基线：DeepSeek Harness 上游提交 `0d1f50007f9bca3f52b06e1c3074fa14d5fb0720`。
 
 ## 一句话结论
 
-<a id="claim-dsh-start-001"></a> **Claim `DSH-START-001`:** 源码中的浮动 npm 命令、`0.1.2-rc.1` 版本声明与固定提交标识不同的复现目标，只有固定提交对应本手册分析的源码树。
+<a id="claim-dsh-start-001"></a> **Claim `DSH-START-001`:** 源码中的浮动 npm 命令、`0.1.6-alpha.1` 版本声明与固定提交标识不同的复现目标，只有固定提交对应本手册分析的源码树。
 
 <a id="claim-dsh-start-002"></a> **Claim `DSH-START-002`:** Python SDK 使用显式 Harness Home 启动捆绑的标准 `dsh --profile sdk` 运行时。
 
@@ -16,10 +16,10 @@
 
 ### 1. 打包 Web UI
 
-此路径适合体验打包应用，但复现强度取决于 registry。`package_spec` 默认使末行等同于 `npx @deepseek-ai/dsh web`；要使它等同于 `npx @deepseek-ai/dsh@0.1.2-rc.1 web`，把第一行改为注释所示的第二个值：
+此路径适合体验打包应用，但复现强度取决于 registry。`package_spec` 默认使末行等同于 `npx @deepseek-ai/dsh web`；要使它等同于 `npx @deepseek-ai/dsh@0.1.6-alpha.1 web`，把第一行改为注释所示的第二个值：
 
 ```sh
-package_spec='@deepseek-ai/dsh' # 或 '@deepseek-ai/dsh@0.1.2-rc.1'
+package_spec='@deepseek-ai/dsh' # 或 '@deepseek-ai/dsh@0.1.6-alpha.1'
 experiment_root="$(mktemp -d)" &&
   trap 'rm -rf -- "$experiment_root"' EXIT &&
   mkdir -p "$experiment_root/workspace" "$experiment_root/dsh-home" &&
@@ -28,7 +28,7 @@ experiment_root="$(mktemp -d)" &&
   npx "$package_spec" web
 ```
 
-第一条命令跟随 npm registry 的解析结果；第二条显式选择固定源码所声明的 `0.1.2-rc.1`，但只有 registry 暴露该版本时才会成功。版本号是源码元数据，不是 registry 可用性证据；两条命令也都不能证明所得包等同于 `dsh-v0.1.2-rc.1-99-g76fda72979` 所描述、比该 tag 多 99 个提交的固定源码树。上游快速开始没有设置 Harness Home，通常按 CLI 的 home 解析规则使用用户的 `~/.dsh`；这里显式设置 `DSH_HOME` 以避免写入日常 home。
+第一条命令跟随 npm registry 的解析结果；第二条显式选择固定源码所声明的 `0.1.6-alpha.1`，但只有 registry 暴露该版本时才会成功。版本号是源码元数据，不是 registry 可用性证据；两条命令也都不能证明所得包等同于 `dsh-v0.1.6-alpha.1-5-g0d1f50007f` 所描述、比该 tag 多 5 个提交的固定源码树。上游快速开始没有设置 Harness Home，通常按 CLI 的 home 解析规则使用用户的 `~/.dsh`；这里显式设置 `DSH_HOME` 以避免写入日常 home。
 
 ### 2. 固定源码构建
 
@@ -40,7 +40,7 @@ experiment_root="$(mktemp -d)" &&
   trap 'rm -rf -- "$experiment_root"' EXIT &&
   git clone https://github.com/deepseek-ai/deepseek-harness.git "$experiment_root/deepseek-harness" &&
   cd "$experiment_root/deepseek-harness" &&
-  git checkout --detach 76fda729799fe9b3848dbe2c211d4b231032b81e &&
+  git checkout --detach 0d1f50007f9bca3f52b06e1c3074fa14d5fb0720 &&
   export DSH_HOME="$experiment_root/dsh-home" &&
   pnpm install &&
   pnpm run build &&
@@ -58,7 +58,7 @@ experiment_root="$(mktemp -d)" &&
 test "${dsh_source_ready:-}" = 1 &&
   test "$PWD" = "$experiment_root/deepseek-harness" &&
   test "$DSH_HOME" = "$experiment_root/dsh-home" &&
-  test "$(git rev-parse HEAD)" = 76fda729799fe9b3848dbe2c211d4b231032b81e &&
+  test "$(git rev-parse HEAD)" = 0d1f50007f9bca3f52b06e1c3074fa14d5fb0720 &&
   pnpm dsh --profile headless "run the tests"
 ```
 
@@ -85,6 +85,7 @@ try {
     profile: 'sdk',
     dshHome,
     cwd: workspace,
+    processCwd: workspace,
   })
   try {
     const result = await harness.run('say hi')
@@ -96,6 +97,8 @@ try {
   await rm(root, { recursive: true, force: true })
 }
 ```
+
+`cwd` 指定 Agent workspace，`processCwd` 指定子进程工作目录；`provider`、`model`、`reasoningEffort` 与 `maxTokens` 可在初始化时选择 route、推理力度与每次输出上限。`run()` 收集 prompt 的 durable inbox receipt 到下一次 whole-agent idle 之间的活动；`finalResponse` 是其中最后一条 root-session assistant 文本。期间的 steering 或其他排队工作也可能参与，因此它不表示某一 prompt 的因果独占答复。
 
 不要为了只设置 `DSH_HOME` 而传入仅含一个键的 `env`：该字段会整体替换子进程环境；直接使用 `dshHome` 可在继承父进程环境的同时传播 Harness Home。
 
@@ -115,26 +118,30 @@ with TemporaryDirectory(prefix="dsh-python-sdk-") as root:
     workspace = experiment_root / "workspace"
     dsh_home.mkdir()
     workspace.mkdir()
-    with DeepSeekHarness(dsh_home=str(dsh_home), cwd=str(workspace)) as harness:
+    with DeepSeekHarness(
+        dsh_home=str(dsh_home),
+        cwd=str(workspace),
+        runtime_cwd=str(workspace),
+    ) as harness:
         result = harness.run("say hi")
         print(result.final_response)
 ```
 
-`TemporaryDirectory` 清理工作区与显式 Harness Home，context manager 先关闭捆绑运行时。平台运行时文件名可能包含 `deepseek-harness-sdk-runtime-<platform>-<arch>`，但该文件名不是 Python 分发包名；本路径只使用 `deepseek-harness-runtime-bin` 指代分发包。
+`cwd` 指定 Agent workspace，`runtime_cwd` 指定子进程工作目录；`provider`、`model`、`reasoning_effort` 与 `max_tokens` 对应初始化选择。`TemporaryDirectory` 清理工作区与显式 Harness Home，context manager 先关闭捆绑运行时。`RunResult.final_response` 是活动区间内最后一条 root-session assistant 文本，`finish_reason` 是最后一个 root `turn/end` 的 kind；没有结束的 Turn 时为 `None`。平台运行时文件名可能包含 `deepseek-harness-sdk-runtime-<platform>-<arch>`，但该文件名不是 Python 分发包名；本路径只使用 `deepseek-harness-runtime-bin` 指代分发包。
 
 ## 证据
 
-- npm 与源码命令：固定 [`README.md` 第 17–41 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/README.md#L17-L41)；版本、Node 与 pnpm：固定 [`package.json` 第 1–10 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/package.json#L1-L10)。
-- 支持的启动入口与 Headless 参数：固定 [`docs/architecture.md` 第 41–47 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L41-L47) 与 [`apps/cli/reference/README.md` 第 23–33 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/apps/cli/reference/README.md#L23-L33)。
-- TypeScript SDK：固定 [`README` 第 25–48 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sdk/client/README.md#L25-L48)、[`types.ts` 第 23–65 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sdk/client/src/types.ts#L23-L65) 与 [`launch.ts` 第 122–151 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sdk/client/src/launch.ts#L122-L151)。
-- Harness Home 默认值：固定 [`packages/util/home-paths/README.md` 第 12 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/util/home-paths/README.md#L12) 与[第 28–40 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/util/home-paths/README.md#L28-L40)。
-- Python SDK 与运行时：固定 [`python/README.md` 第 1–20 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/README.md#L1-L20)、[`python/sdk/README.md` 第 1–45 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/sdk/README.md#L1-L45)、[`python/sdk/examples/README.md` 第 1–40 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/sdk/examples/README.md#L1-L40)、[`python/sdk/pyproject.toml` 第 5–16 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/sdk/pyproject.toml#L5-L16) 与 [`python/sdk-runtime/pyproject.toml` 第 5–16 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/sdk-runtime/pyproject.toml#L5-L16)。
+- npm 与源码命令：[README 第 17–41 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/README.md#L17-L41)；版本、Node 与 pnpm：[package.json 第 1–10 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/package.json#L1-L10)。
+- Headless 与 Profile 参数：[CLI reference 第 24–42 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/cli/reference/README.md#L24-L42)。
+- TypeScript SDK：[客户端启动与结果](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sdk/client/README.md#L30-L54)、[字段定义](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sdk/client/src/types.ts#L23-L79)与[argv、cwd 和 env 解析](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sdk/client/src/launch.ts#L122-L156)。
+- Harness Home：[home-paths README 第 12 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/util/home-paths/README.md#L12)与[优先级规则](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/util/home-paths/README.md#L29-L39)。
+- Python SDK：[启动与显式 home](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/python/sdk/README.md#L5-L33)、[运行时与结果](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/python/sdk/README.md#L58-L70)、[SDK 分发元数据](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/python/sdk/pyproject.toml#L5-L16)与[runtime 分发元数据](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/python/sdk-runtime/pyproject.toml#L5-L21)。
 
 ## 限制与适用范围
 
-固定基线是开发者预览软件，允许破坏性变更，未经过安全审计，也不应视为生产就绪。运行模型生成的代码或命令前应阅读固定提交的 [`SAFETY.md` 第 5–23 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/SAFETY.md#L5-L23)，采用最小权限并只暴露可承受风险的文件、网络与凭据。
+固定基线是开发者预览软件，允许破坏性变更，未经过安全审计，也不应视为生产就绪。运行模型生成的代码或命令前应阅读固定提交的 [`SAFETY.md` 第 5–23 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/SAFETY.md#L5-L23)，采用最小权限并只暴露可承受风险的文件、网络与凭据。
 
-本章命令按固定源码与文档审查；离线验证只执行本机已安装工具的 `--version` 或 `--help`。涉及 clone、registry、依赖安装、构建、模型调用或 Web 服务的示例未在本任务中执行，因此相应成功条件由固定源码说明而不是本次运行结果支持。
+本章命令按固定源码与文档审查；本次更新只执行只读源码核对与手册验证。涉及 clone、registry、依赖安装、构建、模型调用或 Web 服务的示例未在本任务中执行，因此相应成功条件由固定源码说明而不是本次运行结果支持。
 
 ## 继续阅读
 

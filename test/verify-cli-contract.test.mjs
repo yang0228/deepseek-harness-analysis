@@ -18,13 +18,13 @@ type: software
 authors:
   - name: yang0228
 repository-code: https://github.com/yang0228/deepseek-harness-analysis
-version: snapshot-76fda729
+version: snapshot-01234567
 preferred-citation:
   type: report
   authors:
     - name: yang0228
   title: DeepSeek Harness Analysis
-  version: snapshot-76fda729
+  version: snapshot-01234567
   url: https://github.com/yang0228/deepseek-harness-analysis
   year: 2026
 `
@@ -72,7 +72,8 @@ async function rootFixture(t, claims) {
   await mkdir(join(root, '.github/workflows'), { recursive: true })
   await writeFile(
     join(root, '.github/workflows/verify.yml'),
-    await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8'),
+    (await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8'))
+      .replace(/^          ref: .+$/mu, '          ref: 0123456789abcdef0123456789abcdef01234567'),
   )
   await writeFile(join(root, 'evidence/baseline.json'), JSON.stringify({
     repository: 'https://github.com/example/upstream',

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="460" viewBox="0 0 1000 460" role="img" aria-labelledby="title desc">
   <title id="title">从分析结论追溯到固定源码</title>
-  <desc id="desc">先阅读章节结论 DSH-ARCH-007，再查看 evidence/claims.json 中的分类、置信度和 sources，打开提交 76fda729 所对应的固定源码行，结合上下文与限定判断陈述是否成立。自动校验负责基线、结构、链接和观察一致性；人工复核负责代码语义、来源权威性与推论范围。</desc>
+  <desc id="desc">先阅读章节结论 DSH-ARCH-007，再查看 evidence/claims.json 中的分类、置信度和 sources，打开提交 0d1f5000 所对应的固定源码行，结合上下文与限定判断陈述是否成立。自动校验负责基线、结构、链接和观察一致性；人工复核负责代码语义、来源权威性与推论范围。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526781"/></marker>
     <style>
@@ -32,7 +32,7 @@
   <rect x="516" y="116" width="210" height="176" rx="14" fill="#f0fdfa" stroke="#99f6e4"/>
   <text x="536" y="147" class="number">03 / TRACE</text>
   <text x="536" y="180" class="heading">固定源码</text>
-  <text x="536" y="214" class="body">76fda729… · 源码行</text>
+  <text x="536" y="214" class="body">0d1f5000… · 源码行</text>
   <text x="536" y="244" class="body">规则声明与具体实现</text>
   <text x="536" y="270" class="body">从引用行读到上下文</text>
 

@@ -14,26 +14,26 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "README.md",
           "startLine": 1,
           "endLine": 7,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/README.md#L1-L7"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/README.md#L1-L7"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "package.json",
-          "startLine": 1,
-          "endLine": 10,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/package.json#L1-L10"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "docs/architecture.md",
+          "startLine": 9,
+          "endLine": 13,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L9-L13"
         }
       ]
     },
     {
       "id": "DSH-OVR-002",
-      "statement": "模型适配器、工具、会话与循环等产品能力可通过组合替换，但 Cordis、Loader 与受支持的 `dsh` Profile 启动链仍是应用装配基座。",
+      "statement": "产品能力通过 Cordis 插件组合替换；CLI Profile 与 Desktop Host 是需要分别理解的应用装配入口。",
       "kind": "analysis-inference",
       "confidence": "qualified",
       "maturity": "released",
@@ -44,23 +44,23 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
           "startLine": 9,
           "endLine": 29,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L9-L29"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L9-L29"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
           "startLine": 41,
-          "endLine": 47,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L41-L47"
+          "endLine": 53,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L41-L53"
         }
       ],
-      "qualification": "这里的“可替换”描述组合层面的实现选择，不表示运行中的组件可以任意并发替换。"
+      "qualification": "可替换描述配置和能力接口，不承诺活动组件可以任意热替换；Desktop 不是第六个 CLI Profile 模板。"
     },
     {
       "id": "DSH-OVR-003",
@@ -75,11 +75,11 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "README.md",
           "startLine": 11,
           "endLine": 15,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/README.md#L11-L15"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/README.md#L11-L15"
         }
       ],
       "qualification": "该成熟度结论只描述固定提交，不预测后续版本状态。"
@@ -97,65 +97,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/architecture.md",
-          "startLine": 9,
-          "endLine": 13,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L9-L13"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/cordis-primer.md",
-          "startLine": 9,
-          "endLine": 13,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/cordis-primer.md#L9-L13"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/fiber.ts",
-          "startLine": 64,
-          "endLine": 93,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L64-L93"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "vendor/cordis/src/fiber.ts",
-          "startLine": 114,
-          "endLine": 117,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L114-L117"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "vendor/cordis/src/fiber.ts",
-          "startLine": 427,
+          "startLine": 418,
           "endLine": 441,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L427-L441"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L418-L441"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/fiber.ts",
           "startLine": 675,
           "endLine": 695,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L675-L695"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "vendor/cordis/src/utils.ts",
-          "startLine": 27,
-          "endLine": 31,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/utils.ts#L27-L31"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L675-L695"
         }
       ],
       "qualification": "卸载结算不保证每个 disposer 都被调用或资源均已释放；未登记的外部副作用也不在自动清理范围内。"
@@ -173,20 +128,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 64,
-          "endLine": 72,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L64-L72"
+          "startLine": 70,
+          "endLine": 78,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L70-L78"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/cordis-primer.md",
-          "startLine": 9,
-          "endLine": 27,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/cordis-primer.md#L9-L27"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/agent/src/runtime-types.ts",
+          "startLine": 354,
+          "endLine": 363,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/agent/src/runtime-types.ts#L354-L363"
         }
       ]
     },
@@ -203,11 +158,11 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 111,
-          "endLine": 117,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L111-L117"
+          "startLine": 127,
+          "endLine": 131,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L127-L131"
         }
       ]
     },
@@ -225,38 +180,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 15,
+          "startLine": 25,
           "endLine": 29,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L15-L29"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L25-L29"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/boot/app-boot/src/profile.ts",
-          "startLine": 1,
-          "endLine": 23,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/boot/app-boot/src/profile.ts#L1-L23"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/boot/app-boot/src/profile.ts",
-          "startLine": 49,
-          "endLine": 72,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/boot/app-boot/src/profile.ts#L49-L72"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/boot/app-boot/src/profile.ts",
-          "startLine": 136,
-          "endLine": 169,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/boot/app-boot/src/profile.ts#L136-L169"
+          "startLine": 138,
+          "endLine": 171,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/src/profile.ts#L138-L171"
         }
       ],
       "qualification": "自定义 Profile 默认可实时重载，而 `headless`、`sdk`、`sdk-minimal` 与 `acp` 只在启动时应用组合。"
@@ -275,65 +212,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/architecture.md",
-          "startLine": 49,
-          "endLine": 61,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L49-L61"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/src/preset.ts",
-          "startLine": 1,
-          "endLine": 70,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/preset.ts#L1-L70"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/src/index.ts",
-          "startLine": 380,
-          "endLine": 426,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/index.ts#L380-L426"
+          "startLine": 430,
+          "endLine": 455,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/src/index.ts#L430-L455"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/src/index.ts",
-          "startLine": 745,
-          "endLine": 794,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/index.ts#L745-L794"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/src/mount.ts",
-          "startLine": 368,
-          "endLine": 415,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/mount.ts#L368-L415"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/core/scope/src/index.ts",
           "startLine": 32,
-          "endLine": 82,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/scope/src/index.ts#L32-L82"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/scope/src/index.ts",
-          "startLine": 129,
-          "endLine": 147,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/scope/src/index.ts#L129-L147"
+          "endLine": 50,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/scope/src/index.ts#L32-L50"
         }
       ]
     },
@@ -350,29 +242,11 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 76,
-          "endLine": 101,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L76-L101"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/agent-lifecycle.md",
-          "startLine": 4,
-          "endLine": 80,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/agent-lifecycle.md#L4-L80"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/tool-execution-pipeline.md",
-          "startLine": 1,
-          "endLine": 62,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/tool-execution-pipeline.md#L1-L62"
+          "startLine": 82,
+          "endLine": 111,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L82-L111"
         }
       ]
     },
@@ -390,29 +264,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 103,
-          "endLine": 109,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L103-L109"
+          "startLine": 117,
+          "endLine": 125,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L117-L125"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/core/session/src/types.ts",
-          "startLine": 20,
-          "endLine": 120,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/types.ts#L20-L120"
+          "startLine": 226,
+          "endLine": 238,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L226-L238"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/core/session/src/types.ts",
-          "startLine": 436,
-          "endLine": 470,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/types.ts#L436-L470"
+          "startLine": 299,
+          "endLine": 310,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L299-L310"
         }
       ]
     },
@@ -430,11 +304,11 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/boot/app-boot/src/profile.ts",
-          "startLine": 136,
-          "endLine": 158,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/boot/app-boot/src/profile.ts#L136-L158"
+          "startLine": 138,
+          "endLine": 160,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/src/profile.ts#L138-L160"
         }
       ],
       "probe": "profile:web"
@@ -453,74 +327,74 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/presets/standard/preset.yml",
           "startLine": 1,
           "endLine": 3,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/standard/preset.yml#L1-L3"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/preset.yml#L1-L3"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/preset/agent-presets/presets/standard/agent.cordis.yml",
+          "startLine": 1,
+          "endLine": 262,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L1-L262"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/presets/minimal/preset.yml",
           "startLine": 1,
           "endLine": 3,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/minimal/preset.yml#L1-L3"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/preset.yml#L1-L3"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/preset/agent-presets/presets/minimal/agent.cordis.yml",
+          "startLine": 1,
+          "endLine": 69,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L1-L69"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/presets/ptc/preset.yml",
           "startLine": 1,
           "endLine": 3,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/ptc/preset.yml#L1-L3"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/ptc/preset.yml#L1-L3"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/preset/agent-presets/presets/ptc/agent.cordis.yml",
+          "startLine": 1,
+          "endLine": 283,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/ptc/agent.cordis.yml#L1-L283"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/presets/cordis/preset.yml",
           "startLine": 1,
           "endLine": 3,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/cordis/preset.yml#L1-L3"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/cordis/preset.yml#L1-L3"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/presets/standard/agent.cordis.yml",
-          "startLine": 1,
-          "endLine": 251,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L1-L251"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/presets/minimal/agent.cordis.yml",
-          "startLine": 1,
-          "endLine": 88,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L1-L88"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/presets/ptc/agent.cordis.yml",
-          "startLine": 1,
-          "endLine": 271,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/ptc/agent.cordis.yml#L1-L271"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/presets/cordis/agent.cordis.yml",
           "startLine": 1,
-          "endLine": 262,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/cordis/agent.cordis.yml#L1-L262"
+          "endLine": 273,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/cordis/agent.cordis.yml#L1-L273"
         }
       ],
       "probe": "preset:standard"
@@ -538,65 +412,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/bundle/base/cordis.patch.yml",
-          "startLine": 1,
-          "endLine": 498,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/bundle/base/cordis.patch.yml#L1-L498"
+          "startLine": 75,
+          "endLine": 108,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L75-L108"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/llm-streaming.md",
-          "startLine": 277,
-          "endLine": 317,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/llm-streaming.md#L277-L317"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/llm-streaming.md",
-          "startLine": 414,
-          "endLine": 484,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/llm-streaming.md#L414-L484"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/llm-streaming.md",
-          "startLine": 727,
-          "endLine": 865,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/llm-streaming.md#L727-L865"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/llm/llm-pi-ai/README.md",
-          "startLine": 10,
-          "endLine": 12,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/llm/llm-pi-ai/README.md#L10-L12"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/llm/llm-pi-ai/README.md",
-          "startLine": 25,
-          "endLine": 71,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/llm/llm-pi-ai/README.md#L25-L71"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/llm/llm-pi-ai/README.md",
-          "startLine": 144,
-          "endLine": 150,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/llm/llm-pi-ai/README.md#L144-L150"
+          "startLine": 28,
+          "endLine": 80,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/llm/llm-pi-ai/README.md#L28-L80"
         }
       ],
       "qualification": "pi-ai 可声明兼容提供方，但固定组合没有预先启用所有目录中的提供方。"
@@ -615,38 +444,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/tools.md",
-          "startLine": 9,
-          "endLine": 170,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/tools.md#L9-L170"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/tools.md",
-          "startLine": 474,
-          "endLine": 702,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/tools.md#L474-L702"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/bundle/base/cordis.patch.yml",
-          "startLine": 1,
-          "endLine": 498,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/bundle/base/cordis.patch.yml#L1-L498"
+          "startLine": 243,
+          "endLine": 378,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L243-L378"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/bundle/web-app/cordis.patch.yml",
-          "startLine": 1,
-          "endLine": 444,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/bundle/web-app/cordis.patch.yml#L1-L444"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/bundle/base/cordis.patch.yml",
+          "startLine": 450,
+          "endLine": 479,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L450-L479"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/preset/agent-presets/presets/standard/agent.cordis.yml",
+          "startLine": 36,
+          "endLine": 262,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L36-L262"
         }
       ]
     },
@@ -664,38 +484,38 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/sandbox.md",
-          "startLine": 1,
-          "endLine": 79,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/sandbox.md#L1-L79"
+          "startLine": 5,
+          "endLine": 38,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/sandbox.md#L5-L38"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/sandbox.md",
           "startLine": 154,
-          "endLine": 219,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/sandbox.md#L154-L219"
+          "endLine": 158,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/sandbox.md#L154-L158"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/bundle/base/cordis.patch.yml",
-          "startLine": 1,
-          "endLine": 498,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/bundle/base/cordis.patch.yml#L1-L498"
+          "startLine": 202,
+          "endLine": 241,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L202-L241"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/bundle/sdk-minimal/cordis.patch.yml",
-          "startLine": 1,
-          "endLine": 168,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/bundle/sdk-minimal/cordis.patch.yml#L1-L168"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/bundle/sdk-minimal/README.md",
+          "startLine": 12,
+          "endLine": 41,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/sdk-minimal/README.md#L12-L41"
         }
       ],
       "qualification": "Windows ACL 与部分受支持的 Landlock ABI 可能返回 `partial`，而 `danger-full-access` 明确绕过约束；这些模式不承诺通用网络、进程或凭据隔离。"
@@ -714,26 +534,44 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/session.md",
-          "startLine": 178,
-          "endLine": 381,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L178-L381"
+          "startLine": 5,
+          "endLine": 5,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/session.md#L5"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/session.md",
-          "startLine": 563,
-          "endLine": 649,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L563-L649"
+          "startLine": 650,
+          "endLine": 665,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/session.md#L650-L665"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/session/session-projection/src/index.ts",
+          "startLine": 181,
+          "endLine": 197,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-projection/src/index.ts#L181-L197"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/session/session-persistence/src/handle.ts",
+          "startLine": 45,
+          "endLine": 109,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-persistence/src/handle.ts#L45-L109"
         }
       ]
     },
     {
       "id": "DSH-CAP-007",
-      "statement": "`standard` Preset 启用进程内 Subagent，而外部产品 Provider 需要可选组合且对应工具行默认禁用。",
+      "statement": "`standard` Preset 启用进程内 Subagent；Codex 与 Claude Code 工具默认禁用，其他外部 Provider 也需要显式组合。",
       "kind": "upstream-fact",
       "confidence": "qualified",
       "maturity": "released",
@@ -745,90 +583,36 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/presets/standard/agent.cordis.yml",
-          "startLine": 1,
-          "endLine": 251,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L1-L251"
+          "startLine": 175,
+          "endLine": 220,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L175-L220"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/subagent/subagent-acp/package.json",
-          "startLine": 1,
-          "endLine": 12,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-acp/package.json#L1-L12"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "apps/cli/reference/README.md",
+          "startLine": 57,
+          "endLine": 67,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/cli/reference/README.md#L57-L67"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/subagent/subagent-codex/package.json",
-          "startLine": 1,
-          "endLine": 12,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-codex/package.json#L1-L12"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/subagent/subagent-claude-code/package.json",
-          "startLine": 1,
-          "endLine": 12,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-claude-code/package.json#L1-L12"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/subagent/subagent-dsh-sdk/package.json",
-          "startLine": 1,
-          "endLine": 12,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-dsh-sdk/package.json#L1-L12"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/subagent/subagent-codex/cordis.patch.yml",
-          "startLine": 1,
-          "endLine": 5,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-codex/cordis.patch.yml#L1-L5"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/subagent/subagent-claude-code/cordis.patch.yml",
-          "startLine": 1,
-          "endLine": 6,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-claude-code/cordis.patch.yml#L1-L6"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/subagent.md",
-          "startLine": 1,
-          "endLine": 170,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/subagent.md#L1-L170"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/subagent.md",
-          "startLine": 389,
-          "endLine": 464,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/subagent.md#L389-L464"
+          "startLine": 393,
+          "endLine": 467,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/subagent.md#L393-L467"
         }
       ],
       "qualification": "Provider 在 Host 中可用不等于模型已经获得对应工具。"
     },
     {
       "id": "DSH-CAP-008",
-      "statement": "durable current Goal 与 worker-thread Workflow 是两种不同的编排原语。",
+      "statement": "durable current Goal 与通过 PTC Node 进程执行的 Workflow 是两种不同的编排原语。",
       "kind": "upstream-fact",
       "confidence": "qualified",
       "maturity": "released",
@@ -840,41 +624,41 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/goal.md",
-          "startLine": 1,
-          "endLine": 30,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/goal.md#L1-L30"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/goal/goal/README.md",
+          "startLine": 54,
+          "endLine": 82,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/goal/goal/README.md#L54-L82"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/goal.md",
-          "startLine": 72,
-          "endLine": 151,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/goal.md#L72-L151"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/goal/goal/README.md",
+          "startLine": 158,
+          "endLine": 162,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/goal/goal/README.md#L158-L162"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/workflow.md",
-          "startLine": 1,
-          "endLine": 13,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/workflow.md#L1-L13"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/workflow/workflow-ptc/README.md",
+          "startLine": 12,
+          "endLine": 61,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/README.md#L12-L61"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/workflow.md",
-          "startLine": 39,
-          "endLine": 158,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/workflow.md#L39-L158"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/workflow/workflow-ptc/src/index.ts",
+          "startLine": 96,
+          "endLine": 165,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/src/index.ts#L96-L165"
         }
       ],
-      "qualification": "Goal 不是调度器，Workflow Worker 的受限 API 也不是安全 Sandbox。"
+      "qualification": "Goal 状态不负责调度；Workflow 的 VM 不是安全隔离层，文件约束由所选 Sandbox 提供方执行，网络不在该策略内。"
     },
     {
       "id": "DSH-CAP-009",
@@ -890,29 +674,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/session.md",
-          "startLine": 178,
-          "endLine": 381,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L178-L381"
+          "startLine": 5,
+          "endLine": 5,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/session.md#L5"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/session.md",
-          "startLine": 563,
-          "endLine": 649,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L563-L649"
+          "startLine": 650,
+          "endLine": 665,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/session.md#L650-L665"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/testing.md",
-          "startLine": 12,
-          "endLine": 16,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/testing.md#L12-L16"
+          "startLine": 11,
+          "endLine": 17,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/testing.md#L11-L17"
         }
       ],
       "qualification": "该判断限制产品定位，不否认这些原语可被更高层工具组合使用。"
@@ -930,20 +714,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
           "startLine": 9,
           "endLine": 13,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L9-L13"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L9-L13"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 103,
-          "endLine": 115,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L103-L115"
+          "startLine": 127,
+          "endLine": 133,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L127-L133"
         }
       ],
       "qualification": "该结论比较扩展范围，不声称所有运行中组件都能任意热替换。"
@@ -961,20 +745,11 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/architecture.md",
-          "startLine": 9,
-          "endLine": 13,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L9-L13"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/cordis-primer.md",
           "startLine": 9,
           "endLine": 45,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/cordis-primer.md#L9-L45"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/cordis-primer.md#L9-L45"
         }
       ],
       "qualification": "只有通过生命周期 API 注册的副作用自动获得这一清理关系。"
@@ -992,29 +767,11 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 64,
-          "endLine": 72,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L64-L72"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/architecture.md",
-          "startLine": 103,
-          "endLine": 115,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L103-L115"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/cordis-primer.md",
-          "startLine": 9,
-          "endLine": 45,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/cordis-primer.md#L9-L45"
+          "startLine": 107,
+          "endLine": 125,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L107-L125"
         }
       ],
       "qualification": "live 事件总线本身不持久，重建依赖 durable Session Event Log 中已记录的输入。"
@@ -1032,74 +789,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/preset/agent-presets/README.md",
+          "startLine": 98,
+          "endLine": 102,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/README.md#L98-L102"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/src/index.ts",
-          "startLine": 1,
-          "endLine": 14,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/index.ts#L1-L14"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/src/index.ts",
-          "startLine": 227,
-          "endLine": 239,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/index.ts#L227-L239"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/src/index.ts",
-          "startLine": 380,
-          "endLine": 426,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/index.ts#L380-L426"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/src/index.ts",
-          "startLine": 610,
-          "endLine": 727,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/index.ts#L610-L727"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/src/index.ts",
-          "startLine": 745,
-          "endLine": 794,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/index.ts#L745-L794"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/presets/standard/agent.cordis.yml",
-          "startLine": 1,
-          "endLine": 251,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L1-L251"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/presets/ptc/agent.cordis.yml",
-          "startLine": 1,
-          "endLine": 271,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/ptc/agent.cordis.yml#L1-L271"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/presets/cordis/agent.cordis.yml",
-          "startLine": 1,
-          "endLine": 262,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/cordis/agent.cordis.yml#L1-L262"
+          "startLine": 737,
+          "endLine": 751,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/src/index.ts#L737-L751"
         }
       ],
       "qualification": "组合在 Session 开始 Turn 后固定，不支持对活动会话任意换装工具。"
@@ -1118,110 +821,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/ptc.ts",
-          "startLine": 282,
-          "endLine": 359,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/ptc.ts#L282-L359"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/ptc.ts",
-          "startLine": 387,
-          "endLine": 465,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/ptc.ts#L387-L465"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/ptc.ts",
-          "startLine": 479,
-          "endLine": 598,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/ptc.ts#L479-L598"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/ptc.ts",
-          "startLine": 608,
-          "endLine": 653,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/ptc.ts#L608-L653"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 789,
-          "endLine": 794,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L789-L794"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 1319,
-          "endLine": 1352,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L1319-L1352"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 1450,
-          "endLine": 1488,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L1450-L1488"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/core/tools/README.md",
-          "startLine": 226,
-          "endLine": 227,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/README.md#L226-L227"
+          "startLine": 123,
+          "endLine": 129,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/tools/README.md#L123-L129"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/code-runtime/code-runtime-worker-thread/README.md",
-          "startLine": 12,
-          "endLine": 12,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/code-runtime/code-runtime-worker-thread/README.md#L12"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/code-runtime/code-runtime-worker-thread/README.md",
-          "startLine": 42,
-          "endLine": 49,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/code-runtime/code-runtime-worker-thread/README.md#L42-L49"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/code-runtime/code-runtime-worker-thread/README.md",
-          "startLine": 141,
-          "endLine": 146,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/code-runtime/code-runtime-worker-thread/README.md#L141-L146"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/preset/agent-presets/presets/ptc/agent.cordis.yml",
-          "startLine": 1,
-          "endLine": 271,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/ptc/agent.cordis.yml#L1-L271"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/ptc-runtime/ptc-runtime-node/README.md",
+          "startLine": 60,
+          "endLine": 74,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/ptc-runtime/ptc-runtime-node/README.md#L60-L74"
         }
       ],
       "qualification": "“可能减少往返”描述交互结构，没有量化速度、成本或质量收益。"
@@ -1239,38 +852,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/context.ts",
-          "startLine": 109,
+          "startLine": 99,
           "endLine": 125,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/context.ts#L109-L125"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/context.ts#L99-L125"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "vendor/cordis/src/registry.ts",
-          "startLine": 91,
-          "endLine": 123,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/registry.ts#L91-L123"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/reflect.ts",
-          "startLine": 134,
-          "endLine": 170,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/reflect.ts#L134-L170"
+          "startLine": 144,
+          "endLine": 166,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/reflect.ts#L144-L166"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/loader/src/config/isolate.ts",
-          "startLine": 25,
+          "startLine": 75,
           "endLine": 101,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/loader/src/config/isolate.ts#L25-L101"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/loader/src/config/isolate.ts#L75-L101"
         }
       ]
     },
@@ -1287,56 +891,38 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "vendor/cordis/src/fiber.ts",
-          "startLine": 180,
-          "endLine": 203,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L180-L203"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "vendor/cordis/src/fiber.ts",
-          "startLine": 222,
-          "endLine": 295,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L222-L295"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/fiber.ts",
           "startLine": 114,
           "endLine": 117,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L114-L117"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L114-L117"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/fiber.ts",
           "startLine": 427,
           "endLine": 441,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L427-L441"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L427-L441"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/fiber.ts",
           "startLine": 675,
           "endLine": 695,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/fiber.ts#L675-L695"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/fiber.ts#L675-L695"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/utils.ts",
           "startLine": 27,
           "endLine": 31,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/utils.ts#L27-L31"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/utils.ts#L27-L31"
         }
       ],
       "qualification": "跨 Effect 没有全局串行完成顺序；需要确保各项清理均被尝试的资源所有者必须显式处理清理异常。"
@@ -1354,38 +940,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/events.ts",
-          "startLine": 24,
-          "endLine": 32,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/events.ts#L24-L32"
+          "startLine": 234,
+          "endLine": 259,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/events.ts#L234-L259"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "vendor/cordis/src/events.ts",
-          "startLine": 37,
-          "endLine": 108,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/events.ts#L37-L108"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "vendor/cordis/src/events.ts",
-          "startLine": 177,
-          "endLine": 243,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/events.ts#L177-L243"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "vendor/cordis/src/events.ts",
-          "startLine": 254,
+          "startLine": 277,
           "endLine": 301,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/vendor/cordis/src/events.ts#L254-L301"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/vendor/cordis/src/events.ts#L277-L301"
         }
       ]
     },
@@ -1402,29 +970,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/boot/app-boot/src/profile.ts",
-          "startLine": 1,
-          "endLine": 13,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/boot/app-boot/src/profile.ts#L1-L13"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "apps/cli/src/profile-boot.ts",
+          "startLine": 87,
+          "endLine": 92,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/cli/src/profile-boot.ts#L87-L92"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "apps/cli/src/profile-boot.ts",
-          "startLine": 80,
-          "endLine": 88,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/apps/cli/src/profile-boot.ts#L80-L88"
+          "startLine": 191,
+          "endLine": 195,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/cli/src/profile-boot.ts#L191-L195"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "apps/cli/src/profile-boot.ts",
-          "startLine": 125,
-          "endLine": 167,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/apps/cli/src/profile-boot.ts#L125-L167"
+          "startLine": 211,
+          "endLine": 253,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/cli/src/profile-boot.ts#L211-L253"
         }
       ]
     },
@@ -1441,29 +1009,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/boot/app-boot/src/profile.ts",
-          "startLine": 55,
-          "endLine": 72,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/boot/app-boot/src/profile.ts#L55-L72"
+          "startLine": 138,
+          "endLine": 171,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/src/profile.ts#L138-L171"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/boot/app-boot/src/profile.ts",
-          "startLine": 136,
-          "endLine": 169,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/boot/app-boot/src/profile.ts#L136-L169"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "apps/cli/src/profile-boot.ts",
-          "startLine": 278,
-          "endLine": 309,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/apps/cli/src/profile-boot.ts#L278-L309"
+          "startLine": 375,
+          "endLine": 402,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/cli/src/profile-boot.ts#L375-L402"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/boot/app-boot/README.md",
+          "startLine": 67,
+          "endLine": 86,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/README.md#L67-L86"
         }
       ],
       "qualification": "`live` 只覆盖 Patch 重载，不表示任意插件可以在活动请求中并发替换。"
@@ -1481,29 +1049,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/src/mount.ts",
-          "startLine": 368,
-          "endLine": 415,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/mount.ts#L368-L415"
+          "startLine": 359,
+          "endLine": 405,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/src/mount.ts#L359-L405"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/src/authoring.ts",
           "startLine": 105,
-          "endLine": 165,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/src/authoring.ts#L105-L165"
+          "endLine": 125,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/src/authoring.ts#L105-L125"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/preset/agent-presets/README.md",
-          "startLine": 165,
-          "endLine": 179,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/README.md#L165-L179"
+          "startLine": 174,
+          "endLine": 181,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/README.md#L174-L181"
         }
       ],
       "qualification": "部署升级不会更新已复制 Preset，因此副本会与其来源逐渐漂移。"
@@ -1521,29 +1089,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/core/session/src/types.ts",
-          "startLine": 436,
-          "endLine": 470,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/types.ts#L436-L470"
+          "startLine": 470,
+          "endLine": 488,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L470-L488"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/session/session-persistence/src/storage-contract.ts",
-          "startLine": 36,
-          "endLine": 91,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/storage-contract.ts#L36-L91"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/session/session-persistence/src/errors.ts",
-          "startLine": 92,
-          "endLine": 137,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/errors.ts#L92-L137"
+          "startLine": 41,
+          "endLine": 79,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-persistence/src/storage-contract.ts#L41-L79"
         }
       ]
     },
@@ -1560,83 +1119,38 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/session.md",
-          "startLine": 253,
-          "endLine": 317,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L253-L317"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/session/src/surface.ts",
+          "startLine": 137,
+          "endLine": 157,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/surface.ts#L137-L157"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/session-projection.md",
-          "startLine": 5,
-          "endLine": 11,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session-projection.md#L5-L11"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/session-projection.md",
-          "startLine": 38,
-          "endLine": 70,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session-projection.md#L38-L70"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/session-projection.md",
-          "startLine": 72,
-          "endLine": 106,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session-projection.md#L72-L106"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/session-projection.md",
-          "startLine": 182,
-          "endLine": 234,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session-projection.md#L182-L234"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/session/src/index.ts",
-          "startLine": 790,
-          "endLine": 820,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L790-L820"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/session/session-projection/src/index.ts",
-          "startLine": 1,
-          "endLine": 17,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-projection/src/index.ts#L1-L17"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/session/session-projection/src/index.ts",
           "startLine": 40,
-          "endLine": 117,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-projection/src/index.ts#L40-L117"
+          "endLine": 92,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-projection/src/index.ts#L40-L92"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/session/session-projection/src/index.ts",
+          "startLine": 107,
+          "endLine": 115,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-projection/src/index.ts#L107-L115"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/session/session-projection/src/index.ts",
           "startLine": 181,
-          "endLine": 223,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-projection/src/index.ts#L181-L223"
+          "endLine": 197,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-projection/src/index.ts#L181-L197"
         }
       ]
     },
@@ -1653,83 +1167,38 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/session.md",
-          "startLine": 365,
-          "endLine": 381,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L365-L381"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/session.md",
-          "startLine": 552,
-          "endLine": 581,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L552-L581"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/session.md",
-          "startLine": 623,
-          "endLine": 649,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L623-L649"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/core/session/src/index.ts",
-          "startLine": 525,
-          "endLine": 580,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L525-L580"
+          "startLine": 555,
+          "endLine": 618,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L555-L618"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/core/session/src/index.ts",
-          "startLine": 1139,
-          "endLine": 1218,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L1139-L1218"
+          "startLine": 1236,
+          "endLine": 1250,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L1236-L1250"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/session/session-persistence/src/index.ts",
-          "startLine": 115,
-          "endLine": 146,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/index.ts#L115-L146"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/session/src/index.ts",
+          "startLine": 1285,
+          "endLine": 1311,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L1285-L1311"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/session/session-persistence/src/handle.ts",
-          "startLine": 37,
-          "endLine": 94,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/handle.ts#L37-L94"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/session/session-persistence/src/storage-contract.ts",
-          "startLine": 36,
-          "endLine": 91,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/storage-contract.ts#L36-L91"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/session/session-persistence/src/errors.ts",
-          "startLine": 92,
-          "endLine": 137,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/errors.ts#L92-L137"
+          "startLine": 45,
+          "endLine": 109,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-persistence/src/handle.ts#L45-L109"
         }
       ],
       "qualification": "Fork 选定的前缀不能结束于未完成 Turn 内；持久化 Provider 仍负责日志的耐久性与格式拒绝。"
@@ -1747,38 +1216,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/tools/README.md",
+          "startLine": 79,
+          "endLine": 103,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/tools/README.md#L79-L103"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/tools/README.md",
+          "startLine": 119,
+          "endLine": 121,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/tools/README.md#L119-L121"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/tool-execution-pipeline.md",
           "startLine": 6,
           "endLine": 60,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/tool-execution-pipeline.md#L6-L60"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 213,
-          "endLine": 261,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L213-L261"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 1450,
-          "endLine": 1498,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L1450-L1498"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 1523,
-          "endLine": 1612,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L1523-L1612"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/tool-execution-pipeline.md#L6-L60"
         }
       ]
     },
@@ -1795,35 +1255,26 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 788,
-          "endLine": 794,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L788-L794"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 1319,
-          "endLine": 1352,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L1319-L1352"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/core/tools/src/ptc.ts",
-          "startLine": 479,
-          "endLine": 598,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/ptc.ts#L479-L598"
+          "startLine": 531,
+          "endLine": 653,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/tools/src/ptc.ts#L531-L653"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/tools/README.md",
+          "startLine": 123,
+          "endLine": 129,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/tools/README.md#L123-L129"
         }
       ]
     },
     {
       "id": "DSH-DD-TOOLS-003",
-      "statement": "每次 PTC 运行使用全新程序状态，并受资源与并发上限约束。",
+      "statement": "内置 Node PTC Provider 为每次运行创建新进程，并分别约束执行期限、输出、控制流量与堆内存。",
       "kind": "upstream-fact",
       "confidence": "qualified",
       "maturity": "released",
@@ -1834,50 +1285,32 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 649,
-          "endLine": 663,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L649-L663"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/ptc.ts",
-          "startLine": 282,
-          "endLine": 359,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/ptc.ts#L282-L359"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/code-runtime/code-runtime-worker-thread/README.md",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/ptc-runtime/ptc-runtime-node/README.md",
           "startLine": 12,
           "endLine": 12,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/code-runtime/code-runtime-worker-thread/README.md#L12"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/ptc-runtime/ptc-runtime-node/README.md#L12"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/code-runtime/code-runtime-worker-thread/README.md",
-          "startLine": 42,
-          "endLine": 49,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/code-runtime/code-runtime-worker-thread/README.md#L42-L49"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/ptc-runtime/ptc-runtime-node/README.md",
+          "startLine": 46,
+          "endLine": 74,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/ptc-runtime/ptc-runtime-node/README.md#L46-L74"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/core/tools/src/index.ts",
-          "startLine": 548,
-          "endLine": 573,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/tools/src/index.ts#L548-L573"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/ptc-runtime/ptc-runtime-node/README.md",
+          "startLine": 137,
+          "endLine": 144,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/ptc-runtime/ptc-runtime-node/README.md#L137-L144"
         }
       ],
-      "qualification": "程序中的中间 JavaScript 值不会自动成为 durable Session Event。"
+      "qualification": "期限与堆限制不是进程树 CPU/RSS 上限；文件约束继承所选 Sandbox 的 enforcement，脱离管理范围的后代进程可能无法清理。"
     },
     {
       "id": "DSH-DD-SANDBOX-001",
@@ -1892,38 +1325,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/sandbox.md",
-          "startLine": 1,
-          "endLine": 30,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/sandbox.md#L1-L30"
+          "startLine": 9,
+          "endLine": 35,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/sandbox.md#L9-L35"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/sandbox.md",
-          "startLine": 41,
-          "endLine": 79,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/sandbox.md#L41-L79"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/sandbox/sandbox-policy/src/index.ts",
-          "startLine": 104,
-          "endLine": 178,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sandbox/sandbox-policy/src/index.ts#L104-L178"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/shell/bash-sandbox/src/index.ts",
-          "startLine": 80,
-          "endLine": 122,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/shell/bash-sandbox/src/index.ts#L80-L122"
+          "startLine": 155,
+          "endLine": 179,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sandbox/sandbox-policy/src/index.ts#L155-L179"
         }
       ],
       "qualification": "该模式约束文件系统副作用，不构成通用网络、进程或凭据隔离。"
@@ -1941,56 +1356,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/sandbox.md",
-          "startLine": 1,
-          "endLine": 30,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/sandbox.md#L1-L30"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/sandbox/sandbox-local/README.md",
+          "startLine": 51,
+          "endLine": 81,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sandbox/sandbox-local/README.md#L51-L81"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/sandbox/sandbox-local/src/profiles.ts",
-          "startLine": 12,
-          "endLine": 58,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sandbox/sandbox-local/src/profiles.ts#L12-L58"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/sandbox/sandbox-local/src/index.ts",
-          "startLine": 151,
-          "endLine": 187,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sandbox/sandbox-local/src/index.ts#L151-L187"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/sandbox/sandbox-local/src/index.ts",
-          "startLine": 307,
-          "endLine": 344,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sandbox/sandbox-local/src/index.ts#L307-L344"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/sandbox/sandbox-local/src/index.ts",
-          "startLine": 486,
-          "endLine": 539,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sandbox/sandbox-local/src/index.ts#L486-L539"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/sandbox/sandbox-windows-acl/src/index.ts",
-          "startLine": 149,
-          "endLine": 209,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sandbox/sandbox-windows-acl/src/index.ts#L149-L209"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/sandbox/sandbox-local/README.md",
+          "startLine": 128,
+          "endLine": 134,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sandbox/sandbox-local/README.md#L128-L134"
         }
       ],
       "qualification": "Windows ACL 与部分受支持的 Landlock ABI 可能诚实返回 `partial`。"
@@ -2008,29 +1387,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/sandbox.md",
-          "startLine": 98,
+          "startLine": 154,
           "endLine": 158,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/sandbox.md#L98-L158"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/sandbox.md#L154-L158"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/sandbox/sandbox/src/index.ts",
-          "startLine": 128,
-          "endLine": 175,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/sandbox/sandbox/src/index.ts#L128-L175"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/shell/bash-sandbox/src/index.ts",
-          "startLine": 88,
-          "endLine": 177,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/shell/bash-sandbox/src/index.ts#L88-L177"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/sandbox/sandbox-local/README.md",
+          "startLine": 55,
+          "endLine": 57,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/sandbox/sandbox-local/README.md#L55-L57"
         }
       ],
       "qualification": "`danger-full-access` 是调用方选择的无约束模式，不能被描述为 Sandbox 保护。"
@@ -2048,65 +1418,65 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/subagent.md",
-          "startLine": 389,
-          "endLine": 458,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/subagent.md#L389-L458"
+          "startLine": 393,
+          "endLine": 467,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/subagent.md#L393-L467"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/subagent/subagent-spawn-in-process/src/index.ts",
-          "startLine": 34,
-          "endLine": 69,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-spawn-in-process/src/index.ts#L34-L69"
+          "startLine": 41,
+          "endLine": 65,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/subagent/subagent-spawn-in-process/src/index.ts#L41-L65"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/subagent/subagent-fork-in-process/src/index.ts",
           "startLine": 40,
-          "endLine": 94,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-fork-in-process/src/index.ts#L40-L94"
+          "endLine": 91,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/subagent/subagent-fork-in-process/src/index.ts#L40-L91"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/subagent/subagent-codex/src/index.ts",
           "startLine": 63,
           "endLine": 110,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-codex/src/index.ts#L63-L110"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/subagent/subagent-codex/src/index.ts#L63-L110"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/subagent/subagent-claude-code/src/index.ts",
           "startLine": 73,
           "endLine": 126,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-claude-code/src/index.ts#L73-L126"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/subagent/subagent-claude-code/src/index.ts#L73-L126"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/subagent/subagent-acp/src/index.ts",
           "startLine": 141,
           "endLine": 188,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-acp/src/index.ts#L141-L188"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/subagent/subagent-acp/src/index.ts#L141-L188"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/subagent/subagent-dsh-sdk/src/index.ts",
           "startLine": 129,
-          "endLine": 199,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-dsh-sdk/src/index.ts#L129-L199"
+          "endLine": 176,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/subagent/subagent-dsh-sdk/src/index.ts#L129-L176"
         }
       ],
       "qualification": "Provider 可注册不等于对应模型工具已在当前 Preset 中启用。"
@@ -2124,45 +1494,36 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/goal.md",
-          "startLine": 1,
-          "endLine": 30,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/goal.md#L1-L30"
+          "startLine": 7,
+          "endLine": 119,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/goal.md#L7-L119"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/goal.md",
-          "startLine": 72,
-          "endLine": 100,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/goal.md#L72-L100"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/goal/goal/README.md",
           "startLine": 54,
-          "endLine": 72,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/goal/goal/README.md#L54-L72"
+          "endLine": 82,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/goal/goal/README.md#L54-L82"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/goal/goal/README.md",
-          "startLine": 151,
+          "startLine": 158,
           "endLine": 162,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/goal/goal/README.md#L151-L162"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/goal/goal/README.md#L158-L162"
         }
       ],
       "qualification": "Resume 或 Fork 后需要重新激活 Goal；Goal 本身不是调度器。"
     },
     {
       "id": "DSH-DD-ORCH-003",
-      "statement": "Workflow 程序在受限 Worker API 中运行，并在完成或失败后执行 Dispose。",
+      "statement": "Workflow 程序复用 Node PTC runtime，每次在新建的 Node 进程中运行；Consumer 在完成或失败后仍须调用 Dispose。",
       "kind": "upstream-fact",
       "confidence": "qualified",
       "maturity": "released",
@@ -2173,45 +1534,45 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/subsystems/workflow.md",
-          "startLine": 39,
-          "endLine": 65,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/workflow.md#L39-L65"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/subsystems/workflow.md",
           "startLine": 93,
           "endLine": 128,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/workflow.md#L93-L128"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/workflow.md#L93-L128"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/workflow/workflow-worker-thread/src/index.ts",
-          "startLine": 106,
-          "endLine": 201,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/workflow-worker-thread/src/index.ts#L106-L201"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/workflow/workflow-ptc/README.md",
+          "startLine": 12,
+          "endLine": 61,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/README.md#L12-L61"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "packages/workflow/tool-workflow/src/index.ts",
-          "startLine": 281,
-          "endLine": 324,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/tool-workflow/src/index.ts#L281-L324"
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/workflow/workflow-ptc/README.md",
+          "startLine": 153,
+          "endLine": 159,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/README.md#L153-L159"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/workflow/workflow-ptc/src/index.ts",
+          "startLine": 96,
+          "endLine": 165,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/src/index.ts#L96-L165"
         }
       ],
-      "qualification": "Worker 的 API 限制用于缩小执行能力，但不构成安全 Sandbox。"
+      "qualification": "文件约束和进程清理由所选 Provider 决定；Workflow 无整体 elapsed deadline，VM 与协作式 fan-out limits 不构成安全隔离或强制配额。"
     },
     {
       "id": "DSH-DD-ORCH-004",
-      "statement": "Agent Teams 位于私有 experimental package 中，并被官方发布排除。",
+      "statement": "Agent Teams 已纳入公开发布族，保留 experimental 名称与实验成熟度，并由可选 Profile layer 显式启用。",
       "kind": "upstream-fact",
       "confidence": "verified",
       "maturity": "experimental",
@@ -2222,35 +1583,53 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/experimental/agent-team/package.json",
           "startLine": 1,
-          "endLine": 10,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/experimental/agent-team/package.json#L1-L10"
+          "endLine": 11,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team/package.json#L1-L11"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/experimental/agent-team-profile/README.md",
-          "startLine": 1,
-          "endLine": 12,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/experimental/agent-team-profile/README.md#L1-L12"
+          "startLine": 12,
+          "endLine": 41,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team-profile/README.md#L12-L41"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/experimental/agent-team-profile/README.md",
+          "startLine": 90,
+          "endLine": 97,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team-profile/README.md#L90-L97"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "packages/experimental/AGENTS.md",
+          "startLine": 5,
+          "endLine": 9,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/AGENTS.md#L5-L9"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "scripts/experimental-package-policy.ts",
           "startLine": 1,
-          "endLine": 8,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/experimental/AGENTS.md#L1-L8"
+          "endLine": 15,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/scripts/experimental-package-policy.ts#L1-L15"
         }
       ]
     },
     {
       "id": "DSH-START-001",
-      "statement": "源码中的浮动 npm 命令、`0.1.2-rc.1` 版本声明与固定提交标识不同的复现目标，只有固定提交对应本手册分析的源码树。",
+      "statement": "源码中的浮动 npm 命令、`0.1.6-alpha.1` 版本声明与固定提交标识不同的复现目标，只有固定提交对应本手册分析的源码树。",
       "kind": "analysis-inference",
       "confidence": "qualified",
       "maturity": "released",
@@ -2261,20 +1640,20 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "README.md",
           "startLine": 17,
           "endLine": 41,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/README.md#L17-L41"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/README.md#L17-L41"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "package.json",
           "startLine": 1,
           "endLine": 10,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/package.json#L1-L10"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/package.json#L1-L10"
         }
       ],
       "qualification": "源码版本声明不单独证明同名版本当前可从 npm registry 获取。"
@@ -2292,47 +1671,38 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "docs/architecture.md",
-          "startLine": 41,
-          "endLine": 47,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L41-L47"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-          "path": "python/README.md",
-          "startLine": 1,
-          "endLine": 20,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/README.md#L1-L20"
-        },
-        {
-          "type": "upstream",
-          "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "python/sdk/README.md",
-          "startLine": 1,
-          "endLine": 45,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/sdk/README.md#L1-L45"
+          "startLine": 5,
+          "endLine": 33,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/python/sdk/README.md#L5-L33"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "python/sdk/README.md",
+          "startLine": 58,
+          "endLine": 70,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/python/sdk/README.md#L58-L70"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "python/sdk/pyproject.toml",
           "startLine": 5,
           "endLine": 16,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/sdk/pyproject.toml#L5-L16"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/python/sdk/pyproject.toml#L5-L16"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "python/sdk-runtime/pyproject.toml",
           "startLine": 5,
-          "endLine": 16,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/python/sdk-runtime/pyproject.toml#L5-L16"
+          "endLine": 21,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/python/sdk-runtime/pyproject.toml#L5-L21"
         }
       ]
     },
@@ -2583,20 +1953,29 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
           "startLine": 9,
           "endLine": 29,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L9-L29"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L9-L29"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 103,
-          "endLine": 117,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L103-L117"
+          "startLine": 49,
+          "endLine": 53,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L49-L53"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "docs/architecture.md",
+          "startLine": 127,
+          "endLine": 133,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L127-L133"
         }
       ],
       "qualification": "这是基于各项目公开抽象与 DSH 已记录架构所作的跨项目归纳，不代表实现等价或完整内部架构比较。"
@@ -2872,23 +2251,287 @@
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
           "startLine": 9,
           "endLine": 29,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L9-L29"
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L9-L29"
         },
         {
           "type": "upstream",
           "repository": "https://github.com/deepseek-ai/deepseek-harness",
-          "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
           "path": "docs/architecture.md",
-          "startLine": 103,
-          "endLine": 117,
-          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md#L103-L117"
+          "startLine": 49,
+          "endLine": 53,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L49-L53"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "docs/architecture.md",
+          "startLine": 127,
+          "endLine": 133,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L127-L133"
         }
       ],
       "qualification": "这是基于公开产品表面与 DSH 已记录架构所作的跨层比较，不代表隐藏实现、性能、成本或质量结论。"
+    },
+    {
+      "id": "DSH-CAP-010",
+      "statement": "Browser use 与 Computer use 各有单一 Provider 注册服务，其公开实验性 Provider 需要显式启用。",
+      "kind": "upstream-fact",
+      "confidence": "qualified",
+      "maturity": "experimental",
+      "documents": [
+        "docs/03-capabilities.md#claim-dsh-cap-010"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "docs/subsystems/browser-use.md",
+          "startLine": 5,
+          "endLine": 37,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/browser-use.md#L5-L37"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "docs/subsystems/computer-use.md",
+          "startLine": 5,
+          "endLine": 26,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/computer-use.md#L5-L26"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "scripts/experimental-package-policy.ts",
+          "startLine": 1,
+          "endLine": 15,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/scripts/experimental-package-policy.ts#L1-L15"
+        }
+      ],
+      "qualification": "这些 Provider 仍为实验性 opt-in；发布族配置不表示默认启用或生产就绪。"
+    },
+    {
+      "id": "DSH-CAP-011",
+      "statement": "MCP Client 可接入外部工具、资源和服务器指令；已发布 Profile 提供共享资源服务，但默认不配置 MCP Server。",
+      "kind": "upstream-fact",
+      "confidence": "verified",
+      "maturity": "released",
+      "documents": [
+        "docs/03-capabilities.md#claim-dsh-cap-011"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/mcp/mcp-client/README.md",
+          "startLine": 12,
+          "endLine": 28,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/mcp/mcp-client/README.md#L12-L28"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/mcp/mcp-client/README.md",
+          "startLine": 71,
+          "endLine": 93,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/mcp/mcp-client/README.md#L71-L93"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/bundle/base/cordis.patch.yml",
+          "startLine": 471,
+          "endLine": 472,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/base/cordis.patch.yml#L471-L472"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/bundle/sdk-minimal/README.md",
+          "startLine": 39,
+          "endLine": 41,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/sdk-minimal/README.md#L39-L41"
+        }
+      ]
+    },
+    {
+      "id": "DSH-CAP-012",
+      "statement": "Schedule 以可选组合提供持久化的一次性或固定间隔提醒，并在同一会话的 live root Agent 空闲时投递。",
+      "kind": "upstream-fact",
+      "confidence": "qualified",
+      "maturity": "released",
+      "documents": [
+        "docs/03-capabilities.md#claim-dsh-cap-012"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/schedule/schedule/README.md",
+          "startLine": 12,
+          "endLine": 83,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/schedule/schedule/README.md#L12-L83"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/bundle/web-app/cordis.patch.yml",
+          "startLine": 308,
+          "endLine": 313,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/bundle/web-app/cordis.patch.yml#L308-L313"
+        }
+      ],
+      "qualification": "关闭或 cold Session 的提醒保持 overdue，等待下次 live root Agent；它不向会话外发送通知。"
+    },
+    {
+      "id": "DSH-ARCH-008",
+      "statement": "Desktop 由 Electron 启动独立 Node.js Host，通过字节管道与 `dsh-app://` 服务渲染器；应用传输不启动 Web server 或 loopback 端口。",
+      "kind": "upstream-fact",
+      "confidence": "verified",
+      "maturity": "released",
+      "documents": [
+        "docs/02-architecture.md#claim-dsh-arch-008"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "docs/architecture.md",
+          "startLine": 49,
+          "endLine": 53,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L49-L53"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "apps/desktop/README.md",
+          "startLine": 5,
+          "endLine": 5,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/desktop/README.md#L5"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "apps/desktop/README.md",
+          "startLine": 22,
+          "endLine": 26,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/desktop/README.md#L22-L26"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "apps/desktop/src/host-process.ts",
+          "startLine": 88,
+          "endLine": 110,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/apps/desktop/src/host-process.ts#L88-L110"
+        }
+      ]
+    },
+    {
+      "id": "DSH-DD-SESSION-004",
+      "statement": "`agent/assistant-stream` 提供实时帧；`assistant/message` 与 `assistant/attempt` 在结算时持久记录完整 compact stream。",
+      "kind": "upstream-fact",
+      "confidence": "qualified",
+      "maturity": "released",
+      "documents": [
+        "docs/deep-dives/session-event-log.md#claim-dsh-dd-session-004"
+      ],
+      "qualification": "结算前的进程硬终止不会留下该 attempt 的 durable stream；`assistant/attempt` 不进入模型历史。",
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/agent/src/runtime-types.ts",
+          "startLine": 354,
+          "endLine": 363,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/agent/src/runtime-types.ts#L354-L363"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/session/src/types.ts",
+          "startLine": 311,
+          "endLine": 335,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L311-L335"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/llm/llm/src/assistant-stream.ts",
+          "startLine": 13,
+          "endLine": 44,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/llm/llm/src/assistant-stream.ts#L13-L44"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "docs/architecture.md",
+          "startLine": 117,
+          "endLine": 119,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L117-L119"
+        }
+      ]
+    },
+    {
+      "id": "DSH-DD-SESSION-005",
+      "statement": "JSONL Provider 将受支持的历史日志迁移为当前 v3；读打开不发布新文件，写打开验证并独占发布新一代文件且保留原文件。",
+      "kind": "upstream-fact",
+      "confidence": "verified",
+      "maturity": "released",
+      "documents": [
+        "docs/deep-dives/session-event-log.md#claim-dsh-dd-session-005"
+      ],
+      "sources": [
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/core/session/src/types.ts",
+          "startLine": 66,
+          "endLine": 88,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L66-L88"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/session/session-format-catalog/src/generated.ts",
+          "startLine": 13,
+          "endLine": 31,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-format-catalog/src/generated.ts#L13-L31"
+        },
+        {
+          "type": "upstream",
+          "repository": "https://github.com/deepseek-ai/deepseek-harness",
+          "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+          "path": "packages/session/session-persistence-jsonl/README.md",
+          "startLine": 54,
+          "endLine": 82,
+          "url": "https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-persistence-jsonl/README.md#L54-L82"
+        }
+      ]
     }
   ]
 }

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
 const root = new URL('../', import.meta.url)
-const baseline = '76fda729799fe9b3848dbe2c211d4b231032b81e'
+const { commit: baseline } = JSON.parse(await readFile(new URL('evidence/baseline.json', root), 'utf8'))
 const checkout = '/contract/experiment/deepseek-harness'
 const home = '/contract/experiment/dsh-home'
 

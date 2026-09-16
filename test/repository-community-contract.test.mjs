@@ -23,6 +23,7 @@ preferred-citation:
   url: https://github.com/yang0228/deepseek-harness-analysis
   year: 2026
 `
+const baseline = { commit: '76fda729799fe9b3848dbe2c211d4b231032b81e' }
 
 const issueForm = `name: Factual error
 description: Report an evidence error
@@ -38,8 +39,8 @@ body:
 `
 
 test('CITATION.cff has the canonical software and report records', () => {
-  assert.deepEqual(validateCffText(cff), [])
-  assert.deepEqual(validateCffText(cff.replace('cff-version: 1.2.0', 'cff-version: 1.1.0')).map(({ code, path, field }) => ({ code, path, field })), [
+  assert.deepEqual(validateCffText(cff, baseline), [])
+  assert.deepEqual(validateCffText(cff.replace('cff-version: 1.2.0', 'cff-version: 1.1.0'), baseline).map(({ code, path, field }) => ({ code, path, field })), [
     { code: 'REPOSITORY_FILE_INVALID', path: 'CITATION.cff', field: '/cff-version' },
   ])
 })
@@ -67,7 +68,7 @@ for (const [name, scalar] of [
   ['quoted escape', '"escaped\\nvalue"'],
 ]) {
   for (const [label, original, replace, validate, path] of [
-    ['CITATION.cff', cff, 'message: Cite this evidence handbook.', value => validateCffText(value), 'CITATION.cff'],
+    ['CITATION.cff', cff, 'message: Cite this evidence handbook.', value => validateCffText(value, baseline), 'CITATION.cff'],
     ['Issue Form', issueForm, 'description: Report an evidence error', value => validateIssueFormText(value, '.github/ISSUE_TEMPLATE/factual-error.yml'), '.github/ISSUE_TEMPLATE/factual-error.yml'],
   ]) {
     test(`${label} rejects unsupported scalar ${name}`, () => {
@@ -82,7 +83,7 @@ for (const [name, scalar] of [
 
 test('CITATION.cff and Issue Forms ignore comment-only unsupported YAML examples', () => {
   const comment = '# Example: | !!str &copy *copy [value]\n  # value: !<tag:example.com,2026:text> value\n'
-  assert.deepEqual(validateCffText(comment + cff), [])
+  assert.deepEqual(validateCffText(comment + cff, baseline), [])
   assert.deepEqual(validateIssueFormText(comment + issueForm, '.github/ISSUE_TEMPLATE/factual-error.yml'), [])
 })
 
@@ -146,7 +147,7 @@ for (const path of communityPaths) {
           ? issueForm
           : '# Synthetic policy\n'
       await mutate(target, original)
-      assert.deepEqual((await validateRepositoryFiles(root)).map(({ code, path: actualPath, field: actualField }) => ({
+      assert.deepEqual((await validateRepositoryFiles(root, baseline)).map(({ code, path: actualPath, field: actualField }) => ({
         code,
         path: actualPath,
         field: actualField,
@@ -170,7 +171,7 @@ for (const [name, mutate, field] of [
   ['multiline scalar', value => value.replace('message: Cite this evidence handbook.', 'message: |'), '/syntax'],
 ]) {
   test(`CITATION.cff rejects ${name}`, () => {
-    assert.deepEqual(validateCffText(mutate(cff)).map(({ code, path, field: actualField }) => ({ code, path, field: actualField })), [
+    assert.deepEqual(validateCffText(mutate(cff), baseline).map(({ code, path, field: actualField }) => ({ code, path, field: actualField })), [
       { code: 'REPOSITORY_FILE_INVALID', path: 'CITATION.cff', field },
     ])
   })
