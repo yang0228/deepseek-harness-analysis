@@ -5,12 +5,12 @@ type: software
 authors:
   - name: yang0228
 repository-code: https://github.com/yang0228/deepseek-harness-analysis
-version: snapshot-76fda729
+version: snapshot-0d1f5000
 preferred-citation:
   type: report
   authors:
     - name: yang0228
   title: DeepSeek Harness Analysis
-  version: snapshot-76fda729
+  version: snapshot-0d1f5000
   url: https://github.com/yang0228/deepseek-harness-analysis
   year: 2026

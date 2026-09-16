@@ -2,24 +2,26 @@
 
 ## 基线
 
-本章只描述 DeepSeek Harness commit `76fda729799fe9b3848dbe2c211d4b231032b81e` 中四种容易混淆的协作原语。源码链接固定到该提交；“进程内”“Worker”或“独立进程”只说明 transport 与生命周期位置，不自动表示安全隔离、工具继承或父 Agent 权限继承。
+本章描述 DeepSeek Harness commit `0d1f50007f9bca3f52b06e1c3074fa14d5fb0720` 中的委托、目标状态、规划和程序化编排，并区分可选的 Agent Teams 与 Schedule。源码链接固定到该提交；进程位置、发布族与默认启用状态分别核对。
 
 ## 一句话结论
 
-| 原语 | 负责什么 | 不负责什么 |
+| 原语 | 负责什么 | 主要限制 |
 |---|---|---|
-| Subagent | 把工作委托给一个 child agent；Provider 决定初次运行的 transport 与会话种子 | 不替代 Goal 状态、Plan guidance 或 Workflow 程序 |
-| Goal | 在一个 Session 中记录唯一的 durable current objective、阶段、revision 与轮次 | 不决定何时继续、重试或调度 |
-| Plan mode | 记录每 Agent 的协作状态，并在活动时向模型请求加入部署方 guidance | 不执行 approval、Sandbox 或自动 continuation |
-| Workflow | 让模型编写的 JavaScript 程序通过允许的 API 批量编排 subagents | 不向程序提供普通 Host API，也不建立安全 Sandbox |
+| Subagent | 委托一个 child Agent，Provider 决定初次 transport 与 conversation seed | Provider 可用和模型工具启用是两步 |
+| Goal | 在一个 Session 中保存当前目标、phase、revision 与 admitted rounds | activation 为进程内状态，续轮策略由 Consumer 决定 |
+| Plan mode | 保存协作状态，并在活动时向模型请求加入 guidance | approval 与 Sandbox 独立执行 |
+| Workflow | 运行模型编写的 JS 程序，通过 hooks 批量编排 Subagent | Node 进程使用 Session 文件策略；VM 本身不提供安全隔离 |
+| Agent Teams | 可选的持久成员 roster、peer mailbox 与 shared task board | 实验性、共享 checkout、单进程协调 |
+| Schedule | 在原会话发送持久化的一次性或固定间隔提醒 | 需要 live root Agent，不唤醒 cold Session 或通知会话外渠道 |
 
-<a id="claim-dsh-cap-007"></a> **Claim `DSH-CAP-007`:** `standard` Preset 启用进程内 Subagent，而外部产品 Provider 需要可选组合且对应工具行默认禁用。
+<a id="claim-dsh-cap-007"></a> **Claim `DSH-CAP-007`:** `standard` Preset 启用进程内 Subagent；Codex 与 Claude Code 工具默认禁用，其他外部 Provider 也需要显式组合。
 
 Provider 在 Host 中可用不等于模型已经获得对应工具。
 
-<a id="claim-dsh-cap-008"></a> **Claim `DSH-CAP-008`:** durable current Goal 与 worker-thread Workflow 是两种不同的编排原语。
+<a id="claim-dsh-cap-008"></a> **Claim `DSH-CAP-008`:** durable current Goal 与通过 PTC Node 进程执行的 Workflow 是两种不同的编排原语。
 
-Goal 不是调度器，Workflow Worker 的受限 API 也不是安全 Sandbox。
+Goal 状态不负责调度；Workflow 的 VM 不是安全隔离层，文件约束由所选 Sandbox 提供方执行，网络不在该策略内。
 
 <a id="claim-dsh-dd-orch-001"></a> **Claim `DSH-DD-ORCH-001`:** 同一个 Subagent Service 接纳进程内与外部产品 Provider，并暴露不同的 continuation 语义。
 
@@ -29,30 +31,30 @@ Provider 可注册不等于对应模型工具已在当前 Preset 中启用。
 
 Resume 或 Fork 后需要重新激活 Goal；Goal 本身不是调度器。
 
-<a id="claim-dsh-dd-orch-003"></a> **Claim `DSH-DD-ORCH-003`:** Workflow 程序在受限 Worker API 中运行，并在完成或失败后执行 Dispose。
+<a id="claim-dsh-dd-orch-003"></a> **Claim `DSH-DD-ORCH-003`:** Workflow 程序复用 Node PTC runtime，每次在新建的 Node 进程中运行；Consumer 在完成或失败后仍须调用 Dispose。
 
-Worker 的 API 限制用于缩小执行能力，但不构成安全 Sandbox。
+文件约束和进程清理由所选 Provider 决定；Workflow 无整体 elapsed deadline，VM 与协作式 fan-out limits 不构成安全隔离或强制配额。
 
-<a id="claim-dsh-dd-orch-004"></a> **Claim `DSH-DD-ORCH-004`:** Agent Teams 位于私有 experimental package 中，并被官方发布排除。
+<a id="claim-dsh-dd-orch-004"></a> **Claim `DSH-DD-ORCH-004`:** Agent Teams 已纳入公开发布族，保留 experimental 名称与实验成熟度，并由可选 Profile layer 显式启用。
 
 ## 机制
 
 ### Subagent Service 与 Provider
 
-`ctx.subagents` 是可同时登记多个具名 Provider 的 Service；普通 `start()` 始终表示一次 one-shot run，而 optional `prepareContinuable()` 的存在才表示 Provider 能准备 continuable child。该准备方法只贡献初次创建所需的 detached seed：child id、Agent 创建、prompt delivery、cold resume、ownership 与 dispose 都由 continuation manager 负责，不由 Provider 持有。[Provider contract](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/subagent.md#L389-L447)明确区分这两条能力发现路径。
+`ctx.subagents` 可登记多个具名 Provider。`start()` 表示一次 one-shot run；可选方法 `prepareContinuable()` 的存在表示该 Provider 能提供 continuable child 的初始 detached seed。continuation manager 随后负责 Agent 创建、消息接纳、cold resume、ownership 与 dispose。[Provider contract](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/subagent.md#L393-L455)。
 
-| Provider | Transport 与 conversation seed | one-shot | continuable | 固定 `standard` Preset 中的模型工具 |
+| Provider | Transport 与 conversation seed | one-shot | continuable | Standard 模型工具 |
 |---|---|---|---|---|
-| `spawn` | 进程内新 Agent；不带 parent conversation | 支持 | 支持，准备结果无 seed | `subagent`，启用 |
-| `fork` | 进程内新 Agent；只复制 parent 最后一个已完成 Turn 及以前的平衡前缀 | 支持 | 支持，创建时一次性固化该前缀 | `subagent_fork`，启用 |
-| `acp` | 新 ACP subprocess 与 session；只解析 parent workspace cwd，不复制对话 | 支持 | 不支持 | 没有预置工具行，需要显式组合 Consumer |
-| `codex` | 新 app-server process、ephemeral Codex thread 与单个 Turn；不复制对话 | 支持 | 不支持 | `subagent_codex` 行存在但 `disabled: true` |
-| `claude-code` | 新 CLI process 与独立 Agent SDK query；不复制对话 | 支持 | 不支持 | `subagent_claude_code` 行存在但 `disabled: true` |
-| `dsh-sdk` | 新完整 Harness subprocess，经 stdio JSON-RPC 驱动；不复制对话 | 支持 | 不支持 | 没有预置工具行，需要显式组合 Consumer |
+| `spawn` | 进程内新 Agent，无 parent conversation | 支持 | 支持，初始 spec 无 seed | `subagent`，启用 |
+| `fork` | 进程内新 Agent，复制 parent 最后一个已完成 Turn 及以前的前缀 | 支持 | 支持，创建时固化前缀 | `subagent_fork`，启用 |
+| `acp` | 新 ACP subprocess/session，不复制对话 | 支持 | 不支持 | 无预置行，需组合 Consumer |
+| `codex` | app-server process 与独立 thread/Turn | 支持 | 不支持 | `subagent_codex`，disabled |
+| `claude-code` | CLI process 与独立 Agent SDK query | 支持 | 不支持 | `subagent_claude_code`，disabled |
+| `dsh-sdk` | 新 Harness subprocess，经 stdio JSON-RPC 驱动 | 支持 | 不支持 | 无预置行，需组合 Consumer |
 
-`spawn` 与 `fork` 的实现都提供 `start()` 和 `prepareContinuable()`；前者返回空创建规格，后者只截取到最后一个 `turn/end` 的前缀。[spawn provider](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-spawn-in-process/src/index.ts#L34-L69)与[fork provider](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-fork-in-process/src/index.ts#L40-L94)直接给出差异。四个外部 Provider 的 class 都只有 `start()`：Codex 使用 app-server，[Claude Code](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-claude-code/src/index.ts#L73-L126)使用 Agent SDK/CLI，[ACP](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-acp/src/index.ts#L141-L188)与[dsh-sdk](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-dsh-sdk/src/index.ts#L129-L199)分别驱动自己的 wire；没有 `prepareContinuable()` 就会在 continuable start 前失败。
+[spawn 实现](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/subagent/subagent-spawn-in-process/src/index.ts#L41-L65)与[fork 实现](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/subagent/subagent-fork-in-process/src/index.ts#L40-L91)给出 seed 差异；[Standard 工具行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L175-L220)决定启用状态。Base 的 fork 行是 one-shot，Web Standard 的 fork 行是 continuable，选择入口时需区分两者。
 
-Provider 是否已注册、Consumer 工具是否已挂载以及工具行是否 `disabled` 是三件事。固定 `standard` Preset 启用 `spawn`/`fork` 的 continuable 工具，只为 Codex 与 Claude Code 保留禁用的 one-shot 行；ACP 与 DSH SDK 要由部署另行挂载 Provider 和 Consumer。共享 cwd 或另一个进程都不授予 parent 的工具、Service 或 authority。[Preset 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L157-L227)与[`inheritsParentContext` 定义](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/subagent.md#L389-L412)防止把可用性、工具暴露和权限继承混成同一结论。
+每个进程内 child 建立自己的 flat scope；conversation seeding 不等于直接继承 parent 工具注册。授权也不是完全空白：进程内 Provider 按既定规则捕获 delegated permission，Auto/Full access 与 Read Only/Workspace Write 分别沿各自策略传播。具体字段与 cold resume 规则由[in-process 权限和深度约定](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/subagent.md#L457-L467)拥有。
 
 ### 委托与 continuation 时序
 
@@ -64,92 +66,88 @@ sequenceDiagram
   participant Manager as Continuation manager
   participant Child as Child Agent inbox
   participant Store as Session persistence
-
   Parent->>Service: startContinuable(provider, prompt)
   Service->>Provider: prepareContinuable(parent, childId)
   Provider-->>Manager: detached seed or empty spec
   Manager->>Child: create Agent and submit prompt
   Child-->>Parent: accepted childId and messageId
-  Note over Parent,Child: acceptance does not mean turn start, log append, or completion
+  Note over Parent,Child: inbox acceptance precedes turn completion
   Parent->>Service: sendMessage(exact live sender, childId)
   alt Activation resident
-    Service->>Child: steer running/waiting Agent
+    Service->>Child: steer same Agent
   else no Activation
-    Service->>Store: observe durable child Session
-    Service->>Child: resume Agent, then steer
+    Service->>Store: read child Session and descriptor
+    Service->>Child: resume then steer
   end
-  Child->>Store: best-effort final flush after quiescence
-  Manager->>Child: dispose handle and release ownership
+  Manager->>Child: await quiescence and dispose
 ```
 
-一个 continuable child 是 durable Session；Activation 只是该 Session 当前由一个重建 Agent 驻留的 process-local 时段。`startContinuable()` 在 inbox 接受 initial prompt 后返回 `{ childId, messageId }`，并不等待 Turn 开始、消息写入 Session log 或 Turn 完成。[start path](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent/src/continuation.ts#L422-L518)固定了这个完成点。
-
-后续 `sendMessage()` 只接受 exact live sender，并只允许直接 parent/child 邻接关系；resident child 进入同一 Agent inbox，缺失 Activation 的 direct child 则从 persisted header 与自己的 descriptor suffix cold-resume。cold resume 直接调用 `ctx.agents.resume()`，不会再次调用原 Provider。[delivery route](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent/src/continuation.ts#L563-L706)、[cold resume](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent/src/continuation.ts#L1053-L1115)与[materialization](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent/src/continuation.ts#L1181-L1297)共同说明 authority、恢复和 Provider 所有权。
+continuable child 是 durable Session；Activation 是该 Session 当前由一个 Agent 驻留的进程内时段。`startContinuable()` 在 initial prompt 被 inbox 接受后返回 ids，不等待消息落入 Session log 或 Turn 完成。`sendMessage()` 接受 exact live sender，仅授权直接 parent/child；resident child 进入原 inbox，已释放 Activation 的 direct child 从自己的持久 Session/descriptor cold-resume。消息一旦被接纳，后续 caller cancellation 不撤回它。[Activation 与消息接纳](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/subagent.md#L124-L156)。
 
 ### Goal 与 Plan mode
 
-Goal 的 durable 事实来自 `goal/change` Session Event：目标文本、阶段、revision、round cap 与已开始轮次可在 Resume、Fork 和进程重启后重放。activation 则保存在 per-session process-local cache；任何 `agent/session-start` 都把它置为 disarmed，即使 durable phase 仍是 `active`，调用者仍须显式 resume 才能重新允许自动 continuation。[Goal durable changes](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/goal.md#L72-L100)与[process-local activation](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/goal/goal/README.md#L54-L72)划分了耐久状态和运行许可。
+Goal 的 durable 事实来自 `goal/change`：目标文本、phase、revision 与轮数可重放。activation 为 process-local；任何 Session start 都把它 disarm，即使 durable phase 仍为 `active`，仍需显式 resume 才重新允许 continuation。上限是 admitted rounds，不是 token、费用或时间预算。[Goal 生命周期与恢复](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/goal/goal/README.md#L54-L82)；[Goal 限制](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/goal/goal/README.md#L158-L162)。
 
-Goal 不是调度器。
-
-它不决定何时开始下一轮、不重试异常失败，也不取消活动 Turn；这些策略属于 `dsh-goal-round-driver` 等 Consumer。Goal 只保存一个 current objective，不能表达并行目标数据库。[Goal limitations](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/goal/goal/README.md#L151-L162)列出这些非目标。
-
-Plan mode 是另一个 per-agent、durable 且可重放的协作状态：`plan/mode` 决定 model request 是否加入部署方拥有的 guidance。它是 soft guidance；状态选择本身不会迫使 Agent 继续，Sandbox mode 与 approval policy 也不读取 plan state。[Plan mode](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/plan.md#L1-L17)说明日志时点与独立 enforcement。
-
-Plan mode 不是安全策略。
+Plan mode 将 `plan/mode` 记录为 log-only 状态；模型请求读取由部署提供的 guidance。用户切换先成为 pending，下一次获准的 in-turn pre-step 才记录，因此 pending 选择可能在重启前尚未持久化。`exit_plan_mode` 提交完整 Markdown 计划给 user-question review，获准后记录待退出状态；同一批工具调用仍处于原 guidance。[Plan 日志与退出行为](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/plan.md#L5-L35)。
 
 ### Workflow 运行生命周期
 
 ```mermaid
 flowchart LR
-  A[validate meta and script] --> B[fresh worker]
-  B --> C[allowed calls: agent, pipeline, parallel, phase, log, args]
-  C --> D[completion or error]
-  D --> E[dispose]
+  A[validate meta and JS body] --> B[fresh PTC Node process]
+  B --> C[workflow hooks call Host subagents]
+  C --> D[completed / cancelled / error]
+  D --> E[dispose process and children]
 ```
 
-模型面对的 `workflow` tool 把 `meta` 作为 JSON data、把 script 作为 JavaScript body 交给 engine。worker-thread engine 先验证 meta，并用与 Worker 相同的 wrapper 做 Host-side parse；成功后为每次 run 创建 fresh Worker，并通过 Host bridge 把 `agent()` 转为具名 Subagent Provider 的 one-shot `start()`。并发数、总 child 数与单次组合项数都由 engine limits 约束。[engine start](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/workflow-worker-thread/src/index.ts#L106-L201)显示 validate、Provider resolve、limits 与事件边缘。
+`workflow-ptc` 先验证 metadata、JS body、Provider 与 run limits，再调用 shared Node PTC runtime。它拒绝非 TypeScript runtime；Python PTC 组合必须禁用 `workflow-ptc`、`tool-workflow` 与任何启用的 Ralph。脚本保留 `agent()`、`parallel()`、`pipeline()`、`phase()`、`log()` 和 `args`；host binding 把 child 请求交给固定的 Subagent Provider。[Engine validation](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/src/index.ts#L96-L165)。
 
-Workflow Worker 不是安全 Sandbox。
+执行进程继承调用 Session 的 standing file policy 与 cwd，program-visible environment 为空；网络不受文件策略约束。VM 的 withheld globals 约束脚本接口，不提供安全隔离；如果代码到达 Node，它仍由所选 OS 文件策略限制。初始同步片段有 `syncTimeoutMs`，整个 run 没有 elapsed deadline；caller signal 和 enclosing tool deadline 仍生效，取消立即终止 managed process 并取消 child。[执行、取消与 Provider 限制](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/README.md#L47-L61)。
 
-脚本环境只提供 `agent`、`pipeline`、`parallel`、`phase`、`log` 与 `args`；它不提供普通 filesystem、network、timer 或 Node.js API。Worker 使同步脚本不阻塞 Host，并允许超时后强制终止，但其 vm context 可逃逸，因此这里的 API 缩减与生命周期 containment 不能作为 hostile-code security boundary。[model-facing contract](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/tool-workflow/src/index.ts#L133-L149)与[Worker module contract](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/workflow-worker-thread/src/index.ts#L2-L5)给出两项限制。
+`WorkflowRun.result` 以 `completed`、`cancelled` 或 `error` 收敛。Consumer 每条路径都必须调用 idempotent `dispose()` 并等待进程与 child cleanup；Workflow 没有独立的 cleanup timer。[Live run 约定](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/workflow.md#L93-L110)。顶层 workflow Consumer 将 run/member 生命周期写入 parent Session，Web 以独立 Chat node 呈现；缺少末尾终止记录可表示中断。[Durable Chat records](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/workflow.md#L122-L128)。
 
-`WorkflowRun.result` 不 reject：脚本完成返回 `completed`，取消或失败分别以 `cancelled`、`error` 结果收敛。Consumer 必须在每条路径调用 idempotent `dispose()`；model-facing tool 在 `finally` 中等待它，使脚本和 child runs 清理后才结束调用。[run handle](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/workflow/src/runtime-types.ts#L36-L49)与[tool lifecycle](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/tool-workflow/src/index.ts#L281-L324)固定了 completion/error → dispose 的所有权。
+Standard 启用 engine 与通用 Workflow 工具，Ralph 默认 disabled。PTC Preset 的 engine、通用工具和 Ralph 三行均 disabled，模型使用 `run_code`；启用 Ralph 时须在自定义 Preset 中同时恢复 engine。[Standard 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/standard/agent.cordis.yml#L222-L241)；[PTC 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/ptc/agent.cordis.yml#L229-L252)。
 
 ### Agent Teams 的发布状态
 
-Agent Teams 不是上述四种 released 原语的总称。它位于 `packages/experimental/agent-team`，package 声明 `private: true`；experimental 目录规则要求这类 package 使用专用前缀、不得设置 `publishConfig`，并由 release family 排除。[package metadata](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/experimental/agent-team/package.json#L1-L10)与[experimental rules](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/experimental/AGENTS.md#L1-L8)只支持这个成熟度与发布结论，不把它描述为默认能力。
+Agent Teams 包保留 `@deepseek-ai/dsh-experimental-*` 名称，但 metadata 声明 `publishConfig.access: public`；experimental 发布策略默认纳入 release family，固定基线的 private denylist 为空。它仍无稳定性承诺，默认 Profile 不启用。[Package metadata](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team/package.json#L1-L11)；[发布策略](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/AGENTS.md#L5-L9)；[private denylist](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/scripts/experimental-package-policy.ts#L1-L15)。
+
+Host Team Bundle 在 `dsh-base` 上装载 domain/tools，以 `spawn_teammate` 选择 fresh 或 fork，并禁用普通直接委托与重叠的全局 controls；Workflow 仍可创建 fresh one-shot children。domain 以 Lead Session log 持久化 roster、mailbox 与 task DAG，提供 peer messaging 和 compare-and-set task mutation。成员共享工作目录，文件提示只产生冲突警告，不提供 worktree isolation 或文件锁。[Team Profile layer](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team-profile/README.md#L12-L41)；[Team 行为](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team/README.md#L59-L108)。
+
+Web 还需在 Host Team layer 之后装载 Web Team layer，提供 roster/task board/navigation。它只覆盖 Host rows；现有 stable Web Preset 里的 scoped continuable controls 仍可能同时出现。[Web 安装次序](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team-web-profile/README.md#L28-L41)；[Web 组合限制](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team-web-profile/README.md#L82-L88)。
+
+### Schedule 与 Goal 的区别
+
+Schedule 是独立的可选插件，记录提醒并等待 due time；Goal 记录同一 Session 的当前工作目标。Schedule 仅装配到插件加载之后创建的 root Agent，到期投递等待该 Agent idle；closed/cold Session 的提醒保持 overdue，重开后才处理。重复提醒使用固定间隔并只补最新一次；不会发送邮件、SMS、push 或浏览器通知。[Schedule 的使用与时序](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/schedule/schedule/README.md#L12-L83)。
 
 ## 源码导读
 
 | 主题 | 固定来源 | 可核对行为 |
 |---|---|---|
-| Service 与 continuation contract | [`subagent.md` 第 122–167、219–261、389–458 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/subagent.md#L122-L458)、[`index.ts` 第 220–254、574–587 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent/src/index.ts#L220-L587) | one-shot/continuable 能力发现、inbox acceptance、direct adjacency 与 Provider 只参与初次准备 |
-| Continuation manager | [`continuation.ts` 第 422–518 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent/src/continuation.ts#L422-L518)、[第 563–706 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent/src/continuation.ts#L563-L706)、[第 1053–1115 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent/src/continuation.ts#L1053-L1115) | initial acceptance、resident delivery、cold resume 和 persisted descriptor authority |
-| Provider implementations | [`spawn`](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-spawn-in-process/src/index.ts#L34-L69)、[`fork`](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-fork-in-process/src/index.ts#L40-L94)、[`codex`](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-codex/src/index.ts#L63-L110)、[`claude-code`](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-claude-code/src/index.ts#L73-L126)、[`acp`](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-acp/src/index.ts#L141-L188)、[`dsh-sdk`](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/subagent/subagent-dsh-sdk/src/index.ts#L129-L199) | transport、parent conversation seed 与 `prepareContinuable` 是否存在 |
-| Goal | [`goal.md` 第 1–30、72–100 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/goal.md#L1-L100)、[`goal` README 第 54–72、151–162 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/goal/goal/README.md#L54-L162) | durable phase 与 mutation、process-local activation、scheduler 非目标 |
-| Plan mode | [`plan.md` 第 1–17、31–39 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/plan.md#L1-L39) | logged guidance、pending selection、exit tool，以及与 approval/Sandbox 的分离 |
-| Workflow | [`workflow.md` 第 1–13、39–65、93–128 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/workflow.md#L1-L128)、[`worker-thread/index.ts` 第 106–201 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/workflow-worker-thread/src/index.ts#L106-L201)、[`tool-workflow/index.ts` 第 281–324 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/workflow/tool-workflow/src/index.ts#L281-L324) | model-authored script、allowed API、result settlement 与 holder-owned dispose |
-| Agent Teams | [`agent-team/package.json`](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/experimental/agent-team/package.json#L1-L10)、[`agent-team-profile` README](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/experimental/agent-team-profile/README.md#L1-L12)、[`experimental/AGENTS.md`](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/experimental/AGENTS.md#L1-L8) | private package 与 release exclusion |
+| Subagent | [Service 和 Provider contract](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/subagent.md#L393-L467) | capability discovery、seed、permission 与 continuation |
+| Goal | [Goal README](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/goal/goal/README.md#L54-L82) | durable phase 与 process-local activation |
+| Plan mode | [Plan subsystem](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/plan.md#L5-L35) | pending state、pre-step append 与 review |
+| Workflow | [Engine source](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/workflow/workflow-ptc/src/index.ts#L96-L165)；[生命周期记录](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/subsystems/workflow.md#L93-L128) | Node PTC runtime、cancel/dispose 与 Chat projection |
+| Agent Teams | [Profile patch](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/agent-team-profile/cordis.patch.yml#L1-L30)；[发布规则](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/experimental/AGENTS.md#L5-L9) | opt-in 组合与实验成熟度 |
+| Schedule | [Scope 与 live owner](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/schedule/schedule/README.md#L68-L83) | root-Agent 安装与 Session 内投递 |
 
 ## 限制与失败
 
-| 条件 | 可见结果 | 边界或恢复责任 |
+| 条件 | 可见结果 | 恢复责任 |
 |---|---|---|
-| 请求 continuable，但 Provider 没有 `prepareContinuable()` | `UNSUPPORTED_CAPABILITY`，child 不创建 | 选择 `spawn`/`fork`，或把 Consumer 配成 one-shot |
-| `startContinuable()` 返回 | 只保证 initial message 已被 inbox 接受并取得 ids | 用 durable inbox/Turn 事件观察开始、claim、discard 与完成，不能把接受当完成 |
-| exact live sender 不是 direct parent/child | `UNAUTHORIZED` | 调用方必须保留真实 live Agent；descriptor provenance 不授予 authority |
-| child Session 存在但 Activation 已释放 | direct parent 的下一条消息尝试 cold resume | persistence/descriptor/lineage 无法恢复时返回 `NOT_RESUMABLE` |
-| final Session flush listener 失败 | 记录 warning，handle 仍 dispose，ownership 仍释放 | persisted child state 可能缺失或陈旧；best-effort flush 不是耐久保证 |
-| Goal 在 Resume/Fork 后 durable phase 仍为 `active` | activation 为 disarmed，不自动继续 | Consumer 或用户显式 resume；不要把 durable phase 当 scheduler admission |
-| Plan mode 活动 | 请求加入 soft guidance | approval 与 Sandbox 仍由各自策略执行 |
-| Workflow meta/script 在 start 前无效 | start 同步失败，不创建 run | 模型修正 data 或 script；不要执行源码文本来发现 meta |
-| Workflow 运行中失败或取消 | `result` 以 `error`/`cancelled` 收敛 | holder 仍须调用并等待 `dispose()` |
-
-外部 Provider 的独立进程、进程内 Provider 的独立 Agent scope，以及 Workflow 的 Worker thread 都是具体 transport 或生命周期事实。它们不证明通用 filesystem/network/credential isolation，也不表示 child 自动继承 parent tools、Services 或 authority。
+| Provider 无 `prepareContinuable()` | continuable start 被拒绝 | 选择支持的 Provider 或 one-shot Consumer |
+| `startContinuable()` 返回 | initial inbox acceptance | 用后续 Session/Turn 事件观察完成 |
+| sender 不是授权的 direct parent/child | `UNAUTHORIZED` | 保留 exact live Agent 与合法邻接关系 |
+| Goal Resume/Fork 后 phase 为 active | activation 仍 disarmed | 显式 resume Goal |
+| Workflow 接入 Python PTC | engine 在 load 时失败 | 禁用 Workflow/Ralph 对应行或使用 Node runtime |
+| Workflow 失败/取消 | `error`/`cancelled` | holder 仍等待 dispose；清理服从 Provider 约定 |
+| Team 多成员修改同一 checkout | task hints 可提示冲突 | 调用方协调文件写入；没有文件锁 |
+| Schedule 到期但 Session cold | 保持 overdue | 恢复 live root Agent 后处理 |
 
 ## 继续阅读
 
 - [所属核心章节：能力与组合归属](../03-capabilities.md)
-- [证据方法](../00-methodology.md)：了解固定提交、Claim ledger 与限定语如何配对。
-- [证据反向索引](../source-map.md)：按 Provider、Goal、Plan 与 Workflow 的上游文件回到本章声明。
+- [注册工具与 PTC](tools-and-ptc.md)
+- [本地 Sandbox 执行边界](sandbox-execution.md)
+- [证据方法](../00-methodology.md)
+- [证据反向索引](../source-map.md)

@@ -23,6 +23,7 @@ import { createFixtureRepository } from './helpers/fixture-repo.mjs'
 
 const runFile = promisify(execFile)
 const template = new URL('./fixtures/upstream-template/', import.meta.url)
+const repositoryBaseline = JSON.parse(await readFile(new URL('../evidence/baseline.json', import.meta.url), 'utf8'))
 const commitEnv = {
   ...process.env,
   GIT_AUTHOR_NAME: 'Fixture Author',
@@ -76,11 +77,11 @@ const repositoryFixturePaths = [
   '.github/pull_request_template.md',
 ]
 
-async function writeRepositoryFixture(root) {
+async function writeRepositoryFixture(root, baseline) {
   for (const path of repositoryFixturePaths) {
     await mkdir(dirname(join(root, path)), { recursive: true })
     await writeFile(join(root, path), path === 'CITATION.cff'
-      ? repositoryFixtureCff
+      ? repositoryFixtureCff.replaceAll('snapshot-76fda729', `snapshot-${baseline.commit.slice(0, 8)}`)
       : path.startsWith('.github/ISSUE_TEMPLATE/')
         ? repositoryFixtureIssueForm
         : '# Fixture policy\n')
@@ -89,6 +90,11 @@ async function writeRepositoryFixture(root) {
 
 async function readFixture(name) {
   return JSON.parse(await readFile(new URL(`fixtures/handbook/valid/evidence/${name}`, import.meta.url), 'utf8'))
+}
+
+async function readWorkflowFixture(baseline = repositoryBaseline) {
+  return (await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8'))
+    .replace(/^          ref: .+$/mu, `          ref: ${baseline.commit}`)
 }
 
 function baselineFor(fixture, overrides = {}) {
@@ -145,13 +151,48 @@ async function evidenceRoot(t, { baseline, ledger = { schemaVersion: 1, claims: 
   await mkdir(join(root, '.github/workflows'), { recursive: true })
   await writeFile(
     join(root, '.github/workflows/verify.yml'),
-    await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8'),
+    await readWorkflowFixture(baseline),
   )
   await writeFile(join(root, 'evidence/baseline.json'), `${JSON.stringify(baseline, null, 2)}\n`)
   await writeFile(join(root, 'evidence/claims.json'), `${JSON.stringify(ledger, null, 2)}\n`)
   await writeFile(join(root, 'evidence/observations/upstream-facts.json'), `${JSON.stringify(committed, null, 2)}\n`)
-  await writeRepositoryFixture(root)
+  await writeRepositoryFixture(root, baseline)
   return root
+}
+
+test('baseline upgrades accept matching workflow and citation revisions', async t => {
+  const baseline = await readFixture('baseline.json')
+  baseline.commit = '1123456789abcdef0123456789abcdef01234567'
+  const root = await evidenceRoot(t, { baseline })
+
+  assert.deepEqual(await collectEvidenceErrors({ root }), [])
+})
+
+test('offline evidence verification checks Markdown citations outside the ledger', async t => {
+  const baseline = await readFixture('baseline.json')
+  const root = await evidenceRoot(t, { baseline })
+  await mkdir(join(root, 'docs'), { recursive: true })
+  await writeFile(join(root, 'docs/source.md'), '[source](https://github.com/deepseek-ai/deepseek-harness/blob/main/README.md#L1)\n')
+  assert.deepEqual((await collectEvidenceErrors({ root })).map(({ code, path, line }) => ({ code, path, line })), [
+    { code: 'UPSTREAM_MARKDOWN_SOURCE_INVALID', path: 'docs/source.md', line: 1 },
+  ])
+})
+
+for (const [name, path, field, rewrite] of [
+  ['workflow ref', '.github/workflows/verify.yml', '/jobs/verify/steps/upstream/with/ref', text => text.replace(/^          ref: .+$/mu, '          ref: 76fda729799fe9b3848dbe2c211d4b231032b81e')],
+  ['software citation version', 'CITATION.cff', '/version', text => text.replace(/^version: .+$/mu, 'version: snapshot-76fda729')],
+  ['report citation version', 'CITATION.cff', '/preferred-citation/version', text => text.replace(/^  version: .+$/mu, '  version: snapshot-76fda729')],
+]) {
+  test(`baseline upgrades reject stale ${name}`, async t => {
+    const baseline = await readFixture('baseline.json')
+    baseline.commit = '1123456789abcdef0123456789abcdef01234567'
+    const root = await evidenceRoot(t, { baseline })
+    await writeFile(join(root, path), rewrite(await readFile(join(root, path), 'utf8')))
+
+    assert.deepEqual((await collectEvidenceErrors({ root })).map(({ code, path, field }) => ({ code, path, field })), [
+      { code: 'REPOSITORY_FILE_INVALID', path, field },
+    ])
+  })
 }
 
 function output() {
@@ -443,13 +484,13 @@ test('offline verification reports inspectedUpstream false', async t => {
 
 test('repository workflow passes full-SHA pin validation', async () => {
   const root = fileURLToPath(new URL('../', import.meta.url))
-  assert.deepEqual(await validateWorkflowPins(root), [])
+  assert.deepEqual(await validateWorkflowPins(root, repositoryBaseline), [])
 })
 
 test('repository workflow validation rejects missing required workflow', async t => {
   const root = await mkdtemp(join(tmpdir(), 'workflow-contract-'))
   t.after(() => rm(root, { recursive: true, force: true }))
-  assert.deepEqual(await validateWorkflowPins(root), [{
+  assert.deepEqual(await validateWorkflowPins(root, repositoryBaseline), [{
     code: 'REPOSITORY_FILE_INVALID',
     path: '.github/workflows/verify.yml',
     field: '/presence',
@@ -461,9 +502,9 @@ test('repository workflow validation rejects malformed required fields', async t
   const root = await mkdtemp(join(tmpdir(), 'workflow-contract-'))
   t.after(() => rm(root, { recursive: true, force: true }))
   await mkdir(join(root, '.github/workflows'), { recursive: true })
-  const workflow = await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8')
+  const workflow = await readWorkflowFixture()
   await writeFile(join(root, '.github/workflows/verify.yml'), workflow.replace('  contents: read', '  contents: write'))
-  assert.deepEqual(await validateWorkflowPins(root), [{
+  assert.deepEqual(await validateWorkflowPins(root, repositoryBaseline), [{
     code: 'REPOSITORY_FILE_INVALID',
     path: '.github/workflows/verify.yml',
     field: '/permissions/contents',
@@ -475,23 +516,23 @@ test('repository workflow validation accepts a structurally valid updated action
   const root = await mkdtemp(join(tmpdir(), 'workflow-contract-'))
   t.after(() => rm(root, { recursive: true, force: true }))
   await mkdir(join(root, '.github/workflows'), { recursive: true })
-  const workflow = await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8')
+  const workflow = await readWorkflowFixture()
   await writeFile(
     join(root, '.github/workflows/verify.yml'),
     workflow
       .replaceAll('de0fac2e4500dabe0009e67214ff5f5447ce83dd', '1111111111111111111111111111111111111111')
       .replaceAll('820762786026740c76f36085b0efc47a31fe5020', '2222222222222222222222222222222222222222'),
   )
-  assert.deepEqual(await validateWorkflowPins(root), [])
+  assert.deepEqual(await validateWorkflowPins(root, repositoryBaseline), [])
 })
 
 test('repository workflow validation requires the intended action repositories and counts', async t => {
   const root = await mkdtemp(join(tmpdir(), 'workflow-contract-'))
   t.after(() => rm(root, { recursive: true, force: true }))
   await mkdir(join(root, '.github/workflows'), { recursive: true })
-  const workflow = await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8')
+  const workflow = await readWorkflowFixture()
   await writeFile(join(root, '.github/workflows/verify.yml'), workflow.replaceAll('actions/checkout@', 'example/checkout@'))
-  assert.deepEqual((await validateWorkflowPins(root)).map(({ code, path, field }) => ({ code, path, field })), [
+  assert.deepEqual((await validateWorkflowPins(root, repositoryBaseline)).map(({ code, path, field }) => ({ code, path, field })), [
     { code: 'REPOSITORY_FILE_INVALID', path: '.github/workflows/verify.yml', field: '/jobs/verify/steps/checkout/uses' },
   ])
 })
@@ -511,11 +552,11 @@ for (const [name, mutate, field] of [
     const root = await mkdtemp(join(tmpdir(), 'workflow-ownership-'))
     t.after(() => rm(root, { recursive: true, force: true }))
     await mkdir(join(root, '.github/workflows'), { recursive: true })
-    const workflow = await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8')
+    const workflow = await readWorkflowFixture()
     const path = '.github/workflows/verify.yml'
     await writeFile(join(root, path), mutate(workflow))
     assert.deepEqual(
-      (await validateWorkflowPins(root)).map(({ code, path, field }) => ({ code, path, field })),
+      (await validateWorkflowPins(root, repositoryBaseline)).map(({ code, path, field }) => ({ code, path, field })),
       [{ code: 'REPOSITORY_FILE_INVALID', path, field }],
     )
   })
@@ -525,11 +566,11 @@ test('repository workflow keeps unpinned action errors separate from structure',
   const root = await mkdtemp(join(tmpdir(), 'workflow-unpinned-'))
   t.after(() => rm(root, { recursive: true, force: true }))
   await mkdir(join(root, '.github/workflows'), { recursive: true })
-  const workflow = await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8')
+  const workflow = await readWorkflowFixture()
   const path = '.github/workflows/verify.yml'
   await writeFile(join(root, path), workflow.replace('actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd', 'actions/checkout@v6'))
   assert.deepEqual(
-    (await validateWorkflowPins(root)).map(({ code, path, field, line }) => ({ code, path, field, line })),
+    (await validateWorkflowPins(root, repositoryBaseline)).map(({ code, path, field, line }) => ({ code, path, field, line })),
     [{ code: 'WORKFLOW_USES_UNPINNED', path, field: undefined, line: 17 }],
   )
 })
@@ -545,11 +586,11 @@ for (const [name, text] of [
     const root = await mkdtemp(join(tmpdir(), 'workflow-syntax-'))
     t.after(() => rm(root, { recursive: true, force: true }))
     await mkdir(join(root, '.github/workflows'), { recursive: true })
-    await writeFile(join(root, '.github/workflows/verify.yml'), await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8'))
+    await writeFile(join(root, '.github/workflows/verify.yml'), await readWorkflowFixture())
     const path = '.github/workflows/other.yml'
     await writeFile(join(root, path), text)
     assert.deepEqual(
-      (await validateWorkflowPins(root)).map(({ code, path, field }) => ({ code, path, field })),
+      (await validateWorkflowPins(root, repositoryBaseline)).map(({ code, path, field }) => ({ code, path, field })),
       [{ code: 'REPOSITORY_FILE_INVALID', path, field: '/syntax' }],
     )
   })

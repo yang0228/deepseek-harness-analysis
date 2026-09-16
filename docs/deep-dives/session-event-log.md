@@ -1,12 +1,12 @@
-# Session Event Log：从追加到投影与 Fork
+# Session Event Log：结算、投影、迁移与 Fork
 
 ## 基线
 
-本章只描述 DeepSeek Harness commit `76fda729799fe9b3848dbe2c211d4b231032b81e` 中的 Session 日志、Projection、持久化、Resume 与 Fork 行为。源码链接固定到该提交；运行中的 Session 内存提交、持久化 Provider 接受写入和 `flush` 耐久屏障是三个不同时间点。
+DeepSeek Harness commit `0d1f50007f9bca3f52b06e1c3074fa14d5fb0720`。本页区分 Session 内存提交、Provider 接受追加与 `flush` 耐久屏障；当前逻辑格式为 v3。
 
 ## 一句话结论
 
-Session Event Log 是按 `seq` 连续追加的事实记录；模型历史、Client 状态和 Transcript 分别从已提交前缀派生，而 Resume 与 Fork 通过显式种子和持久化元数据保留历史。
+Session 按连续 `seq` 保存已提交事实。模型历史、Client 状态和 Transcript 从日志派生；实时 chunk 在请求结算后才成为 durable compact stream，持久化 Provider 负责历史格式迁移和耐久性。
 
 <a id="claim-dsh-arch-007"></a> **Claim `DSH-ARCH-007`:** 所有进入模型请求的输入都可由追加式 Session Event Log 重建。
 
@@ -20,113 +20,123 @@ Session Event Log 是按 `seq` 连续追加的事实记录；模型历史、Clie
 
 Fork 选定的前缀不能结束于未完成 Turn 内；持久化 Provider 仍负责日志的耐久性与格式拒绝。
 
+<a id="claim-dsh-dd-session-004"></a> **Claim `DSH-DD-SESSION-004`:** `agent/assistant-stream` 提供实时帧；`assistant/message` 与 `assistant/attempt` 在结算时持久记录完整 compact stream。
+
+结算前的进程硬终止不会留下该 attempt 的 durable stream；`assistant/attempt` 不进入模型历史。
+
+<a id="claim-dsh-dd-session-005"></a> **Claim `DSH-DD-SESSION-005`:** JSONL Provider 将受支持的历史日志迁移为当前 v3；读打开不发布新文件，写打开验证并独占发布新一代文件且保留原文件。
+
 <a id="claim-dsh-cap-009"></a> **Claim `DSH-CAP-009`:** Session 原语与确定性 replay fixture 不构成专用的终端用户调试器或通用 Benchmark 产品。
 
 该判断限制产品定位，不否认这些原语可被更高层工具组合使用。
 
 ## 机制
 
-### 事件封套与顺序
+### 追加、提交与广播
 
-每个 `SessionEvent` 都携带 `type`、`seq`、`time` 与 `data`。`Session.append` 以当前日志长度分配连续 `seq`，所以日志位置而非时间戳定义单个 Session 内的单调顺序；`time` 来自 `Date.now()`，只记录 epoch 毫秒，不能替代 `seq` 作为顺序依据。[事件封套](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/types.ts#L436-L470)与[追加实现](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L668-L718)共同固定这项关系。
+事件封套包含 `type`、`seq`、`time`、`data`。`append()` 按当前日志长度分配 `seq`，用 `Date.now()` 记录时间；顺序由序列位置决定，不由时间戳决定。
 
-原始日志保留每个已接受事件及其序列位置，包括不进入模型历史的结构事件、chunk 和可忽略未知事件。
+追加先快照数据、验证事件与 surface 转换，再收集 observer。任何提交前失败都使日志不变；`log.push(event)` 是内存提交点，随后调用 `session/event` observer。每个 observer 的抛错或 rejection 被隔离，已提交事件不回滚，后续 observer 仍被调用。同步重入 append 会被拒绝。[追加顺序](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L719-L769)与[observer 隔离](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L397-L419)提供实现证据。
 
-派生消息是 `deriveMessages()` 从日志 surface 计算的 `Message[]`，不是另一份权威存储。
+### 实时流与 durable 结算
 
-Client Projection 是注册的类型化 fold 计算出的 Host 状态与可选 wire view，也不是原始日志或模型消息的别名。
+`agent/assistant-stream` 发布进程内 start、chunk、end 帧。Chunk 含 attempt id、顺序 index、时间和 provider chunk；UI 可据此增量显示，但这些帧不是 Session Event Log 的逐条事件。
 
-### append/commit/broadcast
+请求结算时，`assistant/message` 同时保存组装出的模型消息与 compact stream；未提交 surface message 的失败、重试、取消或 stream-error 尝试使用 `assistant/attempt`。取消时已产生可见文本或 reasoning 前缀的情况可以形成带 `interrupted: true` 的 message，未派发工具调用不进入该消息。Loop 先追加结算记录，再发 committed end 帧。
 
-`Session.append` 先快照并验证数据、构造事件，再验证 surface 转换；这些步骤失败时日志不变。`log.push(event)` 是内存日志的提交点，随后才调用已收集的 `session/event` observer；observer 失败被隔离，因此不会撤销提交，也不会阻止后续 observer 看到同一事件。[提交与发布顺序](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L637-L718)只承诺内存接受与发布，不承诺某个下游分支已经执行成功。
+Compact stream 保留原 chunk 的时间和 delta 边界，用 text、reasoning、tool-call run 或原始 chunk 记录表示。它不是压成一段字符串，也不再以 `assistant/chunk` 占据多个顶层事件序号。硬终止发生在结算前时，内存中的这次流不会被恢复；写入内存日志后的磁盘耐久性仍取决于持久化。
 
 ```mermaid
 flowchart LR
-  Producer["producer"] --> Append["append-only log"] --> Prefix["committed prefix"]
-  Prefix --> Model["model-history projection"]
-  Prefix --> UI["UI projection"]
-  Prefix --> Persist["persistence"]
-  Prefix --> Transcript["transcript"]
-  Prefix --> Telemetry["telemetry"]
-  Prefix --> Fork["fork seed"]
+  Provider["provider chunks"] --> Live["agent/assistant-stream frames"] --> UI["live UI"]
+  Provider --> Collect["collect timed compact stream"]
+  Collect --> Settle{"attempt settles"}
+  Settle --> Message["assistant/message: surface message + stream"]
+  Settle --> Attempt["assistant/attempt: log-only stream"]
+  Message --> Log["committed Session log"]
+  Attempt --> Log
+  Log --> Model["model-history projection"]
+  Log --> Projection["typed client projection"]
+  Log --> Disk["persistence / migration"]
+  Log --> Readers["transcript / telemetry / fork"]
 ```
 
-这张图表示各表示形式对已提交前缀的依赖，不表示各分支同步执行，也不表示每次广播都已完成磁盘 `flush`。Transcript 从 append-origin 事件读取人类可见历史；surface replacement 可以遮蔽模型历史节点，却不会删除原始日志条目。
+图表示数据依赖，不表示每个分支同步完成或每次广播已经 `flush`。实时流与 durable 结算不能互换。
 
-### deriveMessages
+### 模型历史与 typed Projection
 
-`deriveMessages()` 遍历当前 surface 节点并调用单事件投影；surface replacement 会使缓存重建。`user/message`、非空 `assistant/message` 与 `tool/result` 可形成模型消息，结构事件不形成消息；`assistant/chunk` 和空内容的 `assistant/message` 在语义投影中被跳过，但它们仍保留在日志及原来的 `seq` 位置。[派生规则](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L563-L572)与[缓存实现](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L790-L820)区分“没有消息语义”和“删除事件”。
+`deriveMessages()` 遍历当前 surface。`system/message`、`user/message`、`assistant/message` 和 `tool/result` 可以形成模型消息；空内容 system/assistant 消息不形成 wire message，`assistant/attempt` 和 Turn/Step 边界只留在日志。Surface replacement 改变当前模型历史而不删除原始事件；纯 message projection 也不改写原事件。[单事件投影](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/surface.ts#L137-L157)与[派生缓存](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L832-L869)区分原始事实与模型视图。
 
-模型请求还需要日志中的完整 `request/header` 快照；fold 选择最新快照，从而重建调用配置、adapter 默认标记、system prompt 和工具 schema。[请求封套规则](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L138-L160)说明了这些模型可见输入为何必须进入日志。
+System prompt 来自 `system/message`。`request/header` 最新完整快照提供调用配置、adapter defaults 和工具 schema；它不再携带 system 字段。[请求 header](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L226-L238)与[旧 system 字段拒绝](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/surface.ts#L177-L187)明确这项分工。
 
-### typed projections
+`SessionProjectionRegistry` 只订阅一次 `session/event`，驱动注册 unit 的同步纯 `apply`；可选 `wire.view` 生成 schema 验证后的 Client 值，snapshot 的共同 `asOfSeq` 标记读取位置。晚注册 unit 可从内存日志惰性重建；同 key 注册被计数，最后一个注册卸载后该 key 才从 snapshot 消失。Projection 是可重建视图，不是日志的替代存储。
 
-`SessionProjectionRegistry` 只订阅一次 `session/event`，并把每个已提交事件送入所有已注册 unit 的同步纯 `apply`。每个 unit 持有 Host fold state；带 `wire` 的 unit 再通过 `view` 生成经过 schema 验证的 Client 整体值，snapshot 用共同的 `asOfSeq` 表示一致读取位置。[Projection unit](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-projection/src/index.ts#L40-L117)与[registry 驱动](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-projection/src/index.ts#L181-L223)共同定义这一读取模型。
+### 持久化与格式迁移
 
-晚注册的 unit 或早于 registry 存在的 Session 会在首次事件或读取时从内存日志惰性折叠；注册卸载会移除该 key 与缓存，Client 把缺失 key 视为能力缺失。Projection 因此是可重建、可失效的派生状态，不能用来替换或裁剪日志。[快照和注册语义](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session-projection.md#L72-L106)固定了 watermark、schema 与生命周期规则。
+| 时点或操作 | 承诺 |
+|---|---|
+| Session `append` | 事件进入验证后的内存日志。 |
+| write-handle `append` | backend 接受连续批次，之后同实例读取至少可见该前缀；通用接口不承诺崩溃保留。 |
+| `flush` | 此前确认的追加耐久，未物化的空 Session 也变为可被其他进程列出。 |
+| JSONL 的具体实现 | 每次实际 batch 写入会 fsync；这强于通用 append 的最低保证。 |
+| read handle 或失去写所有权 | 不允许继续追加；read handle 不能执行写耐久屏障。 |
 
-### 持久化与所有权
+当前 `SESSION_FORMAT_VERSION = 3`，静态 catalog 包含 v0→v1→v2→v3 相邻链。Session 消费者只读取当前逻辑事件，历史解码和转换发生在 Provider 暴露它们之前。未知 required 事件仍拒绝恢复；`ignorable: true` 只允许不解释语义，仍要保留记录、验证封套并维持连续 `seq`。
 
-持久化层以 per-session handle 区分 `read` 与 `write`；创建存储 Session 时调用方取得写所有权，read handle 不能 `append` 或 `flush`，失去写所有权的 handle 也不能继续写。写 handle 的 `append` 只保证连续批次已被 backend 接受、排序并对同一 backend 实例的后续读取可见；只有已解决的 `flush` 承诺此前确认的追加能在崩溃后保留。[handle 语义](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/handle.ts#L37-L94)与[Provider 语义](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/index.ts#L115-L146)明确分开接受、可见和耐久。
+JSONL 每次选择数字最大的规范 generation。`stat/list` 只读取并转换 header，不读事件或发布 successor；`open(read)` 在内存中迁移并验证；`open(write)` 复用或重新准备迁移结果，编码临时文件、验证、复查源 revision，最后独占发布当前 generation，原文件保持字节不变。未来版本拒绝打开。
 
-| 操作或状态 | 保留内容 | 不保证或拒绝 | 所有者 |
-|---|---|---|---|
-| 内存 `Session.append` | 验证后的事件进入当前日志，`seq` 连续 | 不等于 backend 接受或磁盘耐久 | `Session` |
-| write-handle `append` | backend 接受连续批次，同实例后续读取至少看到该前缀 | 不保证崩溃后保留 | 持久化 Provider 与当前 write handle |
-| `flush` | 此前已确认追加形成耐久屏障 | read handle、关闭 handle 或失去所有权的 handle 不能写 | 持久化 Provider |
-| Resume | 经版本、封套、连续性与事件词汇检查的存储前缀 | 缺失、损坏或不支持的日志不进入活 Session | 持久化 Provider 读取，Session 构造器接收 seed |
-| Fork | 选定前缀的深拷贝、`parentSession`、`isSeeded`、精确 `inheritedEventCount` 与继承的 `cwd` | 来源必须是 store 中的 live 实例；边界不能落在 open Turn 内 | `SessionStore.fork` |
+```mermaid
+flowchart TD
+  Select["select highest canonical generation"] --> Version{"stored format"}
+  Version -->|future| Reject["refuse"]
+  Version -->|current v3| Fast["current validation"]
+  Version -->|supported historical| Migrate["decode once + adjacent migration chain"]
+  Migrate --> Validate["validate current logical events"]
+  Validate --> Access{"open access"}
+  Access -->|read| Memory["return migrated events without new file"]
+  Access -->|write| Publish["encode + verify + recheck revision + exclusive publish v3"]
+  Publish --> Handle["current write handle; source unchanged"]
+```
 
-### resume
+v0 文件名是 `session.jsonl[.zstd]`，v1 起是 `session.vN.jsonl[.zstd]`。迁移不是任意损坏修复：常规中断尾部由读取/恢复消费者处理；迁移只为受支持历史中已被后续 `turn/start` 封闭的有限中断情形补缺失的结束标记。
 
-Resume 从持久化 Provider 读取有效的连续前缀，并在重建 live Session 前执行 header 版本、事件词汇和封套验证；不支持的格式与损坏内容不会被当作可恢复历史。构造器以 restore seed 接收已转移所有权的记录，验证 `seq` 从 0 连续，并把构造历史与新生命周期写入区分开。[seed 验证](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L525-L580)与[格式错误类型](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/errors.ts#L92-L137)显示了恢复前的拒绝点。
+### Resume 与 completed-turn Fork
 
-`session/end-seed` 是构造器在 seed 之后写入日志的生命周期边界，`firstLiveSeq` 是当前对象中 live 写入的起点。它们说明哪些事件来自构造历史；`SessionHeader.isSeeded` 与存储层的 `inheritedEventCount` 才记录 Fork 谱系和精确继承长度，所以 seed marker 不能被解释为所有权标记。[seed 边界说明](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L627-L635)与[持久化元数据](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/handle.ts#L48-L60)分别拥有这两个概念。
+Resume 从 Provider 取得经迁移和验证的当前事件。构造器校验 seed 从 0 连续，并区分构造历史与本实例 live 写入；`firstLiveSeq` 标识当前实例起点。
 
-### completed-turn fork
+新 Fork child 写入带 `inherited: true` 的 `session/end-seed`，最后一个带该标记的事件记录当前 Session 的继承切点；普通 restore/replay 的非 tagged marker 仅标识生命周期。持久化 handle 仍暴露精确 `inheritedEventCount`，不能把任意 seed marker 当成并发写所有权信号。
 
-`SessionStore.fork` 接受 store 中的 live `Session` 或其 id，选择包含指定边界的前缀并深拷贝为子 Session seed。空来源可以生成空 seed；显式边界可以选择较早的 `turn/end` 或更晚的 between-turn log-only 位置，即使来源随后已有新 open Turn。[Fork 选择](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L1139-L1204)并不要求来源当前完全空闲。
-
-策略检查只拒绝“所选前缀最后一个 Turn 边界仍是 `turn/start`”的情况；它不会静默截短边界。传入 Session 对象还必须与 store 按同一 id 保存的对象完全相同，因而 detached 副本不是合法 policy-fork 来源；需要较低层 seed 创建时应直接使用创建原语，不应把它描述成普通 Fork。[live 来源检查](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L1206-L1218)保留了两层 API 的差异。
+`SessionStore.fork` 接受 store 中的 live Session 或其 id，深拷贝所选前缀，记录 `parentSession`、`isSeeded`、继承长度和 cwd。前缀不能结束于 open Turn 内；显式较早的稳定边界仍可使用，即使来源当前已有新 open Turn。传入对象必须是 store 保存的同一实例，detached 副本不能走这条策略 API。
 
 ## 源码导读
 
-下表按“写入事实 → 派生表示 → 保存与再生”的顺序列出最小阅读路径；每个链接都固定到同一上游提交。
-
-| 阅读主题 | 固定来源 | 核对重点 |
+| 主题 | 固定来源 | 核对重点 |
 |---|---|---|
-| Event 封套与格式号 | [`types.ts` 第 28–87 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/types.ts#L28-L87)、[第 436–470 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/types.ts#L436-L470) | `SESSION_FORMAT_VERSION = 0`；`seq`、`time`、`ignorable` 的职责。 |
-| 内存追加 | [`index.ts` 第 637–718 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L637-L718) | 验证先于 `log.push`；observer 位于提交之后。 |
-| 模型历史与 Transcript | [`session.md` 第 253–317 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L253-L317)、[第 563–572 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L563-L572) | surface、append-origin 与模型消息是不同选择规则。 |
-| 类型化 Projection | [`session-projection.md` 第 38–70 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session-projection.md#L38-L70)、[第 72–106 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session-projection.md#L72-L106)、[`index.ts` 第 181–223 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-projection/src/index.ts#L181-L223) | 同步 fold、共同 watermark、schema 验证与注册生命周期。 |
-| Resume 与 seed | [`index.ts` 第 525–580 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L525-L580)、[`session.md` 第 627–635 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/subsystems/session.md#L627-L635) | seed 连续性、`session/end-seed` 与 `firstLiveSeq`。 |
-| Fork 策略 | [`index.ts` 第 1139–1204 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L1139-L1204)、[第 1206–1218 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/index.ts#L1206-L1218) | 空历史、显式边界、open Turn 拒绝与 live-source 身份检查。 |
-| Backend 接受与耐久 | [`handle.ts` 第 37–94 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/handle.ts#L37-L94)、[`index.ts` 第 115–146 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/index.ts#L115-L146) | read/write 所有权、append 可见性与 `flush` 屏障。 |
+| 格式与封套 | [v3 格式号](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L66-L88)；[seq、time 与 ignorable](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L470-L488) | 单调版本和未知 required 事件策略。 |
+| 流式帧与结算 | [live chunk](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/agent/src/runtime-types.ts#L128-L145)；[settlement-before-end](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/agent/src/runtime-types.ts#L354-L363)；[message 与 attempt](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/types.ts#L311-L335)；[compact records](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/llm/llm/src/assistant-stream.ts#L13-L44)；[结算前硬终止限制](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L117-L119) | 瞬时帧、完整流与模型历史的区别。 |
+| Typed Projection | [纯 fold 与 wire view](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-projection/src/index.ts#L40-L92)；[共同 watermark](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-projection/src/index.ts#L107-L115)；[驱动与注册计数](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-projection/src/index.ts#L181-L197) | 派生值和注册生命周期。 |
+| Handle 与耐久性 | [所有权、接受与 flush](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-persistence/src/handle.ts#L45-L109)；[JSONL 写入与打开](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-persistence-jsonl/README.md#L74-L82) | 接口承诺与具体 backend 行为。 |
+| 历史迁移 | [静态相邻链](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-format-catalog/src/generated.ts#L13-L31)；[generation 与 read/write](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-persistence-jsonl/README.md#L54-L82)；[中断历史的有限修复](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L121) | 只读转换、验证发布、原文件不可变。 |
+| 格式拒绝 | [当前格式和事件验证](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/session/session-persistence/src/storage-contract.ts#L41-L103) | 未知 required 与损坏记录分别拒绝。 |
+| Resume 与 Fork | [seed 校验和继承标记](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L555-L618)；[Fork 元数据](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L1236-L1250)；[Turn 边界与 live 身份](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/core/session/src/index.ts#L1285-L1311) | 切点、所有权与历史保留。 |
 
 ## 限制与失败
 
-### 格式拒绝策略
+| 情况 | 结果与恢复责任 |
+|---|---|
+| append 数据、surface 或同步 dispatch 验证失败 | 内存日志不变，producer 修正数据。 |
+| observer 失败 | 已提交事件保留；observer 负责报告和恢复。 |
+| 流尚未结算即进程硬终止 | 没有该 attempt 的 durable stream；实时 UI 帧不能补作日志。 |
+| 未来格式或未知 required 事件 | 拒绝重建；使用支持该格式和词汇的 build，不静默删事件。 |
+| 完整记录损坏 | 报 corruption；迁移不等于任意内容修复。 |
+| 准备迁移后源 revision 改变 | 拒绝该次写打开；后续打开重新准备，旧读者已取得的逻辑历史不被替换。 |
+| Fork 前缀结束于 open Turn | `OPEN_TURN`，调用者选择稳定边界。 |
+| Fork 来源不是 store 中的 live 实例 | `SESSION_NOT_FOUND` 或 `SESSION_NOT_LIVE`；低层 seed 创建是另一种操作。 |
 
-固定基线把 `SESSION_FORMAT_VERSION` 保持为 `0`，不承诺旧磁盘格式兼容，也不提供迁移。Provider 在 stored-log 读取与重建阶段拒绝不同版本；完整但本 runtime 无法解释的日志产生 `SessionFormatUnsupportedError`，验证失败的记录产生 `SessionPersistenceCorruptionError`，两者不会被混成一次成功 Resume。[版本定义](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/core/session/src/types.ts#L64-L87)与[拒绝分类](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/errors.ts#L92-L137)给出各自职责。
-
-`SessionEventMap` 可以由插件扩展，因此类型化代码允许遇到未枚举分支；但 stored-log guard 默认拒绝当前 build 不认识且没有 `ignorable: true` 的事件类型。对可忽略未知事件的“跳过”仅表示读取方可以不解释其语义：Provider 仍保留记录、校验封套并维持连续 `seq`，不能删除该位置或绕过验证；这项词汇拒绝不应虚构成 `Session.append` 内的全类型目录检查。[stored-log guard](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/session/session-persistence/src/storage-contract.ts#L36-L91)承担该判断。
-
-| 失败或边界 | 可见结果 | 恢复责任 |
-|---|---|---|
-| append 数据或 surface metadata 非法 | 内存日志不变 | producer 修正事件后重新追加 |
-| observer 在内存提交后失败 | 已提交事件保留，其他 observer 继续 | observer 自己记录和修复失败；不能要求回滚日志 |
-| backend `append` 已解决但尚未 `flush` | 同实例后续读取可见，崩溃保留未承诺 | 需要耐久点的调用方显式等待 `flush` |
-| stored header 版本不同 | `SessionFormatUnsupportedError` | 使用可读取该格式的 Harness；不要把原始日志改写成“修复” |
-| stored event 损坏 | `SessionPersistenceCorruptionError` | 保留底层原因并检查 backend artifact |
-| 未知且 required 的 stored event | 拒绝重建整个 Session | 使用认识该事件的 build；不能静默删事件 |
-| Fork 边界位于 open Turn 内 | `OPEN_TURN` | 选择已完成 Turn 后或其他稳定 between-turn 位置 |
-| Fork 来源不是 store 中的 live 实例 | `SESSION_NOT_FOUND` 或 `SESSION_NOT_LIVE` | 传入 live id/对象，或明确使用低层 seed 创建 |
-
-仓库中的 replay 与 snapshot fixture 用于确定性测试和模型可见输出回归；它们不提供通用交互式调试、性能测量或 Benchmark 结论。任何更高层产品都必须另行定义输入控制、可观察性、指标和有效性。
+日志与 replay fixture 只证明明确场景中的重建和回归行为；调试器或 Benchmark 还需定义控制方式、观测与指标。
 
 ## 继续阅读
 
 - [所属核心章节：组合与生命周期架构](../02-architecture.md)
-- [证据方法](../00-methodology.md)
-- [证据反向索引](../source-map.md)
-- [`evidence/claims.json`](../../evidence/claims.json)
+- [证据方法](../00-methodology.md) · [证据反向索引](../source-map.md)
+- [Claim ledger](../../evidence/claims.json)

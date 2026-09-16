@@ -1,18 +1,18 @@
 # GitHub 仓库设置清单
 
-本页记录 Git 无法保存或本地验证的 GitHub 设置。仓库尚未发布，以下项目均未完成；`@yang0228` 在首次推送后的目标复核日期为 2026-09-06，并负责逐项检查、记录结果和保留可复核证据。
+本页记录 Git 无法保存或本地验证的 GitHub 设置。仓库已经发布。2026-09-16 通过 GitHub Repository API 重新读取了公开设置；下列已勾选项只表示 API 可确认的状态，不代表原生页面渲染已检查。未核验或未达到目标的设置保留待办，不在本次源码基线升级中自动修改。
 
-- [ ] 2026-09-06 — `@yang0228`：确认仓库为 public，URL 为 `https://github.com/yang0228/deepseek-harness-analysis`。
-- [ ] 2026-09-06 — `@yang0228`：设置描述为 `DeepSeek Harness 架构与实现的证据链手册`。
-- [ ] 2026-09-06 — `@yang0228`：确认默认分支为 `main`。
+- [x] 2026-09-16 — `@yang0228`：确认仓库为 public，URL 为 `https://github.com/yang0228/deepseek-harness-analysis`。
+- [x] 2026-09-16 — `@yang0228`：API 确认描述为 `DeepSeek Harness 架构与实现的证据链手册`。
+- [x] 2026-09-16 — `@yang0228`：确认默认分支为 `main`。
 - [ ] 2026-09-06 — `@yang0228`：在首次引导完成后为 `main` 设置分支保护，并要求 `verify` 检查通过后才可合并。
 - [ ] 2026-09-06 — `@yang0228`：启用 Private vulnerability reporting，并确认私密报告入口可用。
-- [ ] 2026-09-06 — `@yang0228`：设置 topics 为 `deepseek`、`deepseek-harness`、`agent-harness`、`agent-runtime`、`architecture`、`cordis`、`typescript`，不增删条目。
-- [ ] 2026-09-06 — `@yang0228`：启用 Issues。
-- [ ] 2026-09-06 — `@yang0228`：关闭 Wiki。
-- [ ] 2026-09-06 — `@yang0228`：关闭 Discussions。
-- [ ] 2026-09-06 — `@yang0228`：确认 GitHub Pages 没有发布源且没有已发布站点。
-- [ ] 2026-09-06 — `@yang0228`：完成全部设置与渲染记录前，不创建 `snapshot-76fda729` 标签。
+- [ ] 2026-09-06 — `@yang0228`：设置 topics 为 `deepseek`、`deepseek-harness`、`agent-harness`、`agent-runtime`、`architecture`、`cordis`、`typescript`，不增删条目。2026-09-16 API 返回 topics 为空，尚未设置。
+- [x] 2026-09-16 — `@yang0228`：Issues 已启用。
+- [ ] 2026-09-06 — `@yang0228`：关闭 Wiki。2026-09-16 API 仍为 `has_wiki: true`。
+- [x] 2026-09-16 — `@yang0228`：Discussions 已关闭。
+- [ ] 2026-09-06 — `@yang0228`：确认 GitHub Pages 没有发布源且没有已发布站点。2026-09-16 API 为 `has_pages: false`，发布源设置尚未直接检查。
+- [ ] 2026-09-06 — `@yang0228`：完成全部设置与渲染记录前，不创建 `snapshot-0d1f5000` 标签。
 
 ## Action 来源记录
 

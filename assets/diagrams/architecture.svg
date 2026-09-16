@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="710" viewBox="0 0 1000 710" role="img" aria-labelledby="title desc">
   <title id="title">DeepSeek Harness：应用装配与运行协作</title>
-  <desc id="desc">dsh 选择 Application Profile，按顺序组合 Bundle 与 Patch，由 Cordis 装载插件树。模型经模型适配器与 Agent loop 双向交互，loop 调用工具服务、记录 Session Event Log，工具连接外部世界。Application Profile 与 Agent Preset 分别负责应用级和每个 Agent 的能力组合；分组不代表安全隔离。</desc>
+  <desc id="desc">CLI 的 dsh 选择 Application Profile，按顺序组合 Bundle 与 Patch，由 Cordis 装载插件树。Desktop 由 Electron 启动独立 Node Host，用管道和 dsh-app 协议传输，应用传输不开 Web 端口。模型经模型适配器与 Agent loop 双向交互，loop 调用工具服务、记录 Session Event Log，工具连接外部世界。Application Profile 与 Agent Preset 分别负责应用级和每个 Agent 的能力组合；分组不代表安全隔离。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526781"/></marker>
     <style>
@@ -13,7 +13,7 @@
       .both { marker-start: url(#arrow); }
     </style>
   </defs>
-  <rect width="1000" height="620" rx="20" fill="#f8fafc"/>
+  <rect width="1000" height="710" rx="20" fill="#f8fafc"/>
   <text x="36" y="40" font-size="13" font-weight="700" letter-spacing="2" fill="#2563eb">01 / ARCHITECTURE</text>
   <text x="36" y="77" class="title">从应用装配到运行协作</text>
 
@@ -28,7 +28,14 @@
   <rect x="682" y="106" width="282" height="80" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
   <text x="823" y="138" text-anchor="middle" class="label">Cordis / Loader</text>
   <text x="823" y="164" text-anchor="middle" class="body">装载插件树与依赖</text>
-  <path d="M 823 188 V 216 H 500 V 240" class="line"/>
+  <path d="M 823 188 V 308 H 660 V 330" class="line"/>
+
+  <rect x="36" y="208" width="572" height="82" rx="12" fill="#f0fdfa" stroke="#99f6e4"/>
+  <text x="58" y="238" class="label">Desktop · Electron → 独立 Node Host</text>
+  <text x="58" y="264" class="body">管道 / dsh-app:// · 应用传输不开 Web 端口</text>
+  <path d="M 324 292 V 316 H 340 V 330" class="line"/>
+
+  <g transform="translate(0,90)">
 
   <rect x="212" y="248" width="576" height="292" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
   <text x="234" y="278" class="label">Harness 插件树</text>
@@ -65,5 +72,6 @@
 
   <text x="36" y="574" class="body">Application Profile：应用级组合</text>
   <text x="964" y="574" text-anchor="end" class="body">Agent Preset：每个 Agent 的 prompt / tools / services</text>
-  <text x="36" y="603" class="small">基线 76fda729 · 模型适配器、循环、工具和会话能力均由插件提供</text>
+  <text x="36" y="603" class="small">基线 0d1f5000 · 模型适配器、循环、工具和会话能力均由插件提供</text>
+  </g>
 </svg>

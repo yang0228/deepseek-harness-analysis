@@ -15,6 +15,7 @@ import {
 import { createFixtureRepository } from './helpers/fixture-repo.mjs'
 
 const runFile = promisify(execFile)
+const repositoryBaseline = JSON.parse(await readFile(new URL('../evidence/baseline.json', import.meta.url), 'utf8'))
 
 async function sourceGit(root, args) {
   return (await runFile('git', args, {
@@ -404,6 +405,94 @@ test('qualified inference stays human reviewed', async t => {
   assert.deepEqual(claim, before)
 })
 
+const markdownBaseline = {
+  repository: 'https://github.com/deepseek-ai/deepseek-harness',
+  commit: '0123456789abcdef0123456789abcdef01234567',
+}
+const markdownBlob = `${markdownBaseline.repository}/blob/${markdownBaseline.commit}`
+
+for (const [name, href] of [
+  ['stale SHA', `${markdownBaseline.repository}/blob/1123456789abcdef0123456789abcdef01234567/README.md#L1`],
+  ['short SHA', `${markdownBaseline.repository}/blob/0123456/README.md#L1`],
+  ['symbolic revision', `${markdownBaseline.repository}/blob/main/README.md#L1`],
+  ['mixed-case GitHub host', 'https://GitHub.com/deepseek-ai/deepseek-harness/blob/main/README.md#L1'],
+  ['mixed-case upstream owner', 'https://github.com/DeepSeek-AI/deepseek-harness/blob/main/README.md#L1'],
+  ['mixed-case upstream repository', 'https://github.com/deepseek-ai/DeepSeek-Harness/blob/main/README.md#L1'],
+  ['protocol-relative upstream URL', '//github.com/deepseek-ai/deepseek-harness/blob/main/README.md#L1'],
+  ['uppercase SHA', `${markdownBaseline.repository}/blob/${markdownBaseline.commit.toUpperCase()}/README.md#L1`],
+  ['dot path segment', `${markdownBlob}/./README.md#L1`],
+  ['parent path segment', `${markdownBlob}/docs/../README.md#L1`],
+  ['empty path segment', `${markdownBlob}/docs//README.md#L1`],
+  ['encoded path separator', `${markdownBlob}/docs%2FREADME.md#L1`],
+  ['Git metadata', `${markdownBlob}/.git/HEAD#L1`],
+  ['malformed encoding', `${markdownBlob}/docs/%xx.md#L1`],
+  ['missing line fragment', `${markdownBlob}/README.md`],
+  ['zero line', `${markdownBlob}/README.md#L0`],
+  ['negative line', `${markdownBlob}/README.md#L-1`],
+  ['reversed range', `${markdownBlob}/README.md#L2-L1`],
+  ['fractional line', `${markdownBlob}/README.md#L1.5`],
+  ['leading zero line', `${markdownBlob}/README.md#L01`],
+  ['unsafe integer line', `${markdownBlob}/README.md#L9007199254740993`],
+  ['query string', `${markdownBlob}/README.md?raw=1#L1`],
+]) {
+  test(`Markdown upstream links reject ${name}`, async t => {
+    const root = await createHandbook(t, `[source](${href})\n`)
+    assert.deepEqual((await validateMarkdownLinks(root, { baseline: markdownBaseline }))
+      .map(({ code, path, line }) => ({ code, path, line })), [
+      { code: 'UPSTREAM_MARKDOWN_SOURCE_INVALID', path: 'docs/sample.md', line: 1 },
+    ])
+  })
+}
+
+test('Markdown upstream links accept canonical citations without ledger membership', async t => {
+  const root = await createHandbook(t, `[source](${markdownBlob}/README.md#L1)\n[range](${markdownBlob}/docs/source%20%C3%BC.md#L1-L2)\n`)
+  assert.deepEqual(await validateMarkdownLinks(root, { baseline: markdownBaseline }), [])
+})
+
+test('Markdown upstream link recognition leaves other repositories unchecked', async t => {
+  const root = await createHandbook(t, '[other](https://GitHub.com/another-owner/deepseek-harness/blob/main/README.md#L1)\n[other](//github.com/deepseek-ai/another-repository/blob/main/README.md#L1)\n')
+  assert.deepEqual(await validateMarkdownLinks(root, { baseline: markdownBaseline }), [])
+})
+
+test('Markdown upstream links cover references, autolinks, and visible bare URLs', async t => {
+  const href = `${markdownBaseline.repository}/blob/main/README.md#L1`
+  const root = await createHandbook(t, `[source][source]\n[source]: ${href}\n<${href}>\n${href}\n`)
+  assert.deepEqual((await validateMarkdownLinks(root, { baseline: markdownBaseline }))
+    .map(({ code, path, line }) => ({ code, path, line })), [
+    { code: 'UPSTREAM_MARKDOWN_SOURCE_INVALID', path: 'docs/sample.md', line: 2 },
+    { code: 'UPSTREAM_MARKDOWN_SOURCE_INVALID', path: 'docs/sample.md', line: 3 },
+    { code: 'UPSTREAM_MARKDOWN_SOURCE_INVALID', path: 'docs/sample.md', line: 4 },
+  ])
+})
+
+test('Markdown upstream link checks exempt historical plans and code examples', async t => {
+  const href = `${markdownBaseline.repository}/blob/main/README.md#L1`
+  const root = await createHandbook(t, `\`[source](${href})\`\n\`\`\`md\n[source](${href})\n\`\`\`\n[external](https://github.com/example/project/blob/main/README.md)\n`)
+  await mkdir(join(root, 'docs/superpowers/plans'), { recursive: true })
+  await writeFile(join(root, 'docs/superpowers/plans/historical.md'), `[historical](${href})\n`)
+  assert.deepEqual(await validateMarkdownLinks(root, { baseline: markdownBaseline }), [])
+})
+
+test('Markdown upstream links require regular pinned blobs and their actual line bounds', async t => {
+  const { source, baseline: sourceBaseline, fixture } = await createSourceRepository(t)
+  const baseline = { ...sourceBaseline, repository: markdownBaseline.repository }
+  const blob = `${baseline.repository}/blob/${baseline.commit}`
+  const root = await createHandbook(t, `[range](${blob}/README.md#L1-L3)\n[missing](${blob}/missing.md#L1)\n[directory](${blob}/packages#L1)\n[untracked](${blob}/untracked.md#L1)\n`)
+  await writeFile(join(source, 'README.md'), 'worktree only\n'.repeat(100))
+  await writeFile(join(source, 'untracked.md'), 'untracked\n')
+  const beforeFiles = await fixture.readWorktreeSnapshot()
+  const beforeGit = await fixture.readGitState()
+  assert.deepEqual((await validateMarkdownLinks(root, { baseline, source }))
+    .map(({ code, path, line }) => ({ code, path, line })), [1, 2, 3, 4].map(line => ({
+    code: 'UPSTREAM_MARKDOWN_SOURCE_INVALID', path: 'docs/sample.md', line,
+  })))
+  assert.deepEqual(await fixture.readWorktreeSnapshot(), beforeFiles)
+  assert.deepEqual(await fixture.readGitState(), beforeGit)
+  await rm(join(source, 'README.md'))
+  await writeFile(join(root, 'docs/sample.md'), `[range](${blob}/README.md#L1-L2)\n`)
+  assert.deepEqual(await validateMarkdownLinks(root, { baseline, source }), [])
+})
+
 async function workflowFixture(name) {
   return readFile(new URL(`fixtures/workflows/${name}.yml`, import.meta.url), 'utf8')
 }
@@ -413,16 +502,17 @@ test('workflow uses require local paths or full lowercase SHAs', async t => {
   await mkdir(join(root, '.github/workflows'), { recursive: true })
   await writeFile(
     join(root, '.github/workflows/verify.yml'),
-    await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8'),
+    (await readFile(new URL('../.github/workflows/verify.yml', import.meta.url), 'utf8'))
+      .replace(/^          ref: .+$/mu, `          ref: ${repositoryBaseline.commit}`),
   )
   const local = await workflowFixture('local')
   const pinned = await workflowFixture('pinned')
   await writeFile(join(root, '.github/workflows/valid.yml'), `steps:\n${local}${pinned}`)
-  assert.deepEqual(await validateWorkflowPins(root), [])
+  assert.deepEqual(await validateWorkflowPins(root, repositoryBaseline), [])
   const tagged = await workflowFixture('tagged')
   const malformed = await workflowFixture('malformed')
   await writeFile(join(root, '.github/workflows/invalid.yml'), `steps:\n${tagged}${malformed}`)
-  assert.deepEqual((await validateWorkflowPins(root)).map(({ code, path, line }) => ({ code, path, line })), [
+  assert.deepEqual((await validateWorkflowPins(root, repositoryBaseline)).map(({ code, path, line }) => ({ code, path, line })), [
     { code: 'WORKFLOW_USES_UNPINNED', path: '.github/workflows/invalid.yml', line: 2 },
     { code: 'WORKFLOW_USES_UNPINNED', path: '.github/workflows/invalid.yml', line: 3 },
     { code: 'WORKFLOW_USES_UNPINNED', path: '.github/workflows/invalid.yml', line: 4 },

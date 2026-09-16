@@ -591,17 +591,50 @@ async function explicitAnchors(path) {
   return anchors
 }
 
+async function markdownUpstreamSourceIsValid(url, source, baseline) {
+  const match = /^https:\/\/github\.com\/deepseek-ai\/deepseek-harness\/blob\/([0-9a-f]{40})\/([^?#]+)#L([1-9]\d*)(?:-L([1-9]\d*))?$/u.exec(url)
+  if (match === null) return false
+  let path
+  try {
+    path = decodeURIComponent(match[2])
+  } catch {
+    return false
+  }
+  const startLine = Number(match[3])
+  const endLine = Number(match[4] ?? match[3])
+  if (!Number.isSafeInteger(startLine) || !Number.isSafeInteger(endLine)) return false
+  return upstreamSourceIsValid({
+    type: 'upstream',
+    repository: 'https://github.com/deepseek-ai/deepseek-harness',
+    commit: match[1], path, startLine, endLine, url,
+  }, source, baseline)
+}
+
 /**
- * Check internal document/file targets and explicit fragments without external requests.
+ * Check internal targets and visible upstream blob citations without external requests.
+ * With a baseline, citations require its full SHA, a canonical path, and positive line bounds;
+ * with a checkout, paths and bounds use pinned Git blobs. Historical docs/superpowers plans
+ * retain their original citations. Simple single-line backtick spans and top-level
+ * backtick/tilde fences are excluded; indented blocks and blockquote-prefixed fences are not parsed.
  * @param {string} root - Absolute handbook root.
+ * @param {{ baseline?: Baseline, source?: string }} options - Current revision and optional upstream checkout.
  * @returns {Promise<EvidenceProblem[]>} Broken links with document paths and source lines.
  */
-export async function validateMarkdownLinks(root) {
+export async function validateMarkdownLinks(root, { baseline, source } = {}) {
   const errors = []
   const anchorCache = new Map()
   for (const absolute of await markdownPaths(root)) {
     const path = relative(root, absolute).split(sep).join('/')
     const lines = visibleLines(await readFile(absolute, 'utf8'))
+    if (baseline !== undefined && !path.startsWith('docs/superpowers/')) {
+      for (const { searchable, lineNumber } of lines) {
+        for (const match of searchable.matchAll(/(?:https?:)?\/\/github\.com\/deepseek-ai\/deepseek-harness\/blob\/[^\s<>"`)]*/giu)) {
+          if (!(await markdownUpstreamSourceIsValid(match[0], source, baseline))) {
+            errors.push(problem('UPSTREAM_MARKDOWN_SOURCE_INVALID', { path, line: lineNumber }))
+          }
+        }
+      }
+    }
     for (const link of markdownLinks(lines)) {
       if (/^[A-Za-z][A-Za-z0-9+.-]*:/u.test(link.href) || link.href.startsWith('//')) continue
       const pieces = link.href.split('#')
@@ -656,7 +689,7 @@ function repositoryProblem(path, field) {
   return problem('REPOSITORY_FILE_INVALID', { path, field })
 }
 
-function requiredWorkflowFields(text) {
+function requiredWorkflowFields(text, baseline) {
   const lines = significantYamlLines(text)
   const grammar = [
     ['name: verify', '/name'],
@@ -683,7 +716,7 @@ function requiredWorkflowFields(text) {
     [/^        uses: actions\/checkout(?:@.*)?$/u, '/jobs/verify/steps/upstream/uses'],
     ['        with:', '/jobs/verify/steps/upstream/with'],
     ['          repository: deepseek-ai/deepseek-harness', '/jobs/verify/steps/upstream/with/repository'],
-    ['          ref: 76fda729799fe9b3848dbe2c211d4b231032b81e', '/jobs/verify/steps/upstream/with/ref'],
+    [`          ref: ${baseline.commit}`, '/jobs/verify/steps/upstream/with/ref'],
     ['          path: upstream', '/jobs/verify/steps/upstream/with/path'],
     ['          fetch-depth: 0', '/jobs/verify/steps/upstream/with/fetch-depth'],
     ['          fetch-tags: true', '/jobs/verify/steps/upstream/with/fetch-tags'],
@@ -725,9 +758,10 @@ function workflowActionProblems(text, path) {
  * workflows accept only bare block keys and single-line values. Comment-only lines
  * are ignored, and Action pin updates do not require changing the structural grammar.
  * @param {string} root - Absolute handbook root.
+ * @param {Baseline} baseline - Current upstream revision required by the checkout step.
  * @returns {Promise<EvidenceProblem[]>} Workflow structure and pin problems in path order.
  */
-export async function validateWorkflowPins(root) {
+export async function validateWorkflowPins(root, baseline) {
   const errors = []
   const workflows = await workflowPaths(root)
   const requiredPath = join(root, '.github/workflows/verify.yml')
@@ -738,7 +772,7 @@ export async function validateWorkflowPins(root) {
     const path = relative(root, absolute).split(sep).join('/')
     const text = await readFile(absolute, 'utf8')
     if (path === '.github/workflows/verify.yml') {
-      for (const field of requiredWorkflowFields(text)) errors.push(repositoryProblem(path, field))
+      for (const field of requiredWorkflowFields(text, baseline)) errors.push(repositoryProblem(path, field))
     }
     errors.push(...workflowActionProblems(text, path))
   }
@@ -778,9 +812,10 @@ function duplicateTopLevelKey(lines) {
  * Validate the ordered CFF software/report records and restricted single-line scalars.
  * Comment-only lines are ignored; parseSingleLineScalar defines the supported text values.
  * @param {string} text - Complete CITATION.cff content.
+ * @param {Baseline} baseline - Current upstream revision whose first eight characters identify the snapshot.
  * @returns {EvidenceProblem[]} The first CFF field or syntax problem, or an empty array.
  */
-export function validateCffText(text) {
+export function validateCffText(text, baseline) {
   if (unsupportedYamlSyntax(text)) return [repositoryProblem('CITATION.cff', '/syntax')]
   const lines = significantYamlLines(text)
   const duplicate = duplicateTopLevelKey(lines)
@@ -793,13 +828,13 @@ export function validateCffText(text) {
     [/^authors:$/u, '/authors'],
     [/^  - name: yang0228$/u, '/authors'],
     [/^repository-code: https:\/\/github\.com\/yang0228\/deepseek-harness-analysis$/u, '/repository-code'],
-    [/^version: snapshot-76fda729$/u, '/version'],
+    [new RegExp(`^version: snapshot-${baseline.commit.slice(0, 8)}$`, 'u'), '/version'],
     [/^preferred-citation:$/u, '/preferred-citation'],
     [/^  type: report$/u, '/preferred-citation/type'],
     [/^  authors:$/u, '/preferred-citation/authors'],
     [/^    - name: yang0228$/u, '/preferred-citation/authors'],
     [/^  title: DeepSeek Harness Analysis$/u, '/preferred-citation/title'],
-    [/^  version: snapshot-76fda729$/u, '/preferred-citation/version'],
+    [new RegExp(`^  version: snapshot-${baseline.commit.slice(0, 8)}$`, 'u'), '/preferred-citation/version'],
     [/^  url: https:\/\/github\.com\/yang0228\/deepseek-harness-analysis$/u, '/preferred-citation/url'],
     [/^  year: 2026$/u, '/preferred-citation/year'],
   ]
@@ -978,9 +1013,10 @@ const COMMUNITY_PATHS = [
 /**
  * Check required community files, placeholders, final newlines, and CFF/Form grammar.
  * @param {string} root - Absolute handbook root.
+ * @param {Baseline} baseline - Current upstream revision used by CITATION.cff.
  * @returns {Promise<EvidenceProblem[]>} Problems in the required-file order.
  */
-export async function validateRepositoryFiles(root) {
+export async function validateRepositoryFiles(root, baseline) {
   const errors = []
   for (const path of COMMUNITY_PATHS) {
     let text
@@ -1002,7 +1038,7 @@ export async function validateRepositoryFiles(root) {
       errors.push(repositoryProblem(path, '/final-newline'))
       continue
     }
-    if (path === 'CITATION.cff') errors.push(...validateCffText(text))
+    if (path === 'CITATION.cff') errors.push(...validateCffText(text, baseline))
     if (path.startsWith('.github/ISSUE_TEMPLATE/')) errors.push(...validateIssueFormText(text, path))
   }
   return errors
@@ -1091,9 +1127,9 @@ async function checkEvidence({ root, source }) {
   }
   if (errors.length === 0) {
     errors.push(...await validateClaimTargets({ root, source, baseline, facts: committed, ledger }))
-    errors.push(...await validateMarkdownLinks(root))
-    errors.push(...await validateWorkflowPins(root))
-    errors.push(...await validateRepositoryFiles(root))
+    errors.push(...await validateMarkdownLinks(root, { baseline, source }))
+    errors.push(...await validateWorkflowPins(root, baseline))
+    errors.push(...await validateRepositoryFiles(root, baseline))
   }
   if (source !== undefined && errors.length === 0) {
     const observed = await inspectUpstream({ source, baseline })

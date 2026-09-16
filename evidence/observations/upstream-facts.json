@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "repository": "https://github.com/deepseek-ai/deepseek-harness",
-  "commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-  "commitDate": "2026-09-03",
-  "gitDescribe": "dsh-v0.1.2-rc.1-99-g76fda72979",
-  "rootPackageVersion": "0.1.2-rc.1",
+  "commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+  "commitDate": "2026-09-15",
+  "gitDescribe": "dsh-v0.1.6-alpha.1-5-g0d1f50007f",
+  "rootPackageVersion": "0.1.6-alpha.1",
   "profiles": [
     {
       "id": "acp",
@@ -56,7 +56,7 @@
     {
       "id": "minimal",
       "name": "极简模式",
-      "description": "仅提供持久 bash 与 str_replace_editor 的双工具编码 Agent。",
+      "description": "仅提供持久 shell 的单工具编码 Agent。",
       "order": 3
     },
     {
@@ -73,10 +73,10 @@
     }
   ],
   "probes": {
-    "upstream.commit": "76fda729799fe9b3848dbe2c211d4b231032b81e",
-    "upstream.commit-date": "2026-09-03",
-    "upstream.git-describe": "dsh-v0.1.2-rc.1-99-g76fda72979",
-    "upstream.root-package-version": "0.1.2-rc.1",
+    "upstream.commit": "0d1f50007f9bca3f52b06e1c3074fa14d5fb0720",
+    "upstream.commit-date": "2026-09-15",
+    "upstream.git-describe": "dsh-v0.1.6-alpha.1-5-g0d1f50007f",
+    "upstream.root-package-version": "0.1.6-alpha.1",
     "profile:acp": {
       "id": "acp",
       "bundles": [
@@ -125,7 +125,7 @@
     "preset:minimal": {
       "id": "minimal",
       "name": "极简模式",
-      "description": "仅提供持久 bash 与 str_replace_editor 的双工具编码 Agent。",
+      "description": "仅提供持久 shell 的单工具编码 Agent。",
       "order": 3
     },
     "preset:ptc": {

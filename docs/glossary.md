@@ -24,7 +24,7 @@
 | 投影 | Projection | 将已提交会话事件递增 fold 为按 key 命名的类型状态，供 Host 或 Client carrier 读取。 |
 | 程序化工具调用 | Programmatic Tool Calling (PTC) | 将工具以 SDK 形式提供给模型编写的 TypeScript 程序，使一个程序可组合多步调用；本术语不承诺速度、成本或质量改善。 |
 | 目标 | Goal | 附着在现有会话上的单个持久完成目标；它是状态，不是 scheduler 或独立会话。 |
-| 工作流 | Workflow | 由 Workflow Engine 执行的有界程序化编排，一次 run 可调度子 Agent 并产生结果；它不是安全沙箱。 |
+| 工作流 | Workflow | 由 Workflow Engine 执行的有界程序化编排，一次 run 可调度子 Agent 并产生结果；其 VM 不是安全隔离层；当前文件约束由共享 PTC Node Provider 与所选 Sandbox 实施。 |
 | 官方事实 | Documented fact | 官方一手资料明示的外部对象事实；比较行同时给出来源与访问日期。 |
 | 限定事实 | Qualified fact | 只有连同版本、平台、配置、查阅范围或其他适用条件才成立的事实。 |
 | 未见官方文档说明 | Unavailable information | 在列明的官方资料和访问日期中未找到充分说明；不等于“不支持”。 |
@@ -43,17 +43,19 @@ Profile 决定一个 `dsh` 应用如何启动，Agent Preset 决定一个会话�
 | Application Profile | `sdk-minimal` | 启动由独立 Bundle 拥有的显式最小 SDK 树，不叠加 `dsh-base`。 |
 | Application Profile | `acp` | 启动仅用于自动化的 ACP server，在启动时应用 Patch。 |
 | Agent Preset | `standard` | 为会话提供文件编辑、Shell、文件与 Web 检索、Skill、Plan、Goal、子 Agent 和 Workflow。 |
-| Agent Preset | `minimal` | 为会话仅提供持久 Shell 与 `str_replace_editor`；Shell [在 POSIX 上选择 bash、在 Windows 上选择 pwsh](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L6-L7)，对应的条件行分别见 [bash 第 30–38 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L30-L38)和 [pwsh 第 51–60 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L51-L60)。 |
-| Agent Preset | `ptc` | 提供完整编码 Agent，禁用通用 Workflow tool，其他工具通过 PTC SDK 呈现。 |
+| Agent Preset | `minimal` | 为会话仅提供一个持久 Shell，不再包括 `str_replace_editor`；Shell [在 POSIX 上选择 bash、在 Windows 上选择 pwsh](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L1-L7)，对应的条件行分别见 [bash 第 30–40 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L30-L40)和 [pwsh 第 50–61 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L50-L61)。 |
+| Agent Preset | `ptc` | 通过 PTC SDK 呈现工具；默认禁用 Workflow engine、通用 Workflow tool 与 Ralph。 |
 | Agent Preset | `cordis` | 在 Standard 能力之上加入 runtime inspection、plugin experiment 和 preset-authoring guidance，用于创建自定义 Agent Preset。 |
 
-固定上游 UI 英文 locale 将 `ptc` 显示为 PTC mode，将 `cordis` 显示为 Creator mode。这两个显示名称来自 [UI locale 第 34–45 行](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/client/ui-agent-preset/src/client/locales.ts#L34-L45)，不是从中文 `preset.yml` 元数据推断出的 id。“Code”和“Creator”是显示性标签，权威 id 仍是 `ptc` 和 `cordis`。
+固定上游 UI 英文 locale 将 `ptc` 显示为 PTC mode，将 `cordis` 显示为 Creator mode。这两个显示名称来自 [UI locale 第 36–47 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/client/ui-agent-preset/src/client/locales.ts#L36-L47)，不是从中文 `preset.yml` 元数据推断出的 id。不要把旧称“Code”写成 `code` Preset id；当前权威 id 是 `ptc` 和 `cordis`。
+
+Desktop 使用保留的 `profiles/desktop` 插件区域与独立 Host，但不属于 `PROFILE_TEMPLATES` 中的第六行。会话 live stream、持久化 settlement 与格式 migration 的区别见[Session 专题](deep-dives/session-event-log.md)。
 
 ## 来源
 
-- [上游架构文档](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/architecture.md)
-- [上游术语表](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/docs/glossary.md)
-- [上游 Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/76fda729799fe9b3848dbe2c211d4b231032b81e/packages/boot/app-boot/src/profile.ts#L136-L158)
+- [上游架构文档](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L15-L53)
+- [上游术语表](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/glossary.md#L7-L45)
+- [上游 Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/src/profile.ts#L139-L160)
 
 ## 继续查阅
 
