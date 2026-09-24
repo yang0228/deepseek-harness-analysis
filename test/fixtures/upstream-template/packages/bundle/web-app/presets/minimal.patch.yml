@@ -1,0 +1,9 @@
+- insert:
+    - id: preset-minimal
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: minimal
+        order: 20
+        plugins:
+          - id: synthetic
+            name: '@example/synthetic'

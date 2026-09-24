@@ -18,7 +18,7 @@
 | 应用 Profile | Application Profile | 由 `dsh` launcher 启动的命名应用组合；它按顺序叠加 Bundle，并携带自身 Patch。 |
 | 组合包 | Bundle | 分发 Cordis 配置行与其插件代码的 package，通过 manifest 指向自己的 Patch 文件。 |
 | 补丁层 | Patch | 按层应用的配置修改；可按 id 替换一行的整个 config，或插入新行。 |
-| Agent 预设 | Agent Preset | 为单个会话固定工具、prompt section、Skill 与作用域 Service 的插件组合。 |
+| Agent 预设 | Agent Preset | 由插件行声明、为单个会话固定工具、prompt section、Skill 与作用域 Service 的组合；registry 管理其 revision。 |
 | 作用域 | Scope | 以一个 Agent 为 key 的注册单元，同时控制注册的可见性与生命期；子 Agent 不自动继承父作用域。 |
 | 会话事件日志 | Session Event Log | 按追加顺序保留持久会话事件的记录，是模型历史、恢复、转录与回放的源数据。 |
 | 投影 | Projection | 将已提交会话事件递增 fold 为按 key 命名的类型状态，供 Host 或 Client carrier 读取。 |
@@ -37,25 +37,25 @@ Profile 决定一个 `dsh` 应用如何启动，Agent Preset 决定一个会话�
 
 | 层级 | 精确 id | 用途 |
 |---|---|---|
-| Application Profile | `web` | 启动浏览器应用，叠加 `dsh-base` 与 Web 应用 Bundle，并实时重载用户 Patch。 |
-| Application Profile | `headless` | 启动无 server 的一次性任务运行器，在启动时应用 Patch。 |
-| Application Profile | `sdk` | 启动 SDK JSON-RPC server，在启动时应用 Patch。 |
+| Application Profile | `web` | 启动浏览器应用，叠加 `dsh-base` 与 Web 应用 Bundle，默认经 YAML 中的 `dsh-hmr` 重载配置。 |
+| Application Profile | `headless` | 启动无 server 的一次性任务运行器，默认关闭 HMR，在启动时应用 Patch。 |
+| Application Profile | `sdk` | 启动 SDK JSON-RPC server，默认关闭 HMR，在启动时应用 Patch。 |
 | Application Profile | `sdk-minimal` | 启动由独立 Bundle 拥有的显式最小 SDK 树，不叠加 `dsh-base`。 |
-| Application Profile | `acp` | 启动仅用于自动化的 ACP server，在启动时应用 Patch。 |
+| Application Profile | `acp` | 启动仅用于自动化的 ACP server，默认关闭 HMR，在启动时应用 Patch。 |
 | Agent Preset | `standard` | 为会话提供文件编辑、Shell、文件与 Web 检索、Skill、Plan、Goal、子 Agent 和 Workflow。 |
-| Agent Preset | `minimal` | 为会话仅提供一个持久 Shell，不再包括 `str_replace_editor`；Shell [在 POSIX 上选择 bash、在 Windows 上选择 pwsh](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L1-L7)，对应的条件行分别见 [bash 第 30–40 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L30-L40)和 [pwsh 第 50–61 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/preset/agent-presets/presets/minimal/agent.cordis.yml#L50-L61)。 |
+| Agent Preset | `minimal` | 为会话仅提供持久 Shell；POSIX 使用 [bash 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/presets/minimal.patch.yml#L23-L42)，Windows 使用 [pwsh 条件行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/bundle/web-app/presets/minimal.patch.yml#L43-L61)。 |
 | Agent Preset | `ptc` | 通过 PTC SDK 呈现工具；默认禁用 Workflow engine、通用 Workflow tool 与 Ralph。 |
 | Agent Preset | `cordis` | 在 Standard 能力之上加入 runtime inspection、plugin experiment 和 preset-authoring guidance，用于创建自定义 Agent Preset。 |
 
-固定上游 UI 英文 locale 将 `ptc` 显示为 PTC mode，将 `cordis` 显示为 Creator mode。这两个显示名称来自 [UI locale 第 36–47 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/client/ui-agent-preset/src/client/locales.ts#L36-L47)，不是从中文 `preset.yml` 元数据推断出的 id。不要把旧称“Code”写成 `code` Preset id；当前权威 id 是 `ptc` 和 `cordis`。
+固定上游 UI 英文 locale 将 `ptc` 显示为 PTC mode，将 `cordis` 显示为 Creator mode。这两个显示名称来自 [UI locale 第 50–61 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/client/ui-agent-preset/src/client/locales.ts#L50-L61)，不是从 Preset id 推断出的名称；读取器仅记录声明 id、排序和源路径。不要把旧称“Code”写成 `code` Preset id；当前权威 id 是 `ptc` 和 `cordis`。
 
-Desktop 使用保留的 `profiles/desktop` 插件区域与独立 Host，但不属于 `PROFILE_TEMPLATES` 中的第六行。会话 live stream、持久化 settlement 与格式 migration 的区别见[Session 专题](deep-dives/session-event-log.md)。
+Desktop 使用保留的 `profiles/desktop` 与独立 Web Host，默认端口为 `19387`，但不属于 `PROFILE_TEMPLATES` 中的第六行。会话 live stream、持久化 settlement 与格式 migration 的区别见[Session 专题](deep-dives/session-event-log.md)。
 
 ## 来源
 
-- [上游架构文档](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L15-L53)
-- [上游术语表](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/glossary.md#L7-L45)
-- [上游 Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/packages/boot/app-boot/src/profile.ts#L139-L160)
+- [上游架构文档](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L15-L55)
+- [上游术语表](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/glossary.md#L7-L45)
+- [上游 Profile 声明](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/boot/app-boot/src/profile.ts#L157-L174)
 
 ## 继续查阅
 

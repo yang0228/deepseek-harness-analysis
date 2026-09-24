@@ -4,7 +4,7 @@
 
 ## 基线权威
 
-手册唯一的上游基线是 DeepSeek Harness commit `0d1f50007f9bca3f52b06e1c3074fa14d5fb0720`，验证日期为 `2026-09-16`。该 commit 而非 package version、最近 tag 或 `master` 决定本手册中“上游事实”的含义；精确值由 [`evidence/baseline.json`](../evidence/baseline.json) 保管。
+手册唯一的上游基线是 DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`，验证日期为 `2026-09-24`。该 commit 而非 package version、最近 tag 或 `master` 决定本手册中“上游事实”的含义；精确值由 [`evidence/baseline.json`](../evidence/baseline.json) 保管。
 
 上游文件在手册中始终使用包含完整 40 位 commit 的 GitHub `blob` URL，并标明一个包含端点的行号范围。上游树、观察结果、Claim 记录和手册文本都不自动跟随分支漂移。
 
@@ -40,11 +40,11 @@
 
 ## 读取器 Probe
 
-[`scripts/inspect-upstream.mjs`](../scripts/inspect-upstream.mjs) 在检查绝对路径、准确 HEAD 和干净工作树后，只读地提取 commit、commit date、`git describe`、根 package version、Profile 列表和 Agent Preset 列表。每个可重复观察在 `probes` 中使用 `upstream.*`、`profile:<id>` 或 `preset:<id>` 名称；Claim 只有在命名观察存在时才能引用它。
+[`scripts/inspect-upstream.mjs`](../scripts/inspect-upstream.mjs) 在检查绝对路径、准确 HEAD 和干净工作树后，只读地提取 commit、commit date、`git describe`、根 package version、Profile 的 `id / bundles`，以及 `dsh-web-app` 内置 Preset patch 文件的 `id / order / sourcePath`。观察 schema 版本为 `2`：不再提取已删除的 `patchReload` 字段，也不从 UI locale 推断显示名称。这个 Preset 文件清单不等于运行时 registry 的完整注册清单。每个可重复观察在 `probes` 中使用 `upstream.*`、`profile:<id>` 或 `preset:<id>` 名称；Claim 只有在命名观察存在时才能引用它。
 
 ## 人工复核边界
 
-读取器的 Profile 扫描器是针对固定声明语法的词法扫描，不是通用 TypeScript parser。控制条件之后的正则字面量可能被误判为声明，后缀位置的除法表达式可能被误判为解析失败。本次五个 Profile 与四个 Preset 记录已由 AI 分析代理与固定源声明逐项比较，仍待维护者人工确认；每次基线更新都必须重做声明与观察结果的人工比较。现有测试只证明固定输入契约，不证明扫描器能正确解析任意 TypeScript。
+读取器的 Profile 扫描器是针对固定声明语法的词法扫描，不是通用 TypeScript parser。控制条件之后的正则字面量可能被误判为声明，后缀位置的除法表达式可能被误判为解析失败。本次五个 Profile 与四个 Preset 记录已由 AI 分析代理与固定源声明逐项比较，仍待维护者人工确认；每次基线更新都必须重做声明与观察结果的人工比较。Preset 读取器只接受单个 `insert` / `dsh-agent-preset` 声明的固定头部，忽略空行与注释，并将非空缩进 `plugins` 列表作为不执行的内容处理；它不解析嵌套 YAML，不执行 `!!js`，也不验证插件 config。现有测试只证明固定输入契约，不证明扫描器能正确解析任意 TypeScript 或 YAML。
 
 人工复核还负责判定外部 publisher 是否真的属于官方一手来源、链接在 access date 是否有效，以及分析推论是否超出已列证据。离线验证器不发起 HTTP 请求，因此不替代这些判断。正文中的上游 blob 引用同样检查固定 SHA、规范路径和行号；提供 `--source` 时再检查 Git blob 与跨度。`docs/superpowers/` 是历史设计与计划，不作为当前事实来源，保留其原始基线。
 
@@ -58,7 +58,7 @@
 
 OpenAI 比较来源只使用 `developers.openai.com`、`platform.openai.com` 或 `learn.chatgpt.com` 下的当前官方页面；本手册不使用仓库链接或 `openai.github.io` 支撑这类结论。
 
-本次变化见 [2026-09-16 基线升级记录](updates/2026-09-16.md)。外部产品的既有比较资料保留原访问日期，本次未把它们标为重新核验。
+本次变化见 [2026-09-24 基线升级记录](updates/2026-09-24.md)。外部产品的既有比较资料保留原访问日期，本次未把它们标为重新核验。
 
 ## 七步基线更新
 

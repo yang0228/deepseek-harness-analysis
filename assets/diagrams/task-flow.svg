@@ -45,7 +45,7 @@
   <path d="M 288 379 H 902" class="log"/>
   <text x="596" y="368" text-anchor="middle" class="body">assistant/message（内嵌响应流）→ tool/call</text>
   <path d="M 288 423 H 691" class="line"/>
-  <text x="490" y="412" text-anchor="middle" class="body">策略 / 可选审批 → 执行 → 结果整理</text>
+  <text x="490" y="412" text-anchor="middle" class="body">策略 / 审批 → 执行 → 内容投影与策略</text>
   <path d="M 693 467 H 290" class="line reply"/>
   <text x="490" y="456" text-anchor="middle" class="body">返回工具结果</text>
   <path d="M 288 511 H 902" class="log"/>
@@ -63,5 +63,5 @@
   <text x="190" y="720" text-anchor="middle" class="body">任务完成</text>
 
   <text x="36" y="779" class="note">示例展示两个成功 Step；Turn 也可能没有 Step，或继续更多 Step。</text>
-  <text x="36" y="804" class="note">输入须经 prepareCall 接纳；实时流结算前崩溃，不保证该次响应流可恢复。</text>
+  <text x="36" y="804" class="note">基线 46a7f68b · 输入须经 prepareCall 接纳；结算前崩溃不保证响应流可恢复。</text>
 </svg>

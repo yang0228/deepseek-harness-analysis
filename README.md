@@ -10,11 +10,11 @@ DeepSeek Harness Analysis 是面向 Agent 系统开发者、技术决策者与�
 
 本仓库保存分析文档、证据记录和校验脚本；运行 DeepSeek Harness 应用请使用[上游仓库](https://github.com/deepseek-ai/deepseek-harness)。本手册是由 `yang0228` 维护的独立项目，不隶属于 DeepSeek，也不是其官方文档、支持渠道或安全响应方。
 
-**固定分析基线：** DeepSeek Harness commit `0d1f50007f9bca3f52b06e1c3074fa14d5fb0720`。上游事实、作者推论和限定条件均围绕这一源码快照组织；它不代表上游当前版本。核验日期：2026-09-16；源码版本：`0.1.6-alpha.1`。完整元数据见 [`evidence/baseline.json`](evidence/baseline.json)，变更见[本次升级记录](docs/updates/2026-09-16.md)。
+**固定分析基线：** DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`。上游事实、作者推论和限定条件均围绕这一源码快照组织；它不代表上游当前版本。核验日期：2026-09-24；源码版本：`0.1.7-rc.1`。完整元数据见 [`evidence/baseline.json`](evidence/baseline.json)，变更见[本次升级记录](docs/updates/2026-09-24.md)。
 
 ## 整体架构
 
-先看应用怎样装配，再看运行时怎样协作。模型适配器、Agent loop、工具服务与 Session Event Log 都由插件提供；CLI Application Profile 组合应用，Agent Preset 组合每个 Agent 的能力。Desktop 则由 Electron 启动独立 Node Host，通过管道与 `dsh-app://` 通信，应用传输不启动本地 Web 端口。
+先看应用怎样装配，再看运行时怎样协作。模型适配器、Agent loop、工具服务与 Session Event Log 都由插件提供；CLI Application Profile 组合应用，Agent Preset 组合每个 Agent 的能力。Desktop 通过 Electron Node 模式启动私有 Host，复用 Profile runner 与完整 Web 应用；桌面页面接入带认证的 Web Host，默认端口为 `19387`。
 
 ![整体架构：CLI 通过 Profile、Bundle 与 Patch，Desktop 通过独立 Host 装载运行能力；模型经适配器与 Agent loop 交互，loop 调用工具服务并记录 Session Event Log，工具接入外部世界。](assets/diagrams/architecture.svg)
 
@@ -53,7 +53,7 @@ git clone https://github.com/yang0228/deepseek-harness-analysis.git &&
 ```sh
 handbook_root="$PWD" &&
   git clone https://github.com/deepseek-ai/deepseek-harness.git "$handbook_root/../deepseek-harness-source" &&
-  git -C "$handbook_root/../deepseek-harness-source" checkout --detach 0d1f50007f9bca3f52b06e1c3074fa14d5fb0720 &&
+  git -C "$handbook_root/../deepseek-harness-source" checkout --detach 46a7f68b0922371ce7144b668b90e377d8e799f4 &&
   npm run verify -- --source "$handbook_root/../deepseek-harness-source"
 ```
 
@@ -63,7 +63,7 @@ handbook_root="$PWD" &&
 {
   "ok": true,
   "inspectedUpstream": true,
-  "claimCount": 71
+  "claimCount": 72
 }
 ```
 
@@ -80,7 +80,7 @@ handbook_root="$PWD" &&
 | 执行一次命令行任务 | 入门路径 3：Headless | 接续已经构建的固定源码环境。 |
 | 在应用中调用 Agent | 入门路径 4／5：TypeScript／Python SDK | 使用对应 SDK 的依赖与运行时；示例分别说明启动和回收。 |
 
-**运行前请读安全说明：** 固定基线处于开发者预览阶段，允许破坏性变更，未经过安全审计，也不应视为生产就绪。请阅读固定提交的[上游 `SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/SAFETY.md#L5-L23)，使用最小权限，并按所选 Provider 配置凭据。上游运行示例按源码审查，不能视为本手册已经完成的实机体验记录。
+**运行前请读安全说明：** 固定基线处于开发者预览阶段，允许破坏性变更，未经过安全审计，也不应视为生产就绪。请阅读固定提交的[上游 `SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/SAFETY.md#L5-L23)，使用最小权限，并按所选 Provider 配置凭据。上游运行示例按源码审查，不能视为本手册已经完成的实机体验记录。
 
 ## 证据链示例
 
@@ -92,7 +92,7 @@ handbook_root="$PWD" &&
 
 1. **读结论与解释：** 打开[架构章节中的该项结论](docs/02-architecture.md#claim-dsh-arch-007)，理解“进入模型请求”的范围。
 2. **查正式记录：** 在 [`evidence/claims.json`](evidence/claims.json) 中搜索 `DSH-ARCH-007`，核对 `kind`、`confidence`、`maturity` 和 `sources`。该项记录为 `upstream-fact`／`verified`／`released`；`released` 不等于生产就绪。
-3. **对照固定来源：** 阅读上游架构文档的 [model-visible logging 规则，第 119–125 行](https://github.com/deepseek-ai/deepseek-harness/blob/0d1f50007f9bca3f52b06e1c3074fa14d5fb0720/docs/architecture.md#L119-L125)，再沿记录中的 Session 源码链接检查事件类型与投影。
+3. **对照固定来源：** 阅读上游架构文档的 [model-visible logging 规则，第 121–127 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L121-L127)，再沿记录中的 Session 源码链接检查事件类型与投影。
 4. **同时核验适用范围：** 不是每次 UI／CLI 交互都已进入模型请求，live 事件也不等于 durable 日志。自动校验通过后，仍要判断引用是否足以支撑陈述。
 
 更多规则见[证据方法](docs/00-methodology.md)；从上游文件反查分析结论，使用[证据反向索引](docs/source-map.md)。
@@ -119,7 +119,7 @@ handbook_root="$PWD" &&
 | 模型逐次决定下一项调用 | 模型请求读 A → 工具结果返回模型 → 模型请求读 B → 工具结果返回模型 → 汇总。 |
 | PTC 程序组合调用 | 模型提交一段 `run_code` 程序 → 程序调用读 A、读 B 并处理结果 → 向模型返回所需内容。 |
 
-当前 PTC 使用受会话文件策略约束的新 Node 进程，不再是旧 Worker 执行模型。普通工具调用也可以在一次模型响应中包含多次调用。PTC 的特点是把部分中间控制流交给程序表达；每次子调用仍受策略、取消、并发和资源约束。完整机制见[注册工具与 Programmatic Tool Calling](docs/deep-dives/tools-and-ptc.md)。
+当前 PTC 为每次运行创建受会话文件策略约束的 Node 进程。普通工具调用也可以在一次模型响应中包含多次调用。PTC 的特点是把部分中间控制流交给程序表达；每次子调用仍受策略、取消、并发和资源约束。完整机制见[注册工具与 Programmatic Tool Calling](docs/deep-dives/tools-and-ptc.md)。
 
 </details>
 
@@ -127,9 +127,9 @@ handbook_root="$PWD" &&
 
 ### 本次基线值得关注的变化
 
-- [Desktop 与会话架构](docs/02-architecture.md)：独立桌面 Host、实时流与持久化结算分离。
-- [能力矩阵](docs/03-capabilities.md)：Minimal 改为单 Shell；PTC 的 Workflow engine、通用工具和 Ralph 默认禁用；新增 Browser / Computer Use、MCP 与 Schedule 的组合归属。
-- [编排机制](docs/deep-dives/subagents-goals-workflows.md)：Agent Teams 已发布但仍属 opt-in 实验能力，不能等同于默认启用。
+- [应用与预设组合](docs/deep-dives/profiles-bundles-presets.md)：Desktop 复用 Web Host；热重载由 YAML 插件组合决定；Preset 改为声明式注册与引用计数回收。
+- [Session v4](docs/deep-dives/session-event-log.md)：结构化消息角色与来源、相邻版本迁移，以及未结束任务前缀的分叉补齐；格式支持不等于所有模型适配器已支持该角色。
+- [能力矩阵](docs/03-capabilities.md)与[编排机制](docs/deep-dives/subagents-goals-workflows.md)：Office Skills、Workspace Dependencies 与 Workflow 后台 Job；Agent Teams 仍是已发布但默认关闭的实验能力。
 
 ### 按目标选择阅读路线
 
@@ -157,6 +157,6 @@ handbook_root="$PWD" &&
 - 修改前阅读[参与贡献](CONTRIBUTING.md)，保留 Claim 分类、不可变来源和限定语，并运行本仓库测试与证据校验。
 - 一般问题见[支持范围](SUPPORT.md)；DeepSeek Harness 安装、配置和产品使用问题转向[上游仓库](https://github.com/deepseek-ai/deepseek-harness)的当前支持渠道。
 - 本仓库的安全问题按 [SECURITY.md](SECURITY.md) 私密报告；上游安全问题按其当前公开渠道处理。
-- 引用使用 [`CITATION.cff`](CITATION.cff) 中的首选信息，并注明分析基线 `0d1f5000`；其中的版本字段为 `snapshot-0d1f5000`。
+- 引用使用 [`CITATION.cff`](CITATION.cff) 中的首选信息，并注明分析基线 `46a7f68b`；其中的版本字段为 `snapshot-46a7f68b`。
 
 维护者：[`@yang0228`](https://github.com/yang0228)。

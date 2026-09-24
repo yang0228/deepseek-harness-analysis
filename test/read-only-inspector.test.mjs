@@ -50,17 +50,17 @@ async function commitChanges(root) {
 
 function expectedFacts(fixture) {
   const profiles = [
-    { id: 'alpha', bundles: ['bundle-c'], patchReload: 'live' },
-    { id: 'beta-minimal', bundles: ['bundle-b', 'bundle-a'], patchReload: 'startup' },
+    { id: 'alpha', bundles: ['bundle-c'] },
+    { id: 'beta-minimal', bundles: ['bundle-b', 'bundle-a'] },
   ]
   const presets = [
-    { id: 'cordis', name: '创作样例', description: '提供扩展的合成测试能力', order: 40 },
-    { id: 'minimal', name: '精简样例', description: '提供最少的合成测试能力', order: 20 },
-    { id: 'ptc', name: '编排样例', description: '提供程序化的合成测试能力', order: 30 },
-    { id: 'standard', name: '标准样例', description: '提供完整的合成测试能力', order: 10 },
+    { id: 'cordis', order: 40, sourcePath: 'packages/bundle/web-app/presets/cordis.patch.yml' },
+    { id: 'minimal', order: 20, sourcePath: 'packages/bundle/web-app/presets/minimal.patch.yml' },
+    { id: 'ptc', order: 30, sourcePath: 'packages/bundle/web-app/presets/ptc.patch.yml' },
+    { id: 'standard', order: 10, sourcePath: 'packages/bundle/web-app/presets/standard.patch.yml' },
   ]
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     repository: 'https://github.com/example/upstream',
     commit: fixture.sha,
     commitDate: '2026-01-02',
@@ -231,15 +231,15 @@ test('Preset roster normalizes missing and unreadable paths', async t => {
   const unreadableSource = await mkdtemp(join(tmpdir(), 'unreadable-preset-roster-'))
   t.after(() => rm(missingSource, { recursive: true, force: true }))
   t.after(() => rm(unreadableSource, { recursive: true, force: true }))
-  const missingPath = join(missingSource, 'packages/preset/agent-presets/presets')
+  const missingPath = join(missingSource, 'packages/bundle/web-app/presets')
   await assert.rejects(
     readPresetRoster(missingSource),
     error => error instanceof UpstreamInspectionError
       && error.code === 'UPSTREAM_FILE_MISSING'
       && error.details.path === missingPath,
   )
-  const unreadablePath = join(unreadableSource, 'packages/preset/agent-presets/presets')
-  await mkdir(join(unreadableSource, 'packages/preset/agent-presets'), { recursive: true })
+  const unreadablePath = join(unreadableSource, 'packages/bundle/web-app/presets')
+  await mkdir(join(unreadableSource, 'packages/bundle/web-app'), { recursive: true })
   await writeFile(unreadablePath, 'not a directory\n')
   await assert.rejects(
     readPresetRoster(unreadableSource),

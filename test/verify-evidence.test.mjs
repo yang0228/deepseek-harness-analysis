@@ -111,17 +111,17 @@ function baselineFor(fixture, overrides = {}) {
 
 function expectedFacts(fixture) {
   const profiles = [
-    { id: 'alpha', bundles: ['bundle-c'], patchReload: 'live' },
-    { id: 'beta-minimal', bundles: ['bundle-b', 'bundle-a'], patchReload: 'startup' },
+    { id: 'alpha', bundles: ['bundle-c'] },
+    { id: 'beta-minimal', bundles: ['bundle-b', 'bundle-a'] },
   ]
   const presets = [
-    { id: 'cordis', name: '创作样例', description: '提供扩展的合成测试能力', order: 40 },
-    { id: 'minimal', name: '精简样例', description: '提供最少的合成测试能力', order: 20 },
-    { id: 'ptc', name: '编排样例', description: '提供程序化的合成测试能力', order: 30 },
-    { id: 'standard', name: '标准样例', description: '提供完整的合成测试能力', order: 10 },
+    { id: 'cordis', order: 40, sourcePath: 'packages/bundle/web-app/presets/cordis.patch.yml' },
+    { id: 'minimal', order: 20, sourcePath: 'packages/bundle/web-app/presets/minimal.patch.yml' },
+    { id: 'ptc', order: 30, sourcePath: 'packages/bundle/web-app/presets/ptc.patch.yml' },
+    { id: 'standard', order: 10, sourcePath: 'packages/bundle/web-app/presets/standard.patch.yml' },
   ]
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     repository: 'https://github.com/example/upstream',
     commit: fixture.sha,
     commitDate: '2026-01-02',
@@ -440,14 +440,14 @@ test('live verification surfaces Profile parse drift', async t => {
     verifyEvidence({ root, source: fixture.root }),
     error => error instanceof UpstreamInspectionError
       && error.code === 'PROFILE_TEMPLATES_PARSE_ERROR'
-      && error.details.offset === 112,
+      && error.details.offset === 102,
   )
   const capture = output()
   assert.equal(await main(['--root', root, '--source', fixture.root], capture.io), 1)
   assert.equal(capture.stdout(), '')
   assert.deepEqual(JSON.parse(capture.stderr()), {
     ok: false,
-    errors: [{ code: 'PROFILE_TEMPLATES_PARSE_ERROR', offset: 112 }],
+    errors: [{ code: 'PROFILE_TEMPLATES_PARSE_ERROR', offset: 102 }],
   })
 })
 
