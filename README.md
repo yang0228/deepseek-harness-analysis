@@ -10,15 +10,17 @@ DeepSeek Harness Analysis 是面向 Agent 系统开发者、技术决策者与�
 
 本仓库保存分析文档、证据记录和校验脚本；运行 DeepSeek Harness 应用请使用[上游仓库](https://github.com/deepseek-ai/deepseek-harness)。本手册是由 `yang0228` 维护的独立项目，不隶属于 DeepSeek，也不是其官方文档、支持渠道或安全响应方。
 
+从这里开始：[在线阅读，无需安装](#read-online) · [本地核验证据，可选](#verify-locally) · [运行上游应用](#run-harness)。
+
 **固定分析基线：** DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`。上游事实、作者推论和限定条件均围绕这一源码快照组织；它不代表上游当前版本。核验日期：2026-09-24；源码版本：`0.1.7-rc.1`。完整元数据见 [`evidence/baseline.json`](evidence/baseline.json)，变更见[本次升级记录](docs/updates/2026-09-24.md)。
 
 ## 整体架构
 
-先看应用怎样装配，再看运行时怎样协作。模型适配器、Agent loop、工具服务与 Session Event Log 都由插件提供；CLI Application Profile 组合应用，Agent Preset 组合每个 Agent 的能力。Desktop 通过 Electron Node 模式启动私有 Host，复用 Profile runner 与完整 Web 应用；桌面页面接入带认证的 Web Host，默认端口为 `19387`。
+先看应用怎样装配，再看运行时怎样协作。Application Profile 组合应用，Agent Preset 组合每个 Agent 的能力；模型适配器、Agent loop、工具服务与 Session Event Log 都由插件提供。Desktop 在独立 Host 中复用 Web 应用。
 
 ![整体架构：CLI 通过 Profile、Bundle 与 Patch，Desktop 通过独立 Host 装载运行能力；模型经适配器与 Agent loop 交互，loop 调用工具服务并记录 Session Event Log，工具接入外部世界。](assets/diagrams/architecture.svg)
 
-图中的分组表示组合与协作关系，不表示进程或安全隔离；可替换能力也不意味着运行中的组件可以任意热替换。继续阅读[组合与生命周期架构](docs/02-architecture.md)、[能力与组合归属](docs/03-capabilities.md)和[应用与 Session 的组合层](docs/deep-dives/profiles-bundles-presets.md)。
+图中的分组表示组合与协作关系，不表示进程或安全隔离；可替换能力也不意味着运行中的组件可以任意热替换。继续阅读[组合与生命周期架构](docs/02-architecture.md)、[能力与组合归属](docs/03-capabilities.md)和[应用与 Session 的组合层](docs/deep-dives/profiles-bundles-presets.md)；Desktop 的启动、认证和端口见[独立 Host](docs/02-architecture.md#claim-dsh-arch-008)。
 
 ## 一次任务如何运行
 
@@ -26,17 +28,30 @@ DeepSeek Harness Analysis 是面向 Agent 系统开发者、技术决策者与�
 
 ![任务时序：用户提交任务后，Agent loop 开始 Turn 和 Step、请求模型、记录并执行工具调用、保存工具结果，再进入下一 Step 获取最终答复并结束 Turn。](assets/diagrams/task-flow.svg)
 
-- **Turn 是一次任务推进的外层单位，Step 包含一次模型请求及其工具处理。** 一个 Turn 可以有多个 Step，也可以在首次 pre-step 被拒绝时以零个 Step 结束。
+- **Turn 是一次任务推进的外层单位，Step 包含一次模型请求及其工具处理。** 一个 Turn 可以有零个或多个 Step，具体条件见下方专题。
 - **工具调用经过策略、可选审批和执行管线。** 拒绝、取消和异常有各自的分支；图中展示的是成功路径。
-- **持久日志与实时事件作用不同。** `tool/call`、`tool/result` 等 durable 事件用于保留历史；`tools/*` 等 live 事件用于在途协调，不自动成为持久记录。`agent/assistant-stream` 提供实时响应流，结算后把 compact stream 写入 `assistant/message` 或仅供日志使用的 `assistant/attempt`；结算前崩溃不保证该次流可恢复。
+- **持久日志用于重建历史，实时事件用于在途协调与显示。** 实时事件不会自动成为持久记录；响应流在结算前发生进程崩溃，不保证可恢复。
 
-详细机制见 [Turn 与 Step](docs/02-architecture.md#claim-dsh-arch-006)、[工具执行与 PTC](docs/deep-dives/tools-and-ptc.md)和 [Session Event Log](docs/deep-dives/session-event-log.md)。
+零 Step 的条件见 [Turn 与 Step](docs/02-architecture.md#claim-dsh-arch-006)，执行分支见[工具执行与 PTC](docs/deep-dives/tools-and-ptc.md)，事件类型与结算规则见 [Session Event Log](docs/deep-dives/session-event-log.md)。
 
 ## 快速上手
 
-### 阅读并验证这份手册
+按目标选择入口：阅读手册不需要安装环境；本地核验和运行上游应用是两项独立操作。
 
-需要 Git，以及 Node.js `^22.19.0 || >=24.0.0`。以下是本分析仓库的命令；现有校验脚本没有第三方依赖，不需要配置模型 API key。
+### 在线阅读（无需安装）
+
+<a id="read-online"></a>
+
+直接打开[项目概览](docs/01-overview.md)，再按需要阅读[架构](docs/02-architecture.md)和[能力矩阵](docs/03-capabilities.md)。想先判断结论是否可信，可以从下方[证据链示例](#evidence-example)开始。在线阅读无需 Git、Node.js 或模型 API key。
+
+### 本地核验证据（可选）
+
+<a id="verify-locally"></a>
+
+适合准备贡献或复核引用的读者。需要 Git，以及 Node.js `^22.19.0 || >=24.0.0`；校验脚本没有第三方依赖，不需要模型 API key，也不会启动 DeepSeek Harness。
+
+<details>
+<summary>展开：获取手册、运行测试并核验固定源码</summary>
 
 **1. 获取手册并运行测试。** 在未包含同名目录的位置执行：
 
@@ -69,31 +84,45 @@ handbook_root="$PWD" &&
 
 若已有符合条件的上游 checkout，可直接运行 `npm run verify -- --source /上游目录的绝对路径`，跳过第二次 clone。校验器检查基线、引用和已记录观察；结论的语义、来源权威性和限定语仍需阅读源码核对。
 
-### 运行 DeepSeek Harness
+</details>
 
-运行应用的命令属于上游项目。[可复现的入门路径](docs/05-getting-started.md)提供完整步骤、前置条件、独立实验目录和 Harness Home 设置：
+### 运行上游应用
 
-| 想做什么 | 选择哪条路径 | 需要留意什么 |
-|---|---|---|
-| 体验 Web UI | 入门路径 1：打包 Web UI | 浮动 npm 包跟随 registry，未必等于本手册的固定源码。 |
-| 复现本手册的分析对象 | 入门路径 2：固定源码构建 | checkout 到固定 commit，再安装依赖、构建并启动。 |
-| 执行一次命令行任务 | 入门路径 3：Headless | 接续已经构建的固定源码环境。 |
-| 在应用中调用 Agent | 入门路径 4／5：TypeScript／Python SDK | 使用对应 SDK 的依赖与运行时；示例分别说明启动和回收。 |
+<a id="run-harness"></a>
+
+这是独立于阅读和证据核验的操作。[可复现的入门路径](docs/05-getting-started.md)提供前置条件、独立实验目录和 Harness Home 设置；以下链接直达对应步骤。
 
 **运行前请读安全说明：** 固定基线处于开发者预览阶段，允许破坏性变更，未经过安全审计，也不应视为生产就绪。请阅读固定提交的[上游 `SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/SAFETY.md#L5-L23)，使用最小权限，并按所选 Provider 配置凭据。上游运行示例按源码审查，不能视为本手册已经完成的实机体验记录。
 
+| 想做什么 | 选择哪条路径 | 需要留意什么 |
+|---|---|---|
+| 体验 Web UI | [路径 1：打包 Web UI](docs/05-getting-started.md#packaged-web-ui) | 浮动 npm 包跟随 registry，未必等于本手册的固定源码。 |
+| 复现本手册的分析对象 | [路径 2：固定源码构建](docs/05-getting-started.md#pinned-source) | checkout 到固定 commit，再安装依赖、构建并启动。 |
+| 执行一次命令行任务 | [路径 3：Headless](docs/05-getting-started.md#headless) | 接续已经构建的固定源码环境。 |
+| 在 TypeScript 应用中调用 Agent | [路径 4：TypeScript SDK](docs/05-getting-started.md#typescript-sdk) | 使用对应 SDK 依赖；按示例启动并回收运行时。 |
+| 在 Python 应用中调用 Agent | [路径 5：Python SDK](docs/05-getting-started.md#python-sdk) | 使用对应 SDK 与捆绑运行时；按示例启动并回收。 |
+
 ## 证据链示例
 
-这本手册不止给出结论，也给出检查结论的入口。以 [`DSH-ARCH-007`](docs/02-architecture.md#claim-dsh-arch-007) 为例：
+<a id="evidence-example"></a>
+
+结论能否从代码核实？以 [`DSH-ARCH-007`](docs/02-architecture.md#claim-dsh-arch-007) 为例，直接打开下表的固定源码，无需先搜索 JSON：
 
 > 所有进入模型请求的输入都可由追加式 Session Event Log 重建。
 
 ![证据链：从章节中的 DSH-ARCH-007，查找 claims.json 中的分类与来源，打开固定提交的源码行，结合限定条件判断结论是否成立；自动校验与人工语义复核分别负责不同检查。](assets/diagrams/evidence-chain.svg)
 
-1. **读结论与解释：** 打开[架构章节中的该项结论](docs/02-architecture.md#claim-dsh-arch-007)，理解“进入模型请求”的范围。
-2. **查正式记录：** 在 [`evidence/claims.json`](evidence/claims.json) 中搜索 `DSH-ARCH-007`，核对 `kind`、`confidence`、`maturity` 和 `sources`。该项记录为 `upstream-fact`／`verified`／`released`；`released` 不等于生产就绪。
-3. **对照固定来源：** 阅读上游架构文档的 [model-visible logging 规则，第 121–127 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L121-L127)，再沿记录中的 Session 源码链接检查事件类型与投影。
-4. **同时核验适用范围：** 不是每次 UI／CLI 交互都已进入模型请求，live 事件也不等于 durable 日志。自动校验通过后，仍要判断引用是否足以支撑陈述。
+| 核查点 | 直接打开证据 | 重点看什么 |
+|---|---|---|
+| 上游规定了什么？ | [架构规则，第 119–127 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L119-L127) | 模型可见输入必须可由日志重建；新增模型输入需要对应 Session 事件。 |
+| 请求配置与工具定义从哪里恢复？ | [`EpochHeader` 字段，第 234–250 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/core/session/src/types.ts#L234-L250) | 请求头记录调用配置和工具定义；系统提示属于消息历史。 |
+| 日志怎样变成模型消息？ | [`deriveEventMessage()` 实现，第 120–156 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/core/session/src/surface.ts#L120-L156) | 用户消息、工具结果等可以投影为模型消息；任务边界和失败尝试等仅留在日志。 |
+
+**一个可直接复核的例子：** 在最后一个链接中，`user/message` 分支返回消息数据，未形成模型消息的日志事件返回 `null`。这说明“有日志记录”不等于“会发送给模型”；该函数展示消息投影的一条实现路径，不单独证明所有插件都遵守整个日志规则。
+
+**适用范围：** 不是每次 UI／CLI 交互都已进入模型请求，实时事件也不等于持久日志。该 Claim 在[正式记录](evidence/claims.json)中标为 `upstream-fact`／`verified`／`released`；`released` 不等于生产就绪。
+
+**自动校验的范围：** [本地核验](#verify-locally)检查固定基线、引用路径与行号、已记录观察等；它不会替代对代码语义的判断，也不表示已运行所有 Provider 或插件。完整解释见 [Session Event Log](docs/deep-dives/session-event-log.md#claim-dsh-arch-007)。
 
 更多规则见[证据方法](docs/00-methodology.md)；从上游文件反查分析结论，使用[证据反向索引](docs/source-map.md)。
 

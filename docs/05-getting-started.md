@@ -16,6 +16,8 @@
 
 ### 1. 打包 Web UI
 
+<a id="packaged-web-ui"></a>
+
 此路径适合体验打包应用，但复现强度取决于 registry。`package_spec` 默认使末行等同于 `npx @deepseek-ai/dsh web`；要使它等同于 `npx @deepseek-ai/dsh@0.1.7-rc.1 web`，把第一行改为注释所示的第二个值：
 
 ```sh
@@ -31,6 +33,8 @@ experiment_root="$(mktemp -d)" &&
 第一条命令跟随 npm registry 的解析结果；第二条显式选择固定源码所声明的 `0.1.7-rc.1`，但只有 registry 暴露该版本时才会成功。版本号是源码元数据，不是 registry 可用性证据；两条命令也都不能证明所得包等同于 `dsh-v0.1.7-rc.1-0-g46a7f68b09` 所描述的固定源码树；该 Git describe 与 tag 同点，但 registry 构件仍需独立核验。上游快速开始没有设置 Harness Home，通常按 CLI 的 home 解析规则使用用户的 `~/.dsh`；这里显式设置 `DSH_HOME` 以避免写入日常 home。
 
 ### 2. 固定源码构建
+
+<a id="pinned-source"></a>
 
 此路径精确复现本手册分析的源码树，而不是只选择同名版本：
 
@@ -52,6 +56,8 @@ experiment_root="$(mktemp -d)" &&
 
 ### 3. Headless 单次任务
 
+<a id="headless"></a>
+
 停止路径 2 的 Web UI 后，在同一 Shell 中运行下列命令。检查项要求路径 2 已完成构建、当前目录和 `DSH_HOME` 仍指向该一次性根目录，并再次读取 HEAD 以确认固定提交；任一条件失败都不会启动 Headless：
 
 ```sh
@@ -65,6 +71,8 @@ test "${dsh_source_ready:-}" = 1 &&
 `dsh headless "run the tests"` 是同一 Profile 的简写，Profile 名须紧跟 `dsh`。位置参数是任务文本。若环境中已经安装 `dsh` 可执行文件，同一形式省略 `pnpm` 前缀：`dsh --profile headless "run the tests"`；这不会自动使已安装构件等同于固定源码。
 
 ### 4. TypeScript SDK
+
+<a id="typescript-sdk"></a>
 
 此路径适合已经安装 `@deepseek-ai/dsh-sdk-client` 及其匹配 `dsh` 依赖的 TypeScript 项目。`DeepSeekHarness` 通过 `sdk` Application Profile 启动独立子进程；`dshHome` 与 Agent 的 `cwd` 都指向一次性目录，两个 `finally` 分别保证回收运行时和删除实验目录：
 
@@ -105,6 +113,8 @@ try {
 SDK Server 把用户 prompt 构造成 `source.kind: user` 的消息并交给 Agent inbox；Session v4 的消息与来源格式详见[Session 专题](deep-dives/session-event-log.md)。这些 string prompt 示例无需手工构造底层 Session 事件。[SDK prompt 接纳](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/sdk/server/src/server.ts#L173-L194)。
 
 ### 5. Python SDK
+
+<a id="python-sdk"></a>
 
 此路径要求 Python `>=3.10`。Python 分发包名是 `deepseek-harness-sdk`；其固定源码元数据依赖同版本的捆绑运行时分发包 `deepseek-harness-runtime-bin`。两个 `pyproject.toml` 在该提交都声明 `0.0.0.dev0`，这不是 npm 版本，也不证明这些分发包当前可从 PyPI 获取。Python 客户端不是进程内重实现，而是通过 stdio JSON-RPC 驱动捆绑的标准 CLI；省略 `profile` 时默认启动 `dsh --profile sdk`。
 
