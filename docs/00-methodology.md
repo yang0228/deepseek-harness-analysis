@@ -4,7 +4,7 @@
 
 ## 基线权威
 
-手册唯一的上游基线是 DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`，验证日期为 `2026-09-24`。该 commit 而非 package version、最近 tag 或 `master` 决定本手册中“上游事实”的含义；精确值由 [`evidence/baseline.json`](../evidence/baseline.json) 保管。
+手册唯一的上游基线是 DeepSeek Harness commit `d743267388641bc76f17c45ce8b4c231aed1d32c`，验证日期为 `2026-10-10`。该 commit 而非 package version、最近 tag 或 `master` 决定本手册中“上游事实”的含义；精确值由 [`evidence/baseline.json`](../evidence/baseline.json) 保管。
 
 上游文件在手册中始终使用包含完整 40 位 commit 的 GitHub `blob` URL，并标明一个包含端点的行号范围。上游树、观察结果、Claim 记录和手册文本都不自动跟随分支漂移。
 
@@ -58,7 +58,7 @@
 
 OpenAI 比较来源只使用 `developers.openai.com`、`platform.openai.com` 或 `learn.chatgpt.com` 下的当前官方页面；本手册不使用仓库链接或 `openai.github.io` 支撑这类结论。
 
-本次变化见 [2026-09-24 基线升级记录](updates/2026-09-24.md)。外部产品的既有比较资料保留原访问日期，本次未把它们标为重新核验。
+本次变化见 [2026-10-10 基线升级记录](updates/2026-10-10.md)。外部产品的既有比较资料保留原访问日期，本次未把它们标为重新核验。
 
 ## 七步基线更新
 

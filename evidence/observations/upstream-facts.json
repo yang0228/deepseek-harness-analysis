@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "repository": "https://github.com/deepseek-ai/deepseek-harness",
-  "commit": "46a7f68b0922371ce7144b668b90e377d8e799f4",
-  "commitDate": "2026-09-23",
-  "gitDescribe": "dsh-v0.1.7-rc.1-0-g46a7f68b09",
-  "rootPackageVersion": "0.1.7-rc.1",
+  "commit": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+  "commitDate": "2026-10-09",
+  "gitDescribe": "dsh-v0.2.1-alpha.2-0-gd7432673",
+  "rootPackageVersion": "0.2.1-alpha.2",
   "profiles": [
     {
       "id": "acp",
@@ -64,10 +64,10 @@
     }
   ],
   "probes": {
-    "upstream.commit": "46a7f68b0922371ce7144b668b90e377d8e799f4",
-    "upstream.commit-date": "2026-09-23",
-    "upstream.git-describe": "dsh-v0.1.7-rc.1-0-g46a7f68b09",
-    "upstream.root-package-version": "0.1.7-rc.1",
+    "upstream.commit": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+    "upstream.commit-date": "2026-10-09",
+    "upstream.git-describe": "dsh-v0.2.1-alpha.2-0-gd7432673",
+    "upstream.root-package-version": "0.2.1-alpha.2",
     "profile:acp": {
       "id": "acp",
       "bundles": [
