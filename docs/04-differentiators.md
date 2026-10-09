@@ -1,6 +1,6 @@
 # 差异化机制评估
 
-基线：DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`。
+基线：DeepSeek Harness commit `d743267388641bc76f17c45ce8b4c231aed1d32c`。
 
 ## 一句话结论
 
@@ -28,27 +28,27 @@
 
 ### 日志支持重建，但不是逐帧持久化
 
-循环把 `agent/assistant-stream` 的 start/chunk/end 作为 live 事件；结算时，完整 compact stream 嵌入 `assistant/message`，失败、取消或重试的已结算尝试进入仅供日志使用的 `assistant/attempt`。后者不增加模型历史。模型请求仍从日志投影，而不是从界面流倒推。[Session log](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L109-L127)
+循环把 `agent/assistant-stream` 的 start/chunk/end 作为 live 事件；结算时，完整 compact stream 嵌入 `assistant/message`，失败、取消或重试的已结算尝试进入仅供日志使用的 `assistant/attempt`。后者不增加模型历史。模型请求仍从日志投影，而不是从界面流倒推。[Session log](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L106-L126)
 
 ### Preset 选择与更新
 
-Preset 由普通 `dsh-agent-preset` 插件行声明，registry 为定义创建独立 revision。声明更新或移除后，已有 Agent 保留原组合，新 Agent 使用当前定义；退休版本等到 Agent、子 Scope 与临时历史读取全部释放引用后销毁。进程重启不保留旧代码，而是重新解析当前同名定义。会话开启 Turn 或完成过 Turn 后拒绝切换；仅执行 command 而未开启 Turn 不触发该锁定。因此 Preset 适合在对话开始前选择能力，不是任意运行时工具换装。[声明与 revision](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/preset/agent-preset-registry/README.md#L46-L58)；[选择门禁](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/preset/agent-preset-registry/src/index.ts#L320-L336)
+Preset 由普通 `dsh-agent-preset` 插件行声明，registry 为定义创建独立 revision。声明更新或移除后，已有 Agent 保留原组合，新 Agent 使用当前定义；退休版本等到 Agent、子 Scope 与临时历史读取全部释放引用后销毁。进程重启不保留旧代码，而是重新解析当前同名定义。会话开启 Turn 或完成过 Turn 后拒绝切换；仅执行 command 而未开启 Turn 不触发该锁定。因此 Preset 适合在对话开始前选择能力，不是任意运行时工具换装。[声明与 revision](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/README.md#L46-L60)；[选择门禁](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/src/index.ts#L341-L357)
 
 ### PTC 的执行基础
 
-`run_code` 的 bindings 复用普通工具的 staged scheduler，保留 policy、guard、结果收尾与 durable 子调用记录。当前内置 TypeScript Provider 是 `dsh-ptc-runtime-node`：每次运行启动新的 Node 子进程，应用会话的文件系统 Sandbox 策略，并在结束或取消时清理可管理的进程范围。[PTC 管线](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/core/tools/README.md#L125-L133)；[Node Provider](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/ptc-runtime/ptc-runtime-node/README.md#L12)
+`run_code` 的 bindings 复用普通工具的 staged scheduler，保留 policy、guard、结果收尾与 durable 子调用记录。当前内置 TypeScript Provider 是 `dsh-ptc-runtime-node`：每次运行启动新的 Node 子进程，应用会话的文件系统 Sandbox 策略，并在结束或取消时清理可管理的进程范围。[PTC 管线](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/tools/README.md#L128-L136)；[Node Provider](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/ptc-runtime/ptc-runtime-node/README.md#L12)
 
-默认 elapsed deadline 为 120 秒、上限 600 秒，包含运行中的嵌套工具及其审批等待，不包含 runtime 启动前的整段程序提权审批；输出、控制帧与 V8 old-generation heap 各有独立限制。它们不是整个进程树的 CPU/RSS 上限。Sandbox 的文件效果限制也不是通用网络隔离，`danger-full-access` 仍是明确旁路。[配置与执行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/ptc-runtime/ptc-runtime-node/README.md#L46-L74)；[限制](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/ptc-runtime/ptc-runtime-node/README.md#L137-L144)
+默认 elapsed deadline 为 120 秒、上限 600 秒，包含运行中的嵌套工具及其审批等待，不包含 runtime 启动前的整段程序提权审批；输出、控制帧与 V8 old-generation heap 各有独立限制。它们不是整个进程树的 CPU/RSS 上限。Sandbox 的文件效果限制也不是通用网络隔离，`danger-full-access` 仍是明确旁路。[配置与执行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/ptc-runtime/ptc-runtime-node/README.md#L46-L73)；[限制](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/ptc-runtime/ptc-runtime-node/README.md#L135-L142)
 
 ## 证据
 
 | Claim | 固定来源 |
 |---|---|
-| `DSH-DIFF-001` | [全插件与能力接口](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L9-L13)；[三角色能力接缝](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L129-L135) |
-| `DSH-DIFF-002` | [Effect 与事件](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/cordis-primer.md#L9-L45) |
-| `DSH-DIFF-003` | [事件与持久化](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L109-L127) |
-| `DSH-DIFF-004` | [声明组合](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/preset/agent-preset-registry/README.md#L46-L58)；[选择门禁](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/preset/agent-preset-registry/src/index.ts#L320-L336) |
-| `DSH-DIFF-005` | [工具内的 PTC](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/core/tools/README.md#L125-L133)；[Node 执行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/ptc-runtime/ptc-runtime-node/README.md#L60-L74) |
+| `DSH-DIFF-001` | [全插件与能力接口](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L7-L11)；[三角色能力接缝](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L130-L136) |
+| `DSH-DIFF-002` | [Effect 与事件](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/cordis-primer.md#L9-L45) |
+| `DSH-DIFF-003` | [事件与持久化](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L106-L126) |
+| `DSH-DIFF-004` | [声明组合](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/README.md#L46-L60)；[选择门禁](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/preset/agent-preset-registry/src/index.ts#L341-L357) |
+| `DSH-DIFF-005` | [工具内的 PTC](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/tools/README.md#L128-L136)；[Node 执行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/ptc-runtime/ptc-runtime-node/README.md#L59-L73) |
 
 ## 限制与适用范围
 
@@ -61,6 +61,20 @@ Preset 由普通 `dsh-agent-preset` 插件行声明，registry 为定义创建�
 | `DSH-DIFF-005` | “可能减少往返”描述交互结构，没有量化速度、成本或质量收益。 |
 
 普通 native 模式也可一次返回多个工具调用；不能把“native 每次只能调用一个工具”作为 PTC 的优势依据。所有 `released` 成熟度均不表示生产就绪。
+
+## 迁移到自有 Agent 项目
+
+以下是作者的迁移建议，依据本章已记录机制作取舍，不是上游接口承诺或运行效果评测。
+
+| 顺序 | 最小落地方式 | 保留的架构边界 |
+|---|---|---|
+| 1 | 用追加事件记录消息、请求配置、工具调用与结果，再投影模型上下文和界面状态 | 输入排队、模型接纳和持久结算分别记录；失败尝试与最终模型消息有不同语义 |
+| 2 | 提供一个工具执行入口，集中管理验证、策略、取消、并发、结果处理与记录 | PTC、MCP 和委托入口应复用相应策略；已发生的外部效果不能靠改写结果撤销 |
+| 3 | 用接口和依赖注入分开模型、存储、工具与 loop，再绑定运行实例的资源清理 | 日志用于重建历史，运行实例拥有连接、监听器和子进程；无需立即引入完整插件加载器 |
+| 4 | 区分应用配置、Agent 能力组合、有效目录与权限根 | 活动会话保留能力修订；切换目录不自动扩大写权限；配置文档与实现分歧必须先核验 |
+| 5 | 有批量筛选需求时再加 PTC；有委托需求时明确等待与汇总协议 | `run()` 的 root idle 与托管子任务完成不是同一观察点；分别测量延迟、成本与任务成功率 |
+
+这些设计适合分阶段引入。新增后端或热重载前，先让状态、执行入口和资源所有者有明确接口，再根据真实扩展需求增加组合机制。
 
 ## 继续阅读
 
