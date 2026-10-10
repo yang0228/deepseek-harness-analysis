@@ -12,7 +12,7 @@ DeepSeek Harness Analysis 是面向 Agent 系统开发者、技术决策者与�
 
 从这里开始：[在线阅读，无需安装](#read-online) · [本地核验证据，可选](#verify-locally) · [运行上游应用](#run-harness)。
 
-**固定分析基线：** DeepSeek Harness commit `46a7f68b0922371ce7144b668b90e377d8e799f4`。上游事实、作者推论和限定条件均围绕这一源码快照组织；它不代表上游当前版本。核验日期：2026-09-24；源码版本：`0.1.7-rc.1`。完整元数据见 [`evidence/baseline.json`](evidence/baseline.json)，变更见[本次升级记录](docs/updates/2026-09-24.md)。
+**固定分析基线：** DeepSeek Harness commit `d743267388641bc76f17c45ce8b4c231aed1d32c`。上游事实、作者推论和限定条件均围绕这一源码快照组织；它不代表上游当前版本。核验日期：2026-10-10；源码版本：`0.2.1-alpha.2`。完整元数据见 [`evidence/baseline.json`](evidence/baseline.json)，变更见[本次升级记录](docs/updates/2026-10-10.md)。
 
 ## 整体架构
 
@@ -68,7 +68,7 @@ git clone https://github.com/yang0228/deepseek-harness-analysis.git &&
 ```sh
 handbook_root="$PWD" &&
   git clone https://github.com/deepseek-ai/deepseek-harness.git "$handbook_root/../deepseek-harness-source" &&
-  git -C "$handbook_root/../deepseek-harness-source" checkout --detach 46a7f68b0922371ce7144b668b90e377d8e799f4 &&
+  git -C "$handbook_root/../deepseek-harness-source" checkout --detach d743267388641bc76f17c45ce8b4c231aed1d32c &&
   npm run verify -- --source "$handbook_root/../deepseek-harness-source"
 ```
 
@@ -78,7 +78,7 @@ handbook_root="$PWD" &&
 {
   "ok": true,
   "inspectedUpstream": true,
-  "claimCount": 72
+  "claimCount": 81
 }
 ```
 
@@ -92,7 +92,7 @@ handbook_root="$PWD" &&
 
 这是独立于阅读和证据核验的操作。[可复现的入门路径](docs/05-getting-started.md)提供前置条件、独立实验目录和 Harness Home 设置；以下链接直达对应步骤。
 
-**运行前请读安全说明：** 固定基线处于开发者预览阶段，允许破坏性变更，未经过安全审计，也不应视为生产就绪。请阅读固定提交的[上游 `SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/SAFETY.md#L5-L23)，使用最小权限，并按所选 Provider 配置凭据。上游运行示例按源码审查，不能视为本手册已经完成的实机体验记录。
+**运行前请读安全说明：** 固定基线处于开发者预览阶段，允许破坏性变更，未经过安全审计，也不应视为生产就绪。请阅读固定提交的[上游 `SAFETY.md`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/SAFETY.md#L5-L23)，使用最小权限，并按所选 Provider 配置凭据。上游运行示例按源码审查，不能视为本手册已经完成的实机体验记录。
 
 | 想做什么 | 选择哪条路径 | 需要留意什么 |
 |---|---|---|
@@ -114,9 +114,9 @@ handbook_root="$PWD" &&
 
 | 核查点 | 直接打开证据 | 重点看什么 |
 |---|---|---|
-| 上游规定了什么？ | [架构规则，第 119–127 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/docs/architecture.md#L119-L127) | 模型可见输入必须可由日志重建；新增模型输入需要对应 Session 事件。 |
-| 请求配置与工具定义从哪里恢复？ | [`EpochHeader` 字段，第 234–250 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/core/session/src/types.ts#L234-L250) | 请求头记录调用配置和工具定义；系统提示属于消息历史。 |
-| 日志怎样变成模型消息？ | [`deriveEventMessage()` 实现，第 120–156 行](https://github.com/deepseek-ai/deepseek-harness/blob/46a7f68b0922371ce7144b668b90e377d8e799f4/packages/core/session/src/surface.ts#L120-L156) | 用户消息、工具结果等可以投影为模型消息；任务边界和失败尝试等仅留在日志。 |
+| 上游规定了什么？ | [架构规则，第 118–126 行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/architecture.md#L118-L126) | 模型可见输入必须可由日志重建；新增模型输入需要对应 Session 事件。 |
+| 请求配置与工具定义从哪里恢复？ | [`EpochHeader` 字段，第 234–250 行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/session/src/types.ts#L234-L250) | 请求头记录调用配置和工具定义；系统提示属于消息历史。 |
+| 日志怎样变成模型消息？ | [`deriveEventMessage()` 实现，第 120–150 行](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/session/src/surface.ts#L120-L150) | 用户消息、工具结果等可以投影为模型消息；任务边界和失败尝试等仅留在日志。 |
 
 **一个可直接复核的例子：** 在最后一个链接中，`user/message` 分支返回消息数据，未形成模型消息的日志事件返回 `null`。这说明“有日志记录”不等于“会发送给模型”；该函数展示消息投影的一条实现路径，不单独证明所有插件都遵守整个日志规则。
 
@@ -156,9 +156,11 @@ handbook_root="$PWD" &&
 
 ### 本次基线值得关注的变化
 
-- [应用与预设组合](docs/deep-dives/profiles-bundles-presets.md)：Desktop 复用 Web Host；热重载由 YAML 插件组合决定；Preset 改为声明式注册与引用计数回收。
-- [Session v4](docs/deep-dives/session-event-log.md)：结构化消息角色与来源、相邻版本迁移，以及未结束任务前缀的分叉补齐；格式支持不等于所有模型适配器已支持该角色。
-- [能力矩阵](docs/03-capabilities.md)与[编排机制](docs/deep-dives/subagents-goals-workflows.md)：Office Skills、Workspace Dependencies 与 Workflow 后台 Job；Agent Teams 仍是已发布但默认关闭的实验能力。
+- [应用与预设组合](docs/deep-dives/profiles-bundles-presets.md)：Desktop 默认由系统分配端口；记录上游 `preset` Patch 文档与固定实现的差异，避免把文档新增描述直接当作可用功能。
+- [Session v4](docs/deep-dives/session-event-log.md)与[工具管线](docs/deep-dives/tools-and-ptc.md)：工具增删由日志记录并按模型路由投影；补充 durable inbox、失败工具结果和 PTC 返回值边界；工具呈现仅保留 `native` / `ptc`。
+- [SDK 与目录](docs/05-getting-started.md)：区分 `run()` 的 root idle 和 `session/wait` 的托管后代等待；会话切换目录不改变原项目权限根。
+- [能力矩阵](docs/03-capabilities.md)与[编排机制](docs/deep-dives/subagents-goals-workflows.md)：复核 Schedule、外部委托 Bundle、实验 Agent Teams 与 Ralph；Python Office 和编写资源改为独立显式下载。
+- [迁移建议](docs/04-differentiators.md)：按状态、执行入口、资源所有权、能力组合和委托等待的顺序应用到自有 Agent 项目。
 
 ### 按目标选择阅读路线
 
@@ -186,6 +188,6 @@ handbook_root="$PWD" &&
 - 修改前阅读[参与贡献](CONTRIBUTING.md)，保留 Claim 分类、不可变来源和限定语，并运行本仓库测试与证据校验。
 - 一般问题见[支持范围](SUPPORT.md)；DeepSeek Harness 安装、配置和产品使用问题转向[上游仓库](https://github.com/deepseek-ai/deepseek-harness)的当前支持渠道。
 - 本仓库的安全问题按 [SECURITY.md](SECURITY.md) 私密报告；上游安全问题按其当前公开渠道处理。
-- 引用使用 [`CITATION.cff`](CITATION.cff) 中的首选信息，并注明分析基线 `46a7f68b`；其中的版本字段为 `snapshot-46a7f68b`。
+- 引用使用 [`CITATION.cff`](CITATION.cff) 中的首选信息，并注明分析基线 `d7432673`；其中的版本字段为 `snapshot-d7432673`。
 
 维护者：[`@yang0228`](https://github.com/yang0228)。
